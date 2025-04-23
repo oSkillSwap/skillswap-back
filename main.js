@@ -5,5 +5,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  console.log(`skillswap lancé sur http://localhost:${port}`);
+  console.log(
+    `✨🌟⭐ API SkillSwap lancée sur http://localhost:${port} ╰(*°▽°*)╯ ⭐🌟✨`
+  );
 });
