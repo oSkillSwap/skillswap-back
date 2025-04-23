@@ -1,0 +1,21 @@
+{
+  "name": "skillswap-back",
+  "version": "1.0.0",
+  "description": "Backend api SkillSwap",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/O-clock-Samoussas/skill-swap-back.git"
+  },
+  "keywords": [],
+  "author": "Erwan Mettouchi, Gregory Virmaud, Olivier Renard",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/O-clock-Samoussas/skill-swap-back/issues"
+  },
+  "homepage": "https://github.com/O-clock-Samoussas/skill-swap-back#readme"
+}
