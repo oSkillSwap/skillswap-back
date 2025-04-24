@@ -1,55 +1,60 @@
-
 import { Sequelize } from "sequelize";
 import { User } from "../models/associations.js";
 import argon2 from 'argon2';
+import validator from 'validator';
 
 export const userController = {
     register: async (req, res) => {
-        const { 
-            username, 
-            lastName, 
-            firstName, 
-            email, 
-            password, 
-            role = 'member', // Default role
-            avatar = '/avatar/avatar1.png', // Default avatar
-            description 
-        }  = req.validatedData;
+        const {
+            username,
+            lastName,
+            firstName,
+            email,
+            password,
+            role = 'member',
+            avatar = '/avatar/avatar1.png',
+            description
+        } = req.validatedData;
 
-        // Hash with argon2
+        // Sanitize input
+        const sanitizedUsername = validator.trim(username);
+        const sanitizedLastName = lastName ? validator.trim(lastName) : null;
+        const sanitizedFirstName = firstName ? validator.trim(firstName) : null;
+        const sanitizedDescription = description ? validator.escape(validator.trim(description)) : null;
+
+        
+        // Hash password
         const hashedPassword = await argon2.hash(password);
 
-        const newUser = await User.create({ 
-            username, 
-            lastName, 
-            firstName, 
-            email, 
-            password : hashedPassword, 
+        const newUser = await User.create({
+            username: sanitizedUsername,
+            lastName: sanitizedLastName,
+            firstName: sanitizedFirstName,
+            email,
+            password: hashedPassword,
             role,
             avatar,
-            description 
+            description: sanitizedDescription
         });
+
         res.status(201).json({ message: "Utilisateur créé", user: newUser });
     },
 
     login: async (req, res) => {
         const { email, password } = req.validatedData;
 
-        // Check if the user exists
         const user = await User.findOne({ where: { email } });
         if (!user) {
             return res.status(401).json({ message: 'Identifiants incorrects' });
         }
 
-        // Check if the password is correct
         const isPasswordValid = await argon2.verify(user.password, password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Mot de passe incorrect incorrects' });
+            return res.status(401).json({ message: 'Mot de passe incorrect' });
         }
 
         res.status(200).json({ message: 'Connexion réussie', user });
     },
-
 
     getUsers: async (req, res, next) => {
         // Fetch all users who are not banned, available, and have the role "member"
@@ -64,12 +69,12 @@ export const userController = {
             exclude: ["password", "email", "updatedAt", "createdAt"],
             include: [
             // Calculate the average grade of the user from their reviews
-            [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
+                [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
             // Count the number of reviews the user has
-            [
-                Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-                "nbOfReviews",
-            ],
+                [
+                    Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
+                    "nbOfReviews",
+                ],
             ],
         },
         include: [
