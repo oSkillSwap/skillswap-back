@@ -10,8 +10,8 @@ import { reviewController } from "../controllers/review.controller.js";
 export const router = Router();
 
 
-router.post('/register', validate(registerSchema), userController.register);
-router.post('/login', validate(loginSchema), userController.login);
+router.post('/register', validate(registerSchema), controllerwrapper(userController.register));
+router.post('/login', validate(loginSchema), controllerwrapper(userController.login));
 
 router.get("/users/", controllerwrapper(userController.getUsers));
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
