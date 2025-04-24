@@ -5,7 +5,10 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --watch --env-file=.env main.js"
+    "dev": "node --watch --env-file=.env main.js",
+    "db:create": "node --env-file=.env ./app/data/create-tables.js",
+    "db:seed": "node --env-file=.env ./app/data/seed-tables.js",
+    "db:reset": "npm run db:create && npm run db:seed"
   },
   "repository": {
     "type": "git",
@@ -20,6 +23,7 @@
   },
   "homepage": "https://github.com/O-clock-Samoussas/skill-swap-back#readme",
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "pg": "^8.15.1",

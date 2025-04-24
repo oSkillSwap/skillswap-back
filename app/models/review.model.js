@@ -1,20 +1,19 @@
 import { DataTypes, Sequelize } from "sequelize";
 import { sequelize } from "../data/client.js";
 
-export class Post extends Sequelize.Model {}
-Post.init(
+export class Review extends Sequelize.Model {}
+Review.init(
   {
-    content: {
-      type: DataTypes.TEXT,
+    grade: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    title: {
+    content: {
       type: DataTypes.TEXT,
-      allowNull: false,
     },
   },
   {
     sequelize,
-    tableName: "post",
+    tableName: "review",
   }
 );

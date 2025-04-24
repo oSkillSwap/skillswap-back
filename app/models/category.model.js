@@ -1,20 +1,21 @@
 import { DataTypes, Sequelize } from "sequelize";
 import { sequelize } from "../data/client.js";
 
-export class Post extends Sequelize.Model {}
-Post.init(
+export class Category extends Sequelize.Model {}
+Category.init(
   {
-    content: {
+    name: {
       type: DataTypes.TEXT,
+      unique: true,
       allowNull: false,
     },
-    title: {
+    icon: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
   },
   {
     sequelize,
-    tableName: "post",
+    tableName: "category",
   }
 );
