@@ -9,10 +9,10 @@ import { loginSchema, registerSchema } from "../schemas/user.schema.js";
 
 export const router = Router();
 
-router.post("/register", validate(registerSchema), userController.register);
-router.post("/login", validate(loginSchema), userController.login);
-
 router.get("/users", controllerwrapper(userController.getUsers));
+router.post('/register', validate(registerSchema), controllerwrapper(userController.register));
+router.post('/login', validate(loginSchema), controllerwrapper(userController.login));
+
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
 router.get("/:id/messages", controllerwrapper(messageController.getMessages));
