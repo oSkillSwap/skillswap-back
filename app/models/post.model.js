@@ -8,8 +8,10 @@ Post.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    title: DataTypes.TEXT,
-    allowNull: false,
+    title: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
   },
   {
     sequelize,
