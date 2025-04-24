@@ -9,6 +9,10 @@ Category.init(
       unique: true,
       allowNull: false,
     },
+    icon: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
   },
   {
     sequelize,
