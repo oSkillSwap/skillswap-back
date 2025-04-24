@@ -1,6 +1,6 @@
+import argon2 from "argon2";
 import { Sequelize } from "sequelize";
 import { User } from "../models/associations.js";
-import argon2 from 'argon2';
 import validator from 'validator';
 
 export const userController = {
@@ -55,7 +55,6 @@ export const userController = {
 
         res.status(200).json({ message: 'Connexion réussie', user });
     },
-
     getUsers: async (req, res, next) => {
         // Fetch all users who are not banned, available, and have the role "member"
         const users = await User.findAll({
@@ -97,8 +96,6 @@ export const userController = {
         // Sort users based on the total number of reviews they have
         order: [["nbOfReviews", "DESC"]],
         });
-
         return res.status(200).json({ users });
     },
 };
-
