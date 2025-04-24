@@ -22,3 +22,18 @@ Content-Type: application/json
   "email": "virmaud.gregory@gmail.com",
   "password": "GregoryVirmaud1+"
 }
+
+###
+GET http://localhost:3000/users
+
+###
+GET http://localhost:3000/reviews
+
+###
+GET http://localhost:3000/categories
+
+###
+GET http://localhost:3000/messages/5
+
+###
+GET http://localhost:3000/messages/5/10

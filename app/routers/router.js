@@ -15,4 +15,8 @@ router.post('/login', validate(loginSchema), controllerwrapper(userController.lo
 
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
-router.get("/:id/messages", controllerwrapper(messageController.getMessages));
+router.get("/messages/:id", controllerwrapper(messageController.getMessages));
+
+router
+  .route("/messages/:me/:userId")
+  .get(controllerwrapper(messageController.getConversation));
