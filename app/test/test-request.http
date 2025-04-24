@@ -1,0 +1,24 @@
+### Register a user
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+  "username": "Gregv74",
+  "lastName": "virmaud",
+  "firstName": "gregory",
+  "email": "virmaud.gregory@gmail.com",
+  "password": "GregoryVirmaud1+",
+  "avatar": "",
+  "role": "member",
+  "description": "sur le projet skillswap"
+}
+
+
+### login a user
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "email": "virmaud.gregory@gmail.com",
+  "password": "GregoryVirmaud1+"
+}
