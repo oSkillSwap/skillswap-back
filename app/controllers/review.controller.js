@@ -9,7 +9,7 @@ export const reviewController = {
           [Op.not]: null, // Ensures only reviews with content are fetched
         },
       },
-      order: [["grade", "DESC"]], // Sort reviews by grade in descending order
+      order: [["createdAt", "DESC"]], // Sort reviews by grade in descending order
       attributes: {
         exclude: ["user_id", "proposition_id"],
       },
