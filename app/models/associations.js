@@ -30,8 +30,8 @@ Follow.belongsTo( User, { as: 'Followed', foreignKey: 'followed_id' });
 
 // User 0,N <-> 1,1 Post
 // User can create several posts, Post can be created by one user
-User.hasMany( Post, { foreignKey: 'user_id' });
-Post.belongsTo( User, { foreignKey: 'user_id', allowNull: false });
+User.hasMany( Post, { as: 'Posts', foreignKey: 'user_id' });
+Post.belongsTo( User, { as: 'Author', foreignKey: 'user_id', allowNull: false });
 
 
 // User 0,N <-> 1,1 Proposition
@@ -45,18 +45,18 @@ Proposition.belongsTo( User, { as: 'Receiver', foreignKey: 'receiver_id', allowN
 // User 0,N <-> 1,1 Review
 // User can create and receive several reviews
 // Review can be created by just one user, Review can be received by just one user
-User.hasMany( Review, { foreignKey: 'user_id' });
-Review.belongsTo( User, { foreignKey: 'user_id', allowNull: false });
+User.hasMany( Review, { as: 'Reviews', foreignKey: 'user_id' });
+Review.belongsTo( User, { as: 'Reviewer', foreignKey: 'user_id', allowNull: false });
 
 // Review 1,1 <-> 0,1 Proposition
 // Proposition can have one review, Review can be created for just one proposition
-Proposition.belongsTo( Review, { foreignKey: 'proposition_id', allowNull: true });
+Proposition.hasOne( Review, { foreignKey: 'proposition_id'});
 Review.belongsTo( Proposition, { foreignKey: 'proposition_id', allowNull: false });
 
 // Proposition 0,1 <-> 0,N Post
 // Post can have several propositions, Proposition can be created for one post
 Post.hasMany( Proposition, { foreignKey: 'post_id' });
-Proposition.belongsTo( Post, { foreignKey: 'post_id', allowNull: true });
+Proposition.belongsTo( Post, { foreignKey: 'post_id'});
 
 // Skill 1,1 <-> 0,N Category
 // Category can have several skills, Skill can belong to just one category
