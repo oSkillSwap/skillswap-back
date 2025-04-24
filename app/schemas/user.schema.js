@@ -20,7 +20,7 @@ export const registerSchema = z.object({
   description: z.string().max(800).optional()
 });
 
-// schama for login with rules
+// schema for login with rules
 export const loginSchema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
   password: z.string().min(1, "Mot de passe requis")
