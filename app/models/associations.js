@@ -30,8 +30,7 @@ User.belongsToMany(User, {
   foreignKey: "followed_id",
   otherKey: "follower_id",
 });
-// Follow.belongsTo(User, { as: "Follower", foreignKey: "follower_id" });
-// Follow.belongsTo(User, { as: "Followed", foreignKey: "followed_id" });
+
 
 // User 0,N <-> 1,1 Post
 // User can create several posts, Post can be created by one user
