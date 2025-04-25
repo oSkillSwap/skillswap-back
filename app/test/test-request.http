@@ -26,8 +26,7 @@ Content-Type: application/json
 
 ### Test the JWT connexion
 GET http://localhost:3000/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
 ###
 GET http://localhost:3000/users
 
@@ -42,17 +41,19 @@ GET http://localhost:3000/categories
 
 ### GET all my messages
 GET http://localhost:3000/me/messages
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
-### GET all my messages with a specific user
-GET http://localhost:3000/me/messages/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
-### Send a message to a user
-POST http://localhost:3000/me/messages/6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
+### GET messages with user
+GET http://localhost:3000/me/messages/5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
+Content-Type: application/json
+###
+POST http://localhost:3000/me/messages/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
+Content-Type: application/json
 
 {
-  "message" : "<b>Bonjour</b>"
+  "message" : "<b>Bonjour 2</b>"
 }
 
 ###

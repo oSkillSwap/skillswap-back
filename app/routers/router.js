@@ -11,26 +11,25 @@ import { messageSchema } from "../schemas/message.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
 import { authenticate } from "../middlewares/authenticate.js";
 
-
 export const router = Router();
 
 router.get("/users", controllerwrapper(userController.getUsers));
 router.post(
-  "/register",
-  validate(registerSchema),
-  controllerwrapper(userController.register)
+	"/register",
+	validate(registerSchema),
+	controllerwrapper(userController.register),
 );
 router.post(
-  "/login",
-  validate(loginSchema),
-  controllerwrapper(userController.login)
+	"/login",
+	validate(loginSchema),
+	controllerwrapper(userController.login),
 );
 
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
 router.get(
-  "/reviews/:id",
-  validateParams("id"),
-  controllerwrapper(reviewController.getReviewsFromUser)
+	"/reviews/:id",
+	validateParams("id"),
+	controllerwrapper(reviewController.getReviewsFromUser),
 );
 
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
@@ -42,13 +41,15 @@ router.get("/me", authenticate, (req, res) => {
 	});
 });
 
+router.get("/posts", controllerwrapper(postController.getPosts));
+
 router.get(
 	"/me/messages",
 	authenticate,
 	controllerwrapper(messageController.getMessages),
 );
 
-router.get("/posts", controllerwrapper(postController.getPosts));
+router
 	.route("/me/messages/:userId")
 	.get(
 		authenticate,
