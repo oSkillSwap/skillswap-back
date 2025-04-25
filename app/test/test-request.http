@@ -3,14 +3,14 @@ POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "Gregv74",
-  "lastName": "virmaud",
-  "firstName": "gregory",
-  "email": "virmaud.gregory@gmail.com",
-  "password": "GregoryVirmaud1+",
+  "username": "Erwan",
+  "lastName": "mettouchi",
+  "firstName": "erwan",
+  "email": "erwan@gmail.com",
+  "password": "Erwan1234Mettouchi+",
   "avatar": "",
   "role": "member",
-  "description": "sur le projet skillswap"
+  "description": "En train de dev les reviews"
 }
 
 
@@ -19,9 +19,14 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "virmaud.gregory@gmail.com",
-  "password": "GregoryVirmaud1+"
+  "email": "erwan@gmail.com",
+  "password": "Erwan1234Mettouchi+"
 }
+
+
+### Test the JWT connexion
+GET http://localhost:3000/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
 
 ###
 GET http://localhost:3000/users
@@ -35,15 +40,16 @@ GET http://localhost:3000/reviews/4
 ###
 GET http://localhost:3000/categories
 
-###
-GET http://localhost:3000/messages/5
-
-###
-GET http://localhost:3000/messages/2/1
-
-###
-POST http://localhost:3000/messages/2/3
+### GET all my messages
+GET http://localhost:3000/me/messages
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
+### GET all my messages with a specific user
+GET http://localhost:3000/me/messages/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
+### Send a message to a user
+POST http://localhost:3000/me/messages/6
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
 
 {
   "message" : "<b>Bonjour</b>"
@@ -51,3 +57,4 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3000/posts
+

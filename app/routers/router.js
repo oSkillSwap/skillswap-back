@@ -9,6 +9,8 @@ import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
 import { messageSchema } from "../schemas/message.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
+import { authenticate } from "../middlewares/authenticate.js";
+
 
 export const router = Router();
 
@@ -32,22 +34,30 @@ router.get(
 );
 
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
+
+router.get("/me", authenticate, (req, res) => {
+	res.status(200).json({
+		message: "Utilisateur connecté",
+		user: req.user,
+	});
+});
+
 router.get(
-  "/messages/:id",
-  validateParams("id"),
-  controllerwrapper(messageController.getMessages)
+	"/me/messages",
+	authenticate,
+	controllerwrapper(messageController.getMessages),
 );
 
-router
-  .route("/messages/:me/:userId")
-  .get(
-    validateParams("me", "userId"),
-    controllerwrapper(messageController.getConversation)
-  )
-  .post(
-    validateParams("me", "userId"),
-    validate(messageSchema),
-    messageController.createMessage
-  );
-
 router.get("/posts", controllerwrapper(postController.getPosts));
+	.route("/me/messages/:userId")
+	.get(
+		authenticate,
+		validateParams("userId"),
+		controllerwrapper(messageController.getConversation),
+	)
+	.post(
+		authenticate,
+		validateParams("userId"),
+		validate(messageSchema),
+		messageController.createMessage,
+	);
