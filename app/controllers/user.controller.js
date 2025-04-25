@@ -1,7 +1,7 @@
 import argon2 from "argon2";
-import { Sequelize } from "sequelize";
+import { Sequelize, where } from "sequelize";
 import validator from "validator";
-import { User } from "../models/associations.js";
+import { Category, User } from "../models/associations.js";
 
 export const userController = {
   register: async (req, res) => {
@@ -56,13 +56,36 @@ export const userController = {
     res.status(200).json({ message: "Connexion réussie", user });
   },
   getUsers: async (req, res, next) => {
-    // Fetch all users who are not banned, available, and have the role "member"
+    const whereCondition = {
+      isBanned: false, // Ensure the user is not banned
+      role: "member", // Only include users with the "member" role
+      isAvailable: true, // Ensure the user is available
+    };
+
+    const skillsAndCategory = {
+      association: "Skills", // Include the user's skills
+      attributes: ["id", "name"],
+      through: { attributes: [] }, // Exclude join table attributes
+      include: [
+        {
+          model: Category,
+        },
+      ],
+    };
+
+    const wantedSkills = {
+      association: "WantedSkills", // Include the user's wanted skills
+      attributes: ["id", "name"],
+      through: { attributes: [] }, // Exclude join table attributes
+    };
+
+    const reviews = {
+      association: "Reviews", // Include reviews
+      attributes: [], // No need to fetch review details
+    };
+
     const users = await User.findAll({
-      where: {
-        isBanned: false, // Ensure the user is not banned
-        role: "member", // Only include users with the "member" role
-        isAvailable: true, // Ensure the user is available
-      },
+      where: whereCondition,
       attributes: {
         // Excluse password, email, updatedAt and createdAt fields
         exclude: ["password", "email", "updatedAt", "createdAt"],
@@ -76,23 +99,8 @@ export const userController = {
           ],
         ],
       },
-      include: [
-        {
-          association: "Skills", // Include the user's skills
-          attributes: ["id", "name"],
-          through: { attributes: [] }, // Exclude join table attributes
-        },
-        {
-          association: "WantedSkills", // Include the user's wanted skills
-          attributes: ["id", "name"],
-          through: { attributes: [] }, // Exclude join table attributes
-        },
-        {
-          association: "Reviews", // Include reviews
-          attributes: [], // No need to fetch review details
-        },
-      ],
-      group: ["User.id", "Skills.id", "WantedSkills.id"], // Group by user and related entities,
+      include: [skillsAndCategory, wantedSkills, reviews],
+      group: ["User.id", "Skills.id", "WantedSkills.id", "Skills->Category.id"], // Group by user and related entities,
       // Sort users based on the total number of reviews they have
       order: [["nbOfReviews", "DESC"]],
     });
