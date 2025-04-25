@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { categoryontroller } from "../controllers/category.js";
+import { categoryontroller } from "../controllers/category.controller.js";
 import { messageController } from "../controllers/message.controller.js";
+import { postController } from "../controllers/post.controller.js";
 import { reviewController } from "../controllers/review.controller.js";
 import { userController } from "../controllers/user.controller.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
@@ -24,6 +25,12 @@ router.post(
 );
 
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
+router.get(
+  "/reviews/:id",
+  validateParams("id"),
+  controllerwrapper(reviewController.getReviewsFromUser)
+);
+
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
 router.get(
   "/messages/:id",
@@ -42,3 +49,5 @@ router
     validate(messageSchema),
     messageController.createMessage
   );
+
+router.get("/posts", controllerwrapper(postController.getPosts));

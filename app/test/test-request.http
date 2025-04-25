@@ -30,6 +30,9 @@ GET http://localhost:3000/users
 GET http://localhost:3000/reviews
 
 ###
+GET http://localhost:3000/reviews/4
+
+###
 GET http://localhost:3000/categories
 
 ###
@@ -45,3 +48,6 @@ Content-Type: application/json
 {
   "message" : "<b>Bonjour</b>"
 }
+
+###
+GET http://localhost:3000/posts
