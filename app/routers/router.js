@@ -5,6 +5,7 @@ import { reviewController } from "../controllers/review.controller.js";
 import { userController } from "../controllers/user.controller.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validate } from "../middlewares/validates.js";
+import { messageSchema } from "../schemas/message.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
 import { validateParams } from "../middlewares/validateParams.js";
 
@@ -36,3 +37,7 @@ router
 		validateParams("me", "userId"),
 		controllerwrapper(messageController.getConversation),
 	);
+  .post(
+    validateParams("me", "userId"),
+    validate(messageSchema), messageController.createMessage);
+
