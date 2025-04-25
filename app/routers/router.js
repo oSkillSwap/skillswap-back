@@ -68,3 +68,5 @@ router.get(
   "/availabilities",
   controllerwrapper(availabilityController.getAvailabilities)
 );
+
+router.get("/posts", controllerwrapper(postController.getPosts));
