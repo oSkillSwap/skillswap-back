@@ -36,4 +36,12 @@ GET http://localhost:3000/categories
 GET http://localhost:3000/messages/5
 
 ###
-GET http://localhost:3000/messages/5/10
+GET http://localhost:3000/messages/2/1
+
+###
+POST http://localhost:3000/messages/2/3
+Content-Type: application/json
+
+{
+  "message" : "<b>Bonjour</b>"
+}
