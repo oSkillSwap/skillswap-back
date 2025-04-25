@@ -1,64 +1,70 @@
 import { Router } from "express";
+import { availabilityController } from "../controllers/availability.controller.js";
 import { categoryontroller } from "../controllers/category.controller.js";
 import { messageController } from "../controllers/message.controller.js";
 import { postController } from "../controllers/post.controller.js";
 import { reviewController } from "../controllers/review.controller.js";
 import { userController } from "../controllers/user.controller.js";
+import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
 import { messageSchema } from "../schemas/message.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
-import { authenticate } from "../middlewares/authenticate.js";
 
 export const router = Router();
 
 router.get("/users", controllerwrapper(userController.getUsers));
 router.post(
-	"/register",
-	validate(registerSchema),
-	controllerwrapper(userController.register),
+  "/register",
+  validate(registerSchema),
+  controllerwrapper(userController.register)
 );
 router.post(
-	"/login",
-	validate(loginSchema),
-	controllerwrapper(userController.login),
+  "/login",
+  validate(loginSchema),
+  controllerwrapper(userController.login)
 );
 
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
 router.get(
-	"/reviews/:id",
-	validateParams("id"),
-	controllerwrapper(reviewController.getReviewsFromUser),
+  "/reviews/:id",
+  validateParams("id"),
+  controllerwrapper(reviewController.getReviewsFromUser)
 );
 
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
 
 router.get("/me", authenticate, (req, res) => {
-	res.status(200).json({
-		message: "Utilisateur connecté",
-		user: req.user,
-	});
+  res.status(200).json({
+    message: "Utilisateur connecté",
+    user: req.user,
+  });
 });
 
-router.get("/posts", controllerwrapper(postController.getPosts));
+router.get("/posts/:id", controllerwrapper(postController.getPostsFromUser));
 
 router.get(
-	"/me/messages",
-	authenticate,
-	controllerwrapper(messageController.getMessages),
+  "/me/messages",
+  authenticate,
+  controllerwrapper(messageController.getMessages)
 );
 
 router
-	.route("/me/messages/:userId")
-	.get(
-		authenticate,
-		validateParams("userId"),
-		controllerwrapper(messageController.getConversation),
-	)
-	.post(
-		authenticate,
-		validateParams("userId"),
-		validate(messageSchema),
-		messageController.createMessage,
-	);
+  .route("/me/messages/:userId")
+  .get(
+    authenticate,
+    validateParams("userId"),
+    controllerwrapper(messageController.getConversation)
+  )
+  .post(
+    authenticate,
+    validateParams("userId"),
+    validate(messageSchema),
+    messageController.createMessage
+  );
+
+router.get(
+  "/availabilities",
+  controllerwrapper(availabilityController.getAvailabilities)
+);
