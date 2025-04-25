@@ -8,6 +8,7 @@ import { validate } from "../middlewares/validates.js";
 import { messageSchema } from "../schemas/message.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
 import { validateParams } from "../middlewares/validateParams.js";
+import { authenticate } from "../middlewares/authenticate.js";
 
 export const router = Router();
 
@@ -25,19 +26,30 @@ router.post(
 
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
 router.get("/categories", controllerwrapper(categoryontroller.getCategories));
+
+router.get("/me", authenticate, (req, res) => {
+	res.status(200).json({
+		message: "Utilisateur connecté",
+		user: req.user,
+	});
+});
+
 router.get(
-	"/messages/:id",
-	validateParams("id"),
+	"/me/messages",
+	authenticate,
 	controllerwrapper(messageController.getMessages),
 );
 
 router
-	.route("/messages/:me/:userId")
+	.route("/me/messages/:userId")
 	.get(
-		validateParams("me", "userId"),
+		authenticate,
+		validateParams("userId"),
 		controllerwrapper(messageController.getConversation),
+	)
+	.post(
+		authenticate,
+		validateParams("userId"),
+		validate(messageSchema),
+		messageController.createMessage,
 	);
-  .post(
-    validateParams("me", "userId"),
-    validate(messageSchema), messageController.createMessage);
-
