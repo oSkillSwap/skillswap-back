@@ -35,6 +35,9 @@ GET http://localhost:3000/users
 GET http://localhost:3000/reviews
 
 ###
+GET http://localhost:3000/reviews/4
+
+###
 GET http://localhost:3000/categories
 
 ### GET all my messages
@@ -49,5 +52,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTczNTg2LCJleHAiOjE3NDU1ODA3ODZ9.SlhZy5_8WddUp8LA6SgBTBBU2vxW9Grd2pX7H2im1WU
 
 {
-  "message" : "<b>3eme message avec l utilisateur 6</b>"
+  "message" : "<b>Bonjour</b>"
 }
+
+###
+GET http://localhost:3000/posts
+
