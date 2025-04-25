@@ -99,10 +99,14 @@ for (const user of users) {
 const posts = [];
 for (const user of users) {
   for (let i = 0; i < 3; i++) {
+    // Sélectionner une compétence aléatoire pour ce post
+    const randomSkill = faker.helpers.arrayElement(skills);
+
     posts.push(
       await Post.create({
         title: faker.company.catchPhrase(),
         content: faker.lorem.paragraph(),
+        skill_id: randomSkill.id, // Assigner une compétence au post
         user_id: user.id,
       })
     );

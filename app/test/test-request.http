@@ -1,3 +1,4 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTg5NTgzLCJleHAiOjE3NDU1OTY3ODN9.SOqFhWzXMUoZvvlOPQ_R18PzDp83dS-Vi8hY0JeVnBE
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
@@ -14,7 +15,7 @@ Content-Type: application/json
 }
 
 
-### login a user
+###login a user
 POST http://localhost:3000/login
 Content-Type: application/json
 
@@ -24,38 +25,38 @@ Content-Type: application/json
 }
 
 
-### Test the JWT connexion
+###Test the JWT connexion
 GET http://localhost:3000/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
+Authorization: Bearer {{token}}
+
 ###
 GET http://localhost:3000/users
 
-###
+### GET all reviews
 GET http://localhost:3000/reviews
 
-###
-GET http://localhost:3000/reviews/4
+###GET review by author
+GET http://localhost:3000/reviews/2
 
-###
+###GET all categories
 GET http://localhost:3000/categories
 
-### GET all my messages
+###GET all my messages
 GET http://localhost:3000/me/messages
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
-Content-Type: application/json
-### GET messages with user
-GET http://localhost:3000/me/messages/5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
-Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###GET messages with user
+GET http://localhost:3000/me/messages/12
+Authorization: Bearer {{token}}
+
 ###
 POST http://localhost:3000/me/messages/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTgxMTk0LCJleHAiOjE3NDU1ODgzOTR9.42LnkA7_Z8xbyk2GavX6kHkMUHE9nuHXYTuw5UNrMjk
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "message" : "<b>Bonjour 2</b>"
 }
 
-###
-GET http://localhost:3000/posts
-
+### GET all posts
+GET http://localhost:3000/posts/1
