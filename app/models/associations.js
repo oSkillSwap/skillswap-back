@@ -134,7 +134,8 @@ Availability.belongsToMany(User, {
 // Relation Many-to-One : Un post appartient à une seule compétence
 Post.belongsTo(Skill, {
   foreignKey: "skill_id",
-  as: "SkillWanted", // Alias pour la relation
+  as: "SkillWanted", // Alias pour la relation,
+  allowNull: false,
 });
 
 export {

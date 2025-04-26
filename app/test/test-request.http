@@ -1,17 +1,17 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTg5NTgzLCJleHAiOjE3NDU1OTY3ODN9.SOqFhWzXMUoZvvlOPQ_R18PzDp83dS-Vi8hY0JeVnBE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibWF0aGlldUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im1hdGhpZXUiLCJpYXQiOjE3NDU2MzQ5MzEsImV4cCI6MTc0NTY0MjEzMX0.hE4-29ScMND3dxGg4FO8Q-NbrXfcaF-bqYH9lD1pN2I
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "Erwan",
-  "lastName": "mettouchi",
-  "firstName": "erwan",
-  "email": "erwan@gmail.com",
-  "password": "Erwan1234Mettouchi+",
+  "username": "mathieu",
+  "lastName": "da fonseca",
+  "firstName": "zelitrem",
+  "email": "mathieu@gmail.com",
+  "password": "Zelitrem1234+",
   "avatar": "",
   "role": "member",
-  "description": "En train de dev les reviews"
+  "description": "Immense nez"
 }
 
 
@@ -20,8 +20,8 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "erwan@gmail.com",
-  "password": "Erwan1234Mettouchi+"
+  "email": "mathieu@gmail.com",
+  "password": "Zelitrem1234+"
 }
 
 
@@ -46,11 +46,11 @@ GET http://localhost:3000/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/me/messages/12
+GET http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/3
+POST http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -58,5 +58,23 @@ Content-Type: application/json
   "message" : "<b>Bonjour 2</b>"
 }
 
+### GET all posts written by 1 user
+GET http://localhost:3000/posts/4
+
 ### GET all posts
-GET http://localhost:3000/posts/1
+GET http://localhost:3000/posts
+
+### GET all posts
+GET http://localhost:3000/me/posts
+Authorization: Bearer {{token}}
+
+### create new post
+POST http://localhost:3000/me/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "J'aimerais apprendre React!",
+  "content" : "<b>Bonjour 2</b>",
+  "skill_id" : 11
+}

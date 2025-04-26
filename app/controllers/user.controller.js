@@ -56,7 +56,11 @@ export const userController = {
       return res.status(401).json({ message: "Mot de passe incorrect" });
     }
 
-    const token = generateToken({ id: user.id, email: user.email });
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+    });
 
     res.status(200).json({
       message: "Connexion réussie",

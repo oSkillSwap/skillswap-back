@@ -4,7 +4,7 @@
   "description": "Backend api SkillSwap",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "test",
     "dev": "node --watch --env-file=.env main.js",
     "db:create": "node --env-file=.env ./app/data/create-tables.js",
     "db:seed": "node --env-file=.env ./app/data/seed-tables.js",
@@ -35,6 +35,10 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4"
+    "@biomejs/biome": "1.9.4",
+    "jest": "^29.7.0",
+    "node-mocks-http": "^1.16.2",
+    "sequelize-mock": "^0.10.2",
+    "supertest": "^7.1.0"
   }
 }
