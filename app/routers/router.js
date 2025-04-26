@@ -10,6 +10,7 @@ import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
 import { messageSchema } from "../schemas/message.schema.js";
+import { postSchema } from "../schemas/post.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
 
 export const router = Router();
@@ -70,3 +71,11 @@ router.get(
 );
 
 router.get("/posts", controllerwrapper(postController.getPosts));
+router
+  .route("/me/posts")
+  .get(authenticate, controllerwrapper(postController.getPostFromLoggedUser))
+  .post(
+    authenticate,
+    validate(postSchema),
+    controllerwrapper(postController.createPost)
+  );

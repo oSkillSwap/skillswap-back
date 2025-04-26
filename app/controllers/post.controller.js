@@ -1,7 +1,16 @@
+import sanitize from "sanitize-html";
 import { Op, Sequelize } from "sequelize";
-import { Post, Proposition, Skill, User } from "../models/associations.js";
+import validator from "validator";
+import {
+  Post,
+  Proposition,
+  Review,
+  Skill,
+  User,
+} from "../models/associations.js";
 
 export const postController = {
+  // Get all posts created by a specific user
   getPostsFromUser: async (req, res, next) => {
     const { id } = req.params;
 
@@ -18,7 +27,7 @@ export const postController = {
       include: [
         {
           association: "Author", // Include the author of the post
-          attributes: ["id", "username"], // Only return id and username of the author
+          attributes: [], // Only return id and username of the author
           where: { id }, // Filter posts by the user id
         },
         {
@@ -27,10 +36,10 @@ export const postController = {
         },
       ],
     });
-    return res.json({ posts }); // Return the posts as JSON
+    return res.json({ posts });
   },
-  getPosts: async (req, res, next) => {
-    // Find all posts with additional information
+
+  getPosts: async (req, res, _) => {
     const posts = await Post.findAll({
       include: [
         {
@@ -63,5 +72,127 @@ export const postController = {
     });
 
     return res.status(200).json({ posts }); // Return the posts as JSON
+  },
+
+  // Get all posts created by the logged-in user
+  getPostFromLoggedUser: async (req, res, next) => {
+    const loggedUser = req.user;
+
+    const posts = await Post.findAll({
+      attributes: {
+        exclude: ["user_id", "skill_id"], // Exclude these fields from the result
+      },
+      include: [
+        {
+          association: "Author", // Include the author of the post
+          where: { id: loggedUser.id }, // Filter posts by the logged-in user id
+          attributes: ["id", "username"], // Only return id and username of the author
+        },
+        {
+          association: "SkillWanted", // Include the skill wanted in the post
+        },
+        {
+          model: Proposition, // Include propositions related to the post
+          attributes: {
+            exclude: ["sender_id", "receiver_id", "post_id"], // Exclude these fields from the result
+          },
+          include: {
+            association: "Sender", // Include the sender of the proposition
+            attributes: [
+              "id",
+              "username",
+              // Calculate the average grade of the sender's reviews
+              [
+                Sequelize.fn(
+                  "AVG",
+                  Sequelize.col("Propositions->Sender->Reviews.grade")
+                ),
+                "averageGrade",
+              ],
+              // Count the number of reviews the sender has
+              [
+                Sequelize.fn(
+                  "COUNT",
+                  Sequelize.col("Propositions->Sender->Reviews.grade")
+                ),
+                "nbOfReviews",
+              ],
+            ],
+            include: {
+              association: "Reviews", // Include the reviews of the sender
+              attributes: [], // Do not return any attributes from reviews
+            },
+          },
+        },
+      ],
+      group: [
+        "Post.id",
+        "Author.id",
+        "SkillWanted.id",
+        "Propositions.id",
+        "Propositions->Sender.id",
+        "Propositions->Sender->Reviews.id",
+      ],
+    });
+
+    return res.status(200).json({ posts }); // Return the posts as JSON
+  },
+
+  // Create a new post
+  createPost: async (req, res, _) => {
+    const user = req.user; // Get the logged-in user
+    const { content, title, skill_id } = req.validatedData; // Extract validated data from the request
+
+    // Check if the skill exists
+    const skill = await Skill.findByPk(skill_id);
+    if (!skill) {
+      return res
+        .status(400)
+        .json({ message: "skill_id invalide: Compétence non trouvée" });
+    }
+
+    // Check if the user already has a post with the same skill
+    const existingPost = await Post.findOne({
+      where: {
+        skill_id,
+        user_id: user.id,
+      },
+    });
+
+    // Check if the user has reached the maximum number of posts
+    const maxPostsPerUser = 10;
+    const userPostCount = await Post.count({
+      where: { user_id: user.id },
+    });
+
+    if (userPostCount >= maxPostsPerUser) {
+      return res.status(400).json({
+        message: `Limite de ${maxPostsPerUser} posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.`,
+      });
+    }
+
+    if (existingPost) {
+      return res.status(400).json({
+        message:
+          "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
+      });
+    }
+
+    // Sanitize the content and title to prevent XSS attacks
+    const sanitizedContent = validator.trim(content);
+    const sanitizedTitle = validator.trim(title);
+
+    // Create a new post
+    const newPost = await Post.create({
+      content: sanitizedContent,
+      title: sanitizedTitle,
+      skill_id,
+      user_id: user.id,
+    });
+
+    return res.status(201).json({
+      message: `Nouveau post crée par ${user.username}`,
+      newPost,
+    });
   },
 };

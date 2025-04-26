@@ -1,5 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwiaWF0IjoxNzQ1NTkzNTc5LCJleHAiOjE3NDU2MDA3Nzl9.GsT8F3J3eawb7GEFiQXkpB0PFZJlRsIBfACbG6I0tY4
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibWF0aGlldUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im1hdGhpZXUiLCJpYXQiOjE3NDU2MzQ5MzEsImV4cCI6MTc0NTY0MjEzMX0.hE4-29ScMND3dxGg4FO8Q-NbrXfcaF-bqYH9lD1pN2I
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
@@ -21,8 +20,8 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "erwan@gmail.com",
-  "password": "Erwan1234Mettouchi+"
+  "email": "mathieu@gmail.com",
+  "password": "Zelitrem1234+"
 }
 
 
@@ -47,11 +46,11 @@ GET http://localhost:3000/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/me/messages/14
+GET http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/11
+POST http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -64,3 +63,18 @@ GET http://localhost:3000/posts/4
 
 ### GET all posts
 GET http://localhost:3000/posts
+
+### GET all posts
+GET http://localhost:3000/me/posts
+Authorization: Bearer {{token}}
+
+### create new post
+POST http://localhost:3000/me/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "J'aimerais apprendre React!",
+  "content" : "<b>Bonjour 2</b>",
+  "skill_id" : 11
+}
