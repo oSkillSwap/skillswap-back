@@ -124,4 +124,29 @@ export const userController = {
     });
     return res.status(200).json({ users });
   },
+  getFollowersAndFollowsFromUser: async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findByPk(id, {
+      attributes: [],
+      include: [
+        {
+          association: "Followers",
+          attributes: ["id", "username"],
+          through: { attributes: [] },
+        },
+        {
+          association: "Follows",
+          attributes: ["id", "username"],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    return res.status(200).json({ user });
+  },
+  getOneUser: async (req, res) => {},
 };

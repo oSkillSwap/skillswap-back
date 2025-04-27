@@ -4,6 +4,7 @@ import { categoryontroller } from "../controllers/category.controller.js";
 import { messageController } from "../controllers/message.controller.js";
 import { postController } from "../controllers/post.controller.js";
 import { reviewController } from "../controllers/review.controller.js";
+import { skillController } from "../controllers/skill.controller.js";
 import { userController } from "../controllers/user.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
@@ -79,3 +80,19 @@ router
     validate(postSchema),
     controllerwrapper(postController.createPost)
   );
+
+// Follows and followers from User by params
+router.get(
+  "/users/follows/:id",
+  validateParams("id"),
+  controllerwrapper(userController.getFollowersAndFollowsFromUser)
+);
+
+// Follows and followers from logged in User
+router.get("/me/follows", authenticate, async (req, res, next) => {
+  req.params.id = req.user.id;
+
+  return userController.getFollowersAndFollowsFromUser(req, res, next);
+});
+
+router.get("/skills", controllerwrapper(skillController.getSkills));
