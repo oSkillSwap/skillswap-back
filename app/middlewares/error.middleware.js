@@ -1,5 +1,5 @@
 export const errorMiddleware = (error, _, res, __) => {
-  if (error.name === "Not Found Error") {
+  if (error.name === "NotFoundError") {
     return res.status(404).json({ message: error.message });
   }
 
