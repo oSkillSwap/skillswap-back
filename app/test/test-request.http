@@ -1,17 +1,17 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibWF0aGlldUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im1hdGhpZXUiLCJpYXQiOjE3NDU3NDQyNzMsImV4cCI6MTc0NTc1MTQ3M30.pXmZnA0H-qW8eCN7s0VQNbxIFdbRaj3mo_r3GB2OBxw
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyODkwMiwiZXhwIjoxNzQ1ODM2MTAyfQ.Ye73_fmni8Su9eX2FAkAAEuqDLIF7Q2QmbQpCZI-_dA
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "mathieu",
-  "lastName": "da fonseca",
-  "firstName": "zelitrem",
-  "email": "mathieu@gmail.com",
-  "password": "Zelitrem1234+",
+  "username": "ErwanMAJ",
+  "lastName": "Mettouchi",
+  "firstName": "Erwan",
+  "email": "erwan@gmail.com",
+  "password": "ErwanMettouchi1234+",
   "avatar": "",
   "role": "member",
-  "description": "Immense nez"
+  "description": "Travail en boucle"
 }
 
 
@@ -20,8 +20,8 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "mathieu@gmail.com",
-  "password": "Zelitrem1234+"
+  "email": "erwan@gmail.com",
+  "password": "ErwanMettouchi1234+"
 }
 
 
@@ -55,7 +55,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "message" : "<b>Bonjour 2</b>"
+  "message" : "<b>Bonjour 3</b>"
 }
 
 ### GET all posts written by 1 user
@@ -91,3 +91,84 @@ GET http://localhost:3000/skills
 
 ###
 GET http://localhost:3000/propositions/1
+
+
+
+
+
+
+################ USER PROFILES #######################
+
+### 1. Normal Update
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanMisAJour",
+  "description": "Nouvelle description après mise à jour"
+}
+
+###
+### Fail to change already Used email
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "mathieu@gmail.com"
+}
+
+###
+### Empty request should fail
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+### Update All fields at once
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanTotalUpdate",
+  "firstname": "Erwanupdated",
+  "lastname": "Metouchi2",
+  "email": "erwan2@gmail.com",
+  "avatar": "/avatars/avatar2.png",
+  "description": "Je suis toujours en train de bosser update"
+}
+
+
+
+########################## UPDATE SKILL ##########################
+### Update my wanted skills
+PUT http://localhost:3000/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": [1, 2, 3, 4, 5]
+}
+
+### Try to send invalid wantedSkills
+PUT http://localhost:3000/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": ["javascript", "node"]
+}
+
+
+### Try to send an empty wantedSkills array
+PUT http://localhost:3000/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": []
+}

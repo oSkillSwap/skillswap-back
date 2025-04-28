@@ -1,0 +1,83 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyODkwMiwiZXhwIjoxNzQ1ODM2MTAyfQ.Ye73_fmni8Su9eX2FAkAAEuqDLIF7Q2QmbQpCZI-_dA
+
+
+###
+GET http://localhost:3000/users
+
+
+
+################ USER PROFILES #######################
+
+### 1. Normal Update
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanMAJ",
+  "description": "Nouvelle description de la taille d'erwan"
+}
+
+###
+### Fail to change already Used email
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "mathieu@gmail.com"
+}
+
+###
+### Empty request should fail
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+### Update All fields at once
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanUpdate",
+  "firstname": "ErwanUpdate",
+  "lastname": "Metouchi2",
+  "email": "erwan2@gmail.com",
+  "avatar": "/avatars/avatar2.png",
+  "description": "Je suis toujours en train de bosser meme la nuit"
+}
+
+
+
+########################## UPDATE SKILL ##########################
+### Update my wanted skills
+PUT http://localhost:3000/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": [1, 2, 3, 4, 5]
+}
+
+### Try to send invalid wantedSkills
+PUT http://localhost:3000/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": ["javascript", "node"]
+}
+
+
+### Try to send an empty wantedSkills array
+PUT http://localhost:3000/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": []
+}

@@ -4,152 +4,229 @@ import validator from "validator";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { generateToken } from "../helpers/jwt.js";
 import { Category, User } from "../models/associations.js";
+import {
+	sanitizeString,
+	sanitizeOptionalString,
+	sanitizeDescription,
+} from "../helpers/sanitize.js";
+import sanitize from "sanitize-html";
 
 export const userController = {
-  register: async (req, res) => {
-    const {
-      username,
-      lastName,
-      firstName,
-      email,
-      password,
-      role = "member",
-      avatar = "/avatar/avatar1.png",
-      description,
-    } = req.validatedData;
+	register: async (req, res) => {
+		const {
+			username,
+			lastName,
+			firstName,
+			email,
+			password,
+			role = "member",
+			avatar = "/avatar/avatar1.png",
+			description,
+		} = req.validatedData;
 
-    // Sanitize input
-    const sanitizedUsername = validator.trim(username);
-    const sanitizedLastName = lastName ? validator.trim(lastName) : null;
-    const sanitizedFirstName = firstName ? validator.trim(firstName) : null;
-    const sanitizedDescription = description
-      ? validator.escape(validator.trim(description))
-      : null;
+		// Email have to be unique
+		const existingEmail = await User.findOne({ where: { email } });
+		if (existingEmail) {
+			return res.status(409).json({ message: "Cet email est déjà utilisé" });
+		}
 
-    // Hash password
-    const hashedPassword = await argon2.hash(password);
+		// username have to be unique
+		const existingUsername = await User.findOne({ where: { username } });
+		if (existingUsername) {
+			return res
+				.status(409)
+				.json({ message: "Ce nom d'utilisateur est déjà utilisé" });
+		}
 
-    const newUser = await User.create({
-      username: sanitizedUsername,
-      lastName: sanitizedLastName,
-      firstName: sanitizedFirstName,
-      email,
-      password: hashedPassword,
-      role,
-      avatar,
-      description: sanitizedDescription,
-    });
+		// Sanitize input
+		const sanitizedUsername = validator.trim(username);
+		const sanitizedLastName = lastName ? validator.trim(lastName) : null;
+		const sanitizedFirstName = firstName ? validator.trim(firstName) : null;
+		const sanitizedDescription = description
+			? validator.escape(validator.trim(description))
+			: null;
 
-    res.status(201).json({ message: "Utilisateur créé", user: newUser });
-  },
+		// Hash password
+		const hashedPassword = await argon2.hash(password);
 
-  // Login function to authenticate users
-  login: async (req, res) => {
-    const { email, password } = req.validatedData;
+		const newUser = await User.create({
+			username: sanitizedUsername,
+			lastName: sanitizedLastName,
+			firstName: sanitizedFirstName,
+			email,
+			password: hashedPassword,
+			role,
+			avatar,
+			description: sanitizedDescription,
+		});
 
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(401).json({ message: "Identifiants incorrects" });
-    }
+		res.status(201).json({ message: "Utilisateur créé", user: newUser });
+	},
 
-    const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Mot de passe incorrect" });
-    }
+	// Login function to authenticate users
+	login: async (req, res) => {
+		const { email, password } = req.validatedData;
 
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-    });
+		const user = await User.findOne({ where: { email } });
+		if (!user) {
+			return res.status(401).json({ message: "Identifiants incorrects" });
+		}
 
-    res.status(200).json({
-      message: "Connexion réussie",
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
-    });
-  },
+		const isPasswordValid = await argon2.verify(user.password, password);
+		if (!isPasswordValid) {
+			return res.status(401).json({ message: "Mot de passe incorrect" });
+		}
 
-  getUsers: async (req, res, next) => {
-    const whereCondition = {
-      isBanned: false, // Ensure the user is not banned
-      role: "member", // Only include users with the "member" role
-      isAvailable: true, // Ensure the user is available
-    };
+		const token = generateToken({
+			id: user.id,
+			email: user.email,
+			username: user.username,
+		});
 
-    const skillsAndCategory = {
-      association: "Skills", // Include the user's skills
-      attributes: ["id", "name"],
-      through: { attributes: [] }, // Exclude join table attributes
-      include: [
-        {
-          model: Category,
-        },
-      ],
-    };
+		res.status(200).json({
+			message: "Connexion réussie",
+			token,
+			user: {
+				id: user.id,
+				username: user.username,
+				email: user.email,
+			},
+		});
+	},
 
-    const wantedSkills = {
-      association: "WantedSkills", // Include the user's wanted skills
-      attributes: ["id", "name"],
-      through: { attributes: [] }, // Exclude join table attributes
-    };
+	getUsers: async (req, res, next) => {
+		const whereCondition = {
+			isBanned: false, // Ensure the user is not banned
+			role: "member", // Only include users with the "member" role
+			isAvailable: true, // Ensure the user is available
+		};
 
-    const reviews = {
-      association: "Reviews", // Include reviews
-      attributes: [], // No need to fetch review details
-    };
+		const skillsAndCategory = {
+			association: "Skills", // Include the user's skills
+			attributes: ["id", "name"],
+			through: { attributes: [] }, // Exclude join table attributes
+			include: [
+				{
+					model: Category,
+				},
+			],
+		};
 
-    const users = await User.findAll({
-      where: whereCondition,
-      attributes: {
-        // Excluse password, email, updatedAt and createdAt fields
-        exclude: ["password", "email", "updatedAt", "createdAt"],
-        include: [
-          // Calculate the average grade of the user from their reviews
-          [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
-          // Count the number of reviews the user has
-          [
-            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-            "nbOfReviews",
-          ],
-        ],
-      },
-      include: [skillsAndCategory, wantedSkills, reviews],
-      group: ["User.id", "Skills.id", "WantedSkills.id", "Skills->Category.id"], // Group by user and related entities,
-      // Sort users based on the total number of reviews they have
-      order: [["nbOfReviews", "DESC"]],
-    });
-    return res.status(200).json({ users });
-  },
-  getFollowersAndFollowsFromUser: async (req, res, next) => {
-    const { id } = req.params;
-    const user = await User.findByPk(id, {
-      attributes: [],
-      include: [
-        {
-          association: "Followers",
-          attributes: ["id", "username"],
-          through: { attributes: [] },
-        },
-        {
-          association: "Follows",
-          attributes: ["id", "username"],
-          through: { attributes: [] },
-        },
-      ],
-    });
+		const wantedSkills = {
+			association: "WantedSkills", // Include the user's wanted skills
+			attributes: ["id", "name"],
+			through: { attributes: [] }, // Exclude join table attributes
+		};
 
-    if (!user) {
-      return next(new NotFoundError("Utilisateur non trouvé"));
-    }
+		const reviews = {
+			association: "Reviews", // Include reviews
+			attributes: [], // No need to fetch review details
+		};
 
-    return res.status(200).json({ user });
-  },
-  getOneUser: async (req, res, next) => {
-    // TODO : récupérer les informations de l'utilisateur (disponibilités, intérêts, compétences, description, nombre de reviews faites sur lui, note moyenne, username, s'il est disponible ou non)
-  },
+		const users = await User.findAll({
+			where: whereCondition,
+			attributes: {
+				// Excluse password, email, updatedAt and createdAt fields
+				exclude: ["password", "email", "updatedAt", "createdAt"],
+				include: [
+					// Calculate the average grade of the user from their reviews
+					[Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
+					// Count the number of reviews the user has
+					[
+						Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
+						"nbOfReviews",
+					],
+				],
+			},
+			include: [skillsAndCategory, wantedSkills, reviews],
+			group: ["User.id", "Skills.id", "WantedSkills.id", "Skills->Category.id"], // Group by user and related entities,
+			// Sort users based on the total number of reviews they have
+			order: [["nbOfReviews", "DESC"]],
+		});
+		return res.status(200).json({ users });
+	},
+	getFollowersAndFollowsFromUser: async (req, res, next) => {
+		const { id } = req.params;
+		const user = await User.findByPk(id, {
+			attributes: [],
+			include: [
+				{
+					association: "Followers",
+					attributes: ["id", "username"],
+					through: { attributes: [] },
+				},
+				{
+					association: "Follows",
+					attributes: ["id", "username"],
+					through: { attributes: [] },
+				},
+			],
+		});
+
+		if (!user) {
+			return next(new NotFoundError("Utilisateur non trouvé"));
+		}
+
+		return res.status(200).json({ user });
+	},
+	getOneUser: async (req, res, next) => {
+		// TODO : récupérer les informations de l'utilisateur (disponibilités, intérêts, compétences, description, nombre de reviews faites sur lui, note moyenne, username, s'il est disponible ou non)
+	},
+
+	updateUser: async (req, res, next) => {
+		const userId = req.user.id; // Get the user ID from the token
+		const { username, firstname, lastname, email, avatar, description } =
+			req.validatedData; // Get the data from the request body
+
+		// Check if no data provided
+		if (Object.keys(req.validatedData).length === 0) {
+			return res
+				.status(400)
+				.json({ message: "Aucune donnée fournie pour la mise à jour" });
+		}
+		const user = await User.findByPk(userId); // Find the user by ID
+
+		if (!user) {
+			return next(new NotFoundError("Utilisateur non trouvé")); // If user not found, return error
+		}
+
+		if (email && email !== user.email) {
+			const existingUser = await User.findOne({ where: { email } });
+			if (existingUser) {
+				return res.status(409).json({ message: "Cet email est déjà utilisé" }); // If email already exists, return error => Can't errase existing user
+			}
+		}
+
+		// Sanitize input
+		const updatedFields = {
+			username: username ? sanitizeString(username) : user.username,
+			firstName: firstname ? sanitizeOptionalString(firstname) : user.firstName,
+			lastName: lastname ? sanitizeOptionalString(lastname) : user.lastName,
+			email: email || user.email,
+			avatar: avatar || user.avatar,
+			description: description
+				? sanitizeDescription(description)
+				: user.description,
+		};
+
+		await user.update(updatedFields); // Update the user with the new data
+
+		return res.status(200).json({ message: "Utilisateur mis à jour", user }); // Return success message and updated user
+	},
+
+	updateWantedSkills: async (req, res, next) => {
+		const userId = req.user.id; // Get the user ID from the token
+		const { wantedSkills } = req.validatedData; // Get the data from the request body
+
+		const user = await User.findByPk(userId); // Find the user by ID
+		if (!user) {
+			return next(new NotFoundError("Utilisateur non trouvé")); // If user not found, return error
+		}
+
+		await user.setWantedSkills(wantedSkills); // Update the user's wanted skills
+
+		return res
+			.status(200)
+			.json({ message: "Compétences souhaitées mises à jour" }); // Return success message
+	},
 };
