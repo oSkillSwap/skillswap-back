@@ -163,6 +163,7 @@ Content-Type: application/json
 POST http://localhost:3000/reviews
 Authorization: Bearer {{token}}
 Content-Type: application/json
+
 {
   "title": "Super collaboration",
   "postId": 31,
