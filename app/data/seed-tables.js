@@ -95,6 +95,26 @@ for (const user of users) {
   await user.addAvailabilities(userAvail);
 }
 
+// FOLLOWS
+for (const user of users) {
+  // Chaque utilisateur suivra entre 1 et 3 autres utilisateurs aléatoires
+  const numberOfFollows = faker.number.int({ min: 1, max: 3 });
+  const followedUsers = [];
+
+  for (let i = 0; i < numberOfFollows; i++) {
+    let userToFollow;
+    do {
+      userToFollow = faker.helpers.arrayElement(users);
+    } while (
+      userToFollow.id === user.id ||
+      followedUsers.includes(userToFollow.id)
+    );
+
+    followedUsers.push(userToFollow.id);
+    await user.addFollows(userToFollow);
+  }
+}
+
 // POSTS
 const posts = [];
 for (const user of users) {

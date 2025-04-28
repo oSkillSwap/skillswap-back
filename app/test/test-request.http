@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibWF0aGlldUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im1hdGhpZXUiLCJpYXQiOjE3NDU2MzQ5MzEsImV4cCI6MTc0NTY0MjEzMX0.hE4-29ScMND3dxGg4FO8Q-NbrXfcaF-bqYH9lD1pN2I
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibWF0aGlldUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im1hdGhpZXUiLCJpYXQiOjE3NDU3NDQyNzMsImV4cCI6MTc0NTc1MTQ3M30.pXmZnA0H-qW8eCN7s0VQNbxIFdbRaj3mo_r3GB2OBxw
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
@@ -78,3 +78,13 @@ Content-Type: application/json
   "content" : "<b>Bonjour 2</b>",
   "skill_id" : 11
 }
+
+###
+GET http://localhost:3000/users/follows/2
+
+###
+GET http://localhost:3000/me/follows
+Authorization: Bearer {{token}}
+
+###
+GET http://localhost:3000/skills
