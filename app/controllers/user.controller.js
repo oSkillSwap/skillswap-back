@@ -344,23 +344,41 @@ export const userController = {
       );
     }
 
-    const existingFollow = await User.findOne({
-      where: { id: user.id },
-      include: {
-        required: true,
-        association: "Follows",
-        where: { id: userId },
-      },
-    });
-
-    if (existingFollow) {
+    const isFollowing = await user.hasFollows(targetUser);
+    if (isFollowing) {
       return next(new ConflictError("Vous suivez déjà cet utilisateur"));
     }
 
-    await user.addFollow(targetUser);
+    await user.addFollows(targetUser);
 
     return res
       .status(200)
       .json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
+  },
+  unfollowUser: async (req, res, next) => {
+    const userLoggedIn = req.user;
+    const { userId } = req.params;
+
+    if (!userLoggedIn) {
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    }
+
+    const targetUser = await User.findByPk(userId);
+    const user = await User.findByPk(userLoggedIn.id);
+
+    if (!targetUser) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
+
+    const isFollowing = await user.hasFollows(targetUser);
+    if (!isFollowing) {
+      return next(new BadRequestError("Vous ne suivez pas cet utilisateur"));
+    }
+
+    await user.removeFollows(targetUser);
+
+    return res.status(200).json({
+      message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
+    });
   },
 };
