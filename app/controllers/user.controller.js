@@ -214,11 +214,11 @@ export const userController = {
 		return res.status(200).json({ message: "Utilisateur mis à jour", user }); // Return success message and updated user
 	},
 
-	updateWantedSkills: async (req, res, next) => {
-		const userId = req.user.id; // Get the user ID from the token
-		const { wantedSkills } = req.validatedData; // Get the data from the request body
+	updateUserWantedSkills: async (req, res, next) => {
+		const userId = req.user.id;
+		const { wantedSkills } = req.validatedData;
 
-		const user = await User.findByPk(userId); // Find the user by ID
+		const user = await User.findByPk(userId);
 		if (!user) {
 			return next(new NotFoundError("Utilisateur non trouvé")); // If user not found, return error
 		}
@@ -228,5 +228,21 @@ export const userController = {
 		return res
 			.status(200)
 			.json({ message: "Compétences souhaitées mises à jour" }); // Return success message
+	},
+
+	updateUserSkills: async (req, res, next) => {
+		const userId = req.user.id;
+		const { skills } = req.validatedData;
+		const user = await User.findByPk(userId);
+
+		if (!user) {
+			return next(new NotFoundError("Utilisateur non trouvé"));
+		}
+
+		await user.setSkills(skills); // Update the user's skills
+
+		return res
+			.status(200)
+			.json({ message: "Compétences mises à jour avec succès" });
 	},
 };

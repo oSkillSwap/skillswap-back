@@ -81,3 +81,23 @@ Content-Type: application/json
 {
   "wantedSkills": []
 }
+
+
+
+### PATCH user skills (update user_has_skill table)
+PATCH http://localhost:3000/me/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skills": [1, 3, 5] 
+}
+
+### PATCH user skills - remove all skills
+PATCH http://localhost:3000/me/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skills": []
+}

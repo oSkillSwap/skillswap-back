@@ -19,6 +19,7 @@ import {
 	registerSchema,
 	updateUserSchema,
 	updateWantedSkillsSchema,
+	updateUserSkillsSchema,
 } from "../schemas/user.schema.js";
 
 export const router = Router();
@@ -41,7 +42,14 @@ router.put(
 	"/me/wanted-skills",
 	authenticate,
 	validate(updateWantedSkillsSchema),
-	controllerwrapper(userController.updateWantedSkills),
+	controllerwrapper(userController.updateUserWantedSkills),
+);
+
+router.patch(
+	"/me/skills",
+	authenticate,
+	validate(updateUserSkillsSchema),
+	controllerwrapper(userController.updateUserSkills),
 );
 
 router.get("/users", controllerwrapper(userController.getUsers));

@@ -64,3 +64,15 @@ export const updateWantedSkillsSchema = z.object({
 		.array(z.number())
 		.min(1, "Veuillez sélectionner au moins une compétence"),
 });
+
+// Schema for updated Has Skills with rules
+
+export const updateUserSkillsSchema = z.object({
+	skills: z
+		.array(z.number(), {
+			required_error: "Les compétences doivent être sous forme de tableau",
+		})
+		.refine((skills) => skills.length > 0, {
+			message: "Vous devez sélectionner au moins une compétence",
+		}),
+});
