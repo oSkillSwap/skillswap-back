@@ -10,9 +10,9 @@ import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
 import {
-  sanitizeDescription,
-  sanitizeOptionalString,
-  sanitizeString,
+	sanitizeDescription,
+	sanitizeOptionalString,
+	sanitizeString,
 } from "../helpers/sanitize.js";
 import { Category, Review, User } from "../models/associations.js";
 

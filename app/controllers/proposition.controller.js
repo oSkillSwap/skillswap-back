@@ -1,5 +1,5 @@
 import sanitize from "sanitize-html";
-import { Sequelize, ValidationError } from "sequelize";
+import { Op, Sequelize, ValidationError } from "sequelize";
 import validator from "validator";
 import { sequelize } from "../data/client.js";
 import { BadRequestError } from "../errors/badrequest-error.js";
@@ -11,7 +11,7 @@ import { validate } from "../middlewares/validates.js";
 import { Post, Proposition, User } from "../models/associations.js";
 
 export const propositionController = {
-  // Get all propositions sent to the logged-in user
+	// Get all propositions sent to the logged-in user
   getUserSentPropositions: async (req, res, next) => {
     const user = req.user; // Get the logged-in user
 
@@ -65,7 +65,7 @@ export const propositionController = {
     return res.status(200).json({ propositions }); // Return the propositions
   },
 
-  // Send a proposition to a specific post
+	// Send a proposition to a specific post
   sendPropositionToPost: async (req, res, next) => {
     const { postId } = req.params; // Get the post ID from the request parameters
     const user = req.user; // Get the logged-in user
@@ -145,4 +145,51 @@ export const propositionController = {
       newProposition,
     });
   },
+
+	// Accept a proposition for a specific post
+	acceptProposition: async (req, res, next) => {
+		const propositionId = Number(req.params.id);
+		const userId = req.user.id;
+
+		// Find the proposition
+		const proposition = await Proposition.findByPk(propositionId, {
+			include: [{ model: Post }],
+		});
+
+		if (!proposition) {
+			throw new NotFoundError("Proposition not found");
+		}
+
+		const post = proposition.Post;
+
+		// Check if the user is the post owner
+		if (post.user_id !== userId) {
+			throw new ForbiddenError(
+				"Vous n'etes pas le propriétaire de cette annonce",
+			);
+		}
+
+		// Accepted the proposition
+		proposition.state = "acceptée";
+		await proposition.save();
+
+		// Refusing all other propositions for the same post
+		await Proposition.update(
+			{ state: "refusée" },
+			{
+				where: {
+					post_id: post.id,
+					id: { [Op.ne]: propositionId }, // All except the accepted one
+				},
+			},
+		);
+
+		// Close the post
+		post.isClosed = true;
+		await post.save();
+
+		res
+			.status(200)
+			.json({ message: "Proposition acceptée and Annonce fermée." });
+	},
 };
