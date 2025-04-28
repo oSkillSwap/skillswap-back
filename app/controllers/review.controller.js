@@ -98,7 +98,7 @@ export const reviewController = {
 		const result = reviewSchema.safeParse(req.body);
 		if (!result.success) {
 			const errors = result.error.errors.map((e) => e.message).join(", ");
-			throw new ValidationError(errors);
+			return next(new ValidationError(errors));
 		}
 
 		const { postId, propositionId, grade, title, comment } = result.data;
@@ -122,6 +122,7 @@ export const reviewController = {
 				post_id: postId,
 				state: "acceptée",
 			},
+			attributes: ["id", "receiver_id", "sender_id", "post_id", "state"],
 		});
 		if (!proposition) {
 			return next(new NotFoundError("La proposition doit être acceptée"));
@@ -140,10 +141,11 @@ export const reviewController = {
 		const review = await Review.create({
 			grade,
 			title,
-			comment,
+			content: comment,
 			reviewer_id: userId,
-			reviewed_id: proposition.user_id,
+			reviewed_id: proposition.sender_id,
 			post_id: postId,
+			proposition_id: proposition.id,
 		});
 
 		res.status(201).json(review);

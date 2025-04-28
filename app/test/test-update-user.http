@@ -114,6 +114,3 @@ Content-Type: application/json
 }
 
 
-### Delete a user
-DELETE http://localhost:3000/api/me
-Authorization: Bearer {{token}}
