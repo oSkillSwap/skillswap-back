@@ -28,6 +28,10 @@ export const errorMiddleware = (error, _, res, __) => {
     return res.status(404).json({ message: error.message });
   }
 
+  if (error.name === "ConflictError") {
+    return res.status(409).json({ message: error.message });
+  }
+
   // Handle all other unexpected errors
   return res.status(500).json({
     message: "Une erreur inattendue est survenue. Veuillez réessayez.",

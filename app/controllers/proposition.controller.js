@@ -6,6 +6,7 @@ import { BadRequestError } from "../errors/badrequest-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
+import { sanitizeString } from "../helpers/sanitize.js";
 import { validate } from "../middlewares/validates.js";
 import { Post, Proposition, User } from "../models/associations.js";
 
@@ -114,10 +115,15 @@ export const propositionController = {
 
     const { content } = req.validatedData; // Get the validated content from the request
 
-    const sanitizedContent = validator.escape(content); // Sanitize the content
+    const sanitizedContent = sanitizeString(content); // Sanitize the content
 
     if (!sanitizedContent.trim()) {
       // If the sanitized content is empty, return an error
+      return next(
+        new ValidationError(
+          "Le contenu de la proposition ne doit pas être vide"
+        )
+      );
     }
 
     const newProposition = await Proposition.create({

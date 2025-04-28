@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { ValidationError } from "../errors/validation-error.js";
+import { sanitizeString } from "../helpers/sanitize.js";
 import { Message, User } from "../models/associations.js";
 import { messageSchema } from "../schemas/message.schema.js";
 
@@ -79,7 +80,7 @@ export const messageController = {
 
     const conversationPartner = await User.findByPk(userId);
 
-    const sanitizedMessage = sanitize(message).trim();
+    const sanitizedMessage = sanitizeString(message);
 
     if (!conversationPartner) {
       return next(new NotFoundError("Utilisateur non trouvé"));

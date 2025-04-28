@@ -1,5 +1,5 @@
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTg0MjE0NywiZXhwIjoxNzQ1ODQ5MzQ3fQ.IcTINFyN_Mp-rNFOVb_pz7n9hHzHQV-aborGuH-HWH0
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW5uIiwiaWF0IjoxNzQ1ODQ2ODc3LCJleHAiOjE3NDU4NTQwNzd9.TX8Q5Tdp3IFVJzFuhkfwlgipimV8SEjCHIr0iRPkCrc
 
 
 ### Register a user
@@ -8,10 +8,10 @@ Content-Type: application/json
 
 {
 
-  "username": "Erwan",
+  "username": "Erwann",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
-  "email": "erwan@gmail.com",
+  "email": "erwann@gmail.com",
   "password": "ErwanMettouchi1234+",
   "avatar": "",
   "role": "member",
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 {
 
-  "email": "erwan@gmail.com",
+  "email": "erwann@gmail.com",
   "password": "ErwanMettouchi1234+"
 }
 
@@ -51,11 +51,11 @@ GET http://localhost:3000/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/me/messages/5
+GET http://localhost:3000/me/messages/13
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/11
+POST http://localhost:3000/me/messages/13
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -79,8 +79,8 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "title": "J'aimerais apprendre React!",
-  "content" : "<b>Bonjour 2</b>",
+  "title": "",
+  "content" : "",
   "skill_id" : 11
 }
 
@@ -146,20 +146,10 @@ GET http://localhost:3000/me/propositions
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/propositions/33
-
+POST http://localhost:3000/me/propositions/5
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "username": "ErwanTotalUpdate",
-  "firstname": "Erwanupdated",
-  "lastname": "Metouchi2",
-  "email": "erwan2@gmail.com",
-  "avatar": "/avatars/avatar2.png",
-  "description": "Je suis toujours en train de bosser update"
+  "content" : ""
 }
-
-
-
-
