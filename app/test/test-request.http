@@ -1,17 +1,17 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibWF0aGlldUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im1hdGhpZXUiLCJpYXQiOjE3NDU3NDQyNzMsImV4cCI6MTc0NTc1MTQ3M30.pXmZnA0H-qW8eCN7s0VQNbxIFdbRaj3mo_r3GB2OBxw
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5tZXR0b3VjaGlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyNzg3MywiZXhwIjoxNzQ1ODM1MDczfQ.hxjUFuC2qTwvqbx_Yogr5anakoqJjq_nY_xV4jX17VA
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "mathieu",
-  "lastName": "da fonseca",
-  "firstName": "zelitrem",
-  "email": "mathieu@gmail.com",
-  "password": "Zelitrem1234+",
+  "username": "Winnblaser",
+  "lastName": "Mettouchi",
+  "firstName": "Erwan",
+  "email": "erwanmettouchi@gmail.com",
+  "password": "Erwan1234+",
   "avatar": "",
   "role": "member",
-  "description": "Immense nez"
+  "description": "Bonjour"
 }
 
 
@@ -20,8 +20,8 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "mathieu@gmail.com",
-  "password": "Zelitrem1234+"
+  "email": "erwanmettouchi@gmail.com",
+  "password": "Erwan1234+"
 }
 
 
@@ -59,7 +59,7 @@ Content-Type: application/json
 }
 
 ### GET all posts written by 1 user
-GET http://localhost:3000/posts/50
+GET http://localhost:3000/posts/1
 
 ### GET all posts
 GET http://localhost:3000/posts
@@ -91,3 +91,10 @@ GET http://localhost:3000/skills
 
 ###
 GET http://localhost:3000/propositions/1
+
+###
+GET http://localhost:3000/users/5
+
+###
+GET http://localhost:3000/me/users
+Authorization: Bearer {{token}}

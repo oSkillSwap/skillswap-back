@@ -1,6 +1,6 @@
 import { Category } from "../models/associations.js";
 
-export const categoryontroller = {
+export const categoryController = {
   getCategories: async (req, res, next) => {
     const categories = await Category.findAll();
 
