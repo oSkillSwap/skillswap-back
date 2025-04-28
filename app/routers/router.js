@@ -54,9 +54,9 @@ router.patch(
 );
 
 router.patch(
-	"/me/reviews/:reviewId",
+	"/me/reviews/:userId",
 	authenticate,
-	validateParams("reviewId"),
+	validateParams("userId"),
 	validate(updateReviewSchema),
 	controllerwrapper(userController.updateReview),
 );
