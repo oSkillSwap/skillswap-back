@@ -20,6 +20,7 @@ import {
 	updateUserSchema,
 	updateWantedSkillsSchema,
 	updateUserSkillsSchema,
+	updateReviewSchema,
 } from "../schemas/user.schema.js";
 
 export const router = Router();
@@ -50,6 +51,14 @@ router.patch(
 	authenticate,
 	validate(updateUserSkillsSchema),
 	controllerwrapper(userController.updateUserSkills),
+);
+
+router.patch(
+	"/me/reviews/:reviewId",
+	authenticate,
+	validateParams("reviewId"),
+	validate(updateReviewSchema),
+	controllerwrapper(userController.updateReview),
 );
 
 router.get("/users", controllerwrapper(userController.getUsers));

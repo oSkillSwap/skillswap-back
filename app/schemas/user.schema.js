@@ -66,7 +66,6 @@ export const updateWantedSkillsSchema = z.object({
 });
 
 // Schema for updated Has Skills with rules
-
 export const updateUserSkillsSchema = z.object({
 	skills: z
 		.array(z.number(), {
@@ -75,4 +74,16 @@ export const updateUserSkillsSchema = z.object({
 		.refine((skills) => skills.length > 0, {
 			message: "Vous devez sélectionner au moins une compétence",
 		}),
+});
+
+// Schema for update Reviews with rules => Only the owner can modify his review
+export const updateReviewSchema = z.object({
+	grade: z
+		.number()
+		.min(1, "La note doit être au moins 1")
+		.max(5, "La note ne peut pas dépasser 5"),
+	content: z
+		.string()
+		.min(10, "La review doit contenir au moins 10 caractères")
+		.max(1000, "La review ne peut pas dépasser 1000 caractères"),
 });

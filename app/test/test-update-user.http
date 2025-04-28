@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyODkwMiwiZXhwIjoxNzQ1ODM2MTAyfQ.Ye73_fmni8Su9eX2FAkAAEuqDLIF7Q2QmbQpCZI-_dA
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgzOTAxNywiZXhwIjoxNzQ1ODQ2MjE3fQ.LMvBGr2rz_221oA4dHBqGbi1k18qWHS_rkFQM7qbqwQ
 
 
 ###
@@ -100,4 +100,15 @@ Content-Type: application/json
 
 {
   "skills": []
+}
+
+
+### PATCH a review (update)
+PATCH http://localhost:3000/me/reviews/3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grade": 5,
+  "content": "Mise à jour de ma review, super expérience !"
 }

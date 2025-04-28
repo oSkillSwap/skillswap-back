@@ -1,10 +1,10 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyODkwMiwiZXhwIjoxNzQ1ODM2MTAyfQ.Ye73_fmni8Su9eX2FAkAAEuqDLIF7Q2QmbQpCZI-_dA
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgzOTAxNywiZXhwIjoxNzQ1ODQ2MjE3fQ.LMvBGr2rz_221oA4dHBqGbi1k18qWHS_rkFQM7qbqwQ
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "ErwanMAJ",
+  "username": "Erwan",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
   "email": "erwan@gmail.com",
@@ -36,7 +36,7 @@ GET http://localhost:3000/users
 GET http://localhost:3000/reviews
 
 ###GET review by author
-GET http://localhost:3000/reviews/2
+GET http://localhost:3000/reviews/11
 
 ###GET all categories
 GET http://localhost:3000/categories
@@ -144,31 +144,6 @@ Content-Type: application/json
 
 
 
-########################## UPDATE SKILL ##########################
-### Update my wanted skills
-PUT http://localhost:3000/me/wanted-skills
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "wantedSkills": [1, 2, 3, 4, 5]
-}
-
-### Try to send invalid wantedSkills
-PUT http://localhost:3000/me/wanted-skills
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "wantedSkills": ["javascript", "node"]
-}
 
 
-### Try to send an empty wantedSkills array
-PUT http://localhost:3000/me/wanted-skills
-Authorization: Bearer {{token}}
-Content-Type: application/json
 
-{
-  "wantedSkills": []
-}

@@ -3,7 +3,7 @@ import { Sequelize } from "sequelize";
 import validator from "validator";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, User } from "../models/associations.js";
+import { Category, User, Review } from "../models/associations.js";
 import {
 	sanitizeString,
 	sanitizeOptionalString,
@@ -244,5 +244,29 @@ export const userController = {
 		return res
 			.status(200)
 			.json({ message: "Compétences mises à jour avec succès" });
+	},
+
+	updateReview: async (req, res, next) => {
+		const { reviewId } = req.params;
+		const { grade, content } = req.validatedData;
+		const userId = req.user.id;
+
+		const review = await Review.findByPk(reviewId);
+
+		if (!review) {
+			return res.status(404).json({ message: "Review non trouvée" });
+		}
+
+		if (review.user_id !== userId) {
+			return res
+				.status(403)
+				.json({ message: "Vous ne pouvez modifier que vos propres reviews" });
+		}
+
+		await review.update({ grade, content });
+
+		return res
+			.status(200)
+			.json({ message: "Review mise à jour avec succès", review });
 	},
 };
