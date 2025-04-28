@@ -1,17 +1,21 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5tZXR0b3VjaEBnbWFpbC5jb20iLCJ1c2VybmFtZSI6ImVyd2FuIiwiaWF0IjoxNzQ1ODQyODkzLCJleHAiOjE3NDU4NTAwOTN9.PyS_nGsjRuOcoQVzoYjz9RVek5RejmcsWZMtC4llY-A
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTg0MjE0NywiZXhwIjoxNzQ1ODQ5MzQ3fQ.IcTINFyN_Mp-rNFOVb_pz7n9hHzHQV-aborGuH-HWH0
+
+
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "erwann",
+
+  "username": "Erwan",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
-  "email": "erwanmettouchi@gmail.com",
-  "password": "Erwan1234+",
+  "email": "erwan@gmail.com",
+  "password": "ErwanMettouchi1234+",
   "avatar": "",
   "role": "member",
-  "description": "Bonjour"
+  "description": "Travail en boucle"
 }
 
 
@@ -20,8 +24,9 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "erwanmettouch@gmail.com",
-  "password": "Erwan1234+"
+
+  "email": "erwan@gmail.com",
+  "password": "ErwanMettouchi1234+"
 }
 
 
@@ -36,7 +41,7 @@ GET http://localhost:3000/users
 GET http://localhost:3000/reviews
 
 ###GET review by author
-GET http://localhost:3000/reviews/2
+GET http://localhost:3000/reviews/5
 
 ###GET all categories
 GET http://localhost:3000/categories
@@ -55,7 +60,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "message" : "<script></script>"
+  "message" : "<b>Bonjour 3</b>"
 }
 
 ### GET all posts written by 1 user
@@ -92,6 +97,43 @@ GET http://localhost:3000/skills
 ###
 GET http://localhost:3000/propositions/1
 
+
+
+
+################ USER PROFILES #######################
+
+### 1. Normal Update
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanMisAJour",
+  "description": "Nouvelle description après mise à jour"
+}
+
+###
+### Fail to change already Used email
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "mathieu@gmail.com"
+}
+
+###
+### Empty request should fail
+PATCH http://localhost:3000/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+### Update All fields at once
+PATCH http://localhost:3000/me
+
 ###
 GET http://localhost:3000/users/500
 
@@ -105,9 +147,19 @@ Authorization: Bearer {{token}}
 
 ###
 POST http://localhost:3000/me/propositions/33
+
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "content" : "<b>bonjour</b>"
+  "username": "ErwanTotalUpdate",
+  "firstname": "Erwanupdated",
+  "lastname": "Metouchi2",
+  "email": "erwan2@gmail.com",
+  "avatar": "/avatars/avatar2.png",
+  "description": "Je suis toujours en train de bosser update"
 }
+
+
+
+
