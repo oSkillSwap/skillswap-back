@@ -2,14 +2,14 @@
 
 
 ###
-GET http://localhost:3000/users
+GET http://localhost:3000/api/users
 
 
 
 ################ USER PROFILES #######################
 
 ### 1. Normal Update
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 ###
 ### Fail to change already Used email
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 
 ###
 ### Empty request should fail
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ### Update All fields at once
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -55,7 +55,7 @@ Content-Type: application/json
 
 ########################## UPDATE SKILL ##########################
 ### Update my wanted skills
-PUT http://localhost:3000/me/wanted-skills
+PUT http://localhost:3000/api/me/wanted-skills
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -64,7 +64,7 @@ Content-Type: application/json
 }
 
 ### Try to send invalid wantedSkills
-PUT http://localhost:3000/me/wanted-skills
+PUT http://localhost:3000/api/me/wanted-skills
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -74,7 +74,7 @@ Content-Type: application/json
 
 
 ### Try to send an empty wantedSkills array
-PUT http://localhost:3000/me/wanted-skills
+PUT http://localhost:3000/api/me/wanted-skills
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -85,7 +85,7 @@ Content-Type: application/json
 
 
 ### PATCH user skills (update user_has_skill table)
-PATCH http://localhost:3000/me/skills
+PATCH http://localhost:3000/api/me/skills
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -94,7 +94,7 @@ Content-Type: application/json
 }
 
 ### PATCH user skills - remove all skills
-PATCH http://localhost:3000/me/skills
+PATCH http://localhost:3000/api/me/skills
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -104,7 +104,7 @@ Content-Type: application/json
 
 
 ### PATCH a review (update)
-PATCH http://localhost:3000/me/reviews/3
+PATCH http://localhost:3000/api/me/reviews/3
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -115,5 +115,5 @@ Content-Type: application/json
 
 
 ### Delete a user
-DELETE http://localhost:3000/me
+DELETE http://localhost:3000/api/me
 Authorization: Bearer {{token}}

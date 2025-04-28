@@ -4,7 +4,7 @@
 
 
 ### Register a user
-POST http://localhost:3000/register
+POST http://localhost:3000/api/register
 Content-Type: application/json
 
 {
@@ -21,7 +21,7 @@ Content-Type: application/json
 
 
 ###login a user
-POST http://localhost:3000/login
+POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
@@ -32,31 +32,31 @@ Content-Type: application/json
 
 
 ###Test the JWT connexion
-GET http://localhost:3000/me
+GET http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 
 ###
-GET http://localhost:3000/users
+GET http://localhost:3000/api/users
 
 ### GET all reviews
-GET http://localhost:3000/reviews
+GET http://localhost:3000/api/reviews
 
 ###GET review by author
-GET http://localhost:3000/reviews/5
+GET http://localhost:3000/api/reviews/5
 
 ###GET all categories
-GET http://localhost:3000/categories
+GET http://localhost:3000/api/categories
 
 ###GET all my messages
-GET http://localhost:3000/me/messages
+GET http://localhost:3000/api/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/me/messages/16
+GET http://localhost:3000/api/me/messages/16
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/16
+POST http://localhost:3000/api/me/messages/16
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -65,17 +65,17 @@ Content-Type: application/json
 }
 
 ### GET all posts written by 1 user
-GET http://localhost:3000/posts/5
+GET http://localhost:3000/api/posts/5
 
 ### GET all posts
-GET http://localhost:3000/posts
+GET http://localhost:3000/api/posts
 
 ### GET all posts
-GET http://localhost:3000/me/posts
+GET http://localhost:3000/api/me/posts
 Authorization: Bearer {{token}}
 
 ### create new post
-POST http://localhost:3000/me/posts
+POST http://localhost:3000/api/me/posts
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -87,15 +87,15 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/users/follows/1
+GET http://localhost:3000/api/users/follows/1
 
 
 
 ###
-GET http://localhost:3000/skills
+GET http://localhost:3000/api/skills
 
 ###
-GET http://localhost:3000/propositions/1
+GET http://localhost:3000/api/propositions/1
 
 
 
@@ -103,7 +103,7 @@ GET http://localhost:3000/propositions/1
 ################ USER PROFILES #######################
 
 ### 1. Normal Update
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -114,7 +114,7 @@ Content-Type: application/json
 
 ###
 ### Fail to change already Used email
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -124,7 +124,7 @@ Content-Type: application/json
 
 ###
 ### Empty request should fail
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -132,21 +132,21 @@ Content-Type: application/json
 }
 
 ### Update All fields at once
-PATCH http://localhost:3000/me
+PATCH http://localhost:3000/api/me
 
 ###
-GET http://localhost:3000/users/500
+GET http://localhost:3000/api/users/500
 
 ###
-GET http://localhost:3000/me/users
+GET http://localhost:3000/api/me/users
 Authorization: Bearer {{token}}
 
 ###
-GET http://localhost:3000/me/propositions
+GET http://localhost:3000/api/me/propositions
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/propositions/31
+POST http://localhost:3000/api/me/propositions/31
 Authorization: Bearer {{token}}
 Content-Type: application/json
 {
@@ -155,12 +155,12 @@ Content-Type: application/json
 
 
 ### Accept a proposition
-PATCH http://localhost:3000/propositions/23/accept
+PATCH http://localhost:3000/api/propositions/23/accept
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 ### Create a review
-POST http://localhost:3000/reviews
+POST http://localhost:3000/api/reviews
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -174,18 +174,18 @@ Content-Type: application/json
  
 
 ###
-DELETE http://localhost:3000/me
+DELETE http://localhost:3000/api/me
 Authorization: Bearer {{token}}
 
 ###
-GET http://localhost:3000/me/follows
+GET http://localhost:3000/api/me/follows
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/follow/11
+POST http://localhost:3000/api/me/follow/11
 Authorization: Bearer {{token}}
 
 ###
-DELETE http://localhost:3000/me/follow/12
+DELETE http://localhost:3000/api/me/follow/12
 Authorization: Bearer {{token}}
 
