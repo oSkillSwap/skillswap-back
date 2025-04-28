@@ -39,6 +39,12 @@ router.patch(
 	controllerwrapper(userController.updateUser),
 );
 
+router.delete(
+	"/me",
+	authenticate,
+	controllerwrapper(userController.deleteUser),
+);
+
 router.put(
 	"/me/wanted-skills",
 	authenticate,

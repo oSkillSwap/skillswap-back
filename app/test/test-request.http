@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgzOTAxNywiZXhwIjoxNzQ1ODQ2MjE3fQ.LMvBGr2rz_221oA4dHBqGbi1k18qWHS_rkFQM7qbqwQ
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTg0MjE0NywiZXhwIjoxNzQ1ODQ5MzQ3fQ.IcTINFyN_Mp-rNFOVb_pz7n9hHzHQV-aborGuH-HWH0
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json

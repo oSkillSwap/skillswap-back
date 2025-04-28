@@ -269,4 +269,17 @@ export const userController = {
 			.status(200)
 			.json({ message: "Review mise à jour avec succès", review });
 	},
+
+	deleteUser: async (req, res, next) => {
+		const userId = req.user.id; // Get the user ID from the token
+		const user = await User.findByPk(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "Utilisateur non trouvé" });
+		}
+
+		await user.destroy(); // Delete User
+
+		return res.status(200).json({ message: "Compte supprimé avec succès" });
+	},
 };
