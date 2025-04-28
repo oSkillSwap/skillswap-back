@@ -24,9 +24,6 @@ import {
 	updateReviewSchema,
 } from "../schemas/user.schema.js";
 
-
-
-
 export const router = Router();
 
 router.get("/me", authenticate, (req, res) => {
@@ -68,7 +65,7 @@ router.patch(
 	authenticate,
 	validateParams("userId"),
 	validate(updateReviewSchema),
-	controllerwrapper(userController.updateReview),
+	controllerwrapper(reviewController.updateReview),
 );
 
 router.get("/users", controllerwrapper(userController.getUsers));
@@ -84,6 +81,11 @@ router.post(
 );
 
 router.get("/reviews", controllerwrapper(reviewController.getReviews));
+router.post(
+	"/reviews",
+	authenticate,
+	controllerwrapper(reviewController.createReview),
+);
 router.get(
 	"/reviews/:id",
 	validateParams("id"),
@@ -150,28 +152,34 @@ router.get("/skills", controllerwrapper(skillController.getSkills));
 // );
 
 router.get(
-  "/users/:userId",
-  validateParams("userId"),
-  controllerwrapper(userController.getOneUser)
+	"/users/:userId",
+	validateParams("userId"),
+	controllerwrapper(userController.getOneUser),
 );
 
 router.get("/me/users", authenticate, async (req, res, next) => {
-  req.params.userId = req.user.id;
-  return userController.getOneUser(req, res, next);
+	req.params.userId = req.user.id;
+	return userController.getOneUser(req, res, next);
 });
 
 router.get(
-  "/me/propositions",
-  authenticate,
-  controllerwrapper(propositionController.getUserSentPropositions)
+	"/me/propositions",
+	authenticate,
+	controllerwrapper(propositionController.getUserSentPropositions),
 );
 
 router.post(
-  "/me/propositions/:postId",
-  authenticate,
-  validateParams("postId"),
-  validate(propositionSchema),
-  controllerwrapper(propositionController.sendPropositionToPost)
+	"/me/propositions/:postId",
+	authenticate,
+	validateParams("postId"),
+	validate(propositionSchema),
+	controllerwrapper(propositionController.sendPropositionToPost),
+);
+
+router.patch(
+	"/propositions/:id/accept",
+	authenticate,
+	controllerwrapper(propositionController.acceptProposition),
 );
 
 router.use(errorMiddleware);

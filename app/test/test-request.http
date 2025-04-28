@@ -1,5 +1,5 @@
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW5uIiwiaWF0IjoxNzQ1ODQ2ODc3LCJleHAiOjE3NDU4NTQwNzd9.TX8Q5Tdp3IFVJzFuhkfwlgipimV8SEjCHIr0iRPkCrc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW5uIiwiaWF0IjoxNzQ1ODUzNzc1LCJleHAiOjE3NDU4NjA5NzV9.ImFIj1awAT_uxt-5SmXkThA3RD-l6kIbbNpTNXmXvh4
 
 
 ### Register a user
@@ -8,10 +8,10 @@ Content-Type: application/json
 
 {
 
-  "username": "Erwann",
-  "lastName": "Mettouchi",
-  "firstName": "Erwan",
-  "email": "erwann@gmail.com",
+  "username": "Greg",
+  "lastName": "greg",
+  "firstName": "greg",
+  "email": "greg@gmail.com",
   "password": "ErwanMettouchi1234+",
   "avatar": "",
   "role": "member",
@@ -79,8 +79,8 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "title": "",
-  "content" : "",
+  "title": "un test de post",
+  "content" : "un texte de test",
   "skill_id" : 11
 }
 
@@ -146,10 +146,29 @@ GET http://localhost:3000/me/propositions
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/propositions/5
+POST http://localhost:3000/me/propositions/31
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "content" : ""
+  "content" : "une proposition"
+}
+
+
+### Accept a proposition
+PATCH http://localhost:3000/propositions/23/accept
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Create a review
+POST http://localhost:3000/reviews
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Super collaboration",
+  "postId": 31,
+  "propositionId": 23,
+  "grade": 5,
+  "comment": "Super collaboration, très professionnel !"
 }
