@@ -86,7 +86,7 @@ export const messageController = {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
-    if (senderId.toString() === userId) {
+    if (senderId === Number(userId)) {
       return next(
         new ForbiddenError("Impossible d'envoyer un message à soi-même")
       );

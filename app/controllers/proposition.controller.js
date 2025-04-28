@@ -12,8 +12,13 @@ import { Post, Proposition, User } from "../models/associations.js";
 
 export const propositionController = {
   // Get all propositions sent to the logged-in user
-  getUserSentPropositions: async (req, res, _) => {
+  getUserSentPropositions: async (req, res, next) => {
     const user = req.user; // Get the logged-in user
+
+    if (!user) {
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    }
+
     const propositions = await Proposition.findAll({
       where: { sender_id: user.id }, // Find propositions where the user is the receiver
       include: [

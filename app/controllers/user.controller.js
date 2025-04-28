@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import sanitize from "sanitize-html";
 import { Sequelize } from "sequelize";
 import validator from "validator";
+import { sequelize } from "../data/client.js";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ConflictError } from "../errors/conflict-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
@@ -16,7 +17,7 @@ import {
 import { Category, Review, User } from "../models/associations.js";
 
 export const userController = {
-  register: async (req, res) => {
+  register: async (req, res, next) => {
     const {
       username,
       lastName,
@@ -63,12 +64,12 @@ export const userController = {
   },
 
   // Login function to authenticate users
-  login: async (req, res) => {
+  login: async (req, res, next) => {
     const { email, password } = req.validatedData;
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return next(new ConflictError("Ce nom d'utilisateur est déjà utilisé"));
+      return next(new UnauthorizedError("Identifiants incorrects"));
     }
 
     const isPasswordValid = await argon2.verify(user.password, password);
@@ -321,5 +322,45 @@ export const userController = {
     await user.destroy(); // Delete User
 
     return res.status(200).json({ message: "Compte supprimé avec succès" });
+  },
+  followUser: async (req, res, next) => {
+    const { userId } = req.params;
+    const userLoggedIn = req.user;
+
+    const targetUser = await User.findByPk(userId);
+    const user = await User.findByPk(userLoggedIn.id);
+
+    if (!targetUser) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
+
+    if (!userLoggedIn) {
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    }
+
+    if (userLoggedIn.id === Number(userId)) {
+      return next(
+        new BadRequestError("Vous ne pouvez pas vous suivre vous-même")
+      );
+    }
+
+    const existingFollow = await User.findOne({
+      where: { id: user.id },
+      include: {
+        required: true,
+        association: "Follows",
+        where: { id: userId },
+      },
+    });
+
+    if (existingFollow) {
+      return next(new ConflictError("Vous suivez déjà cet utilisateur"));
+    }
+
+    await user.addFollow(targetUser);
+
+    return res
+      .status(200)
+      .json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
   },
 };

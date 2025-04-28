@@ -1,6 +1,5 @@
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW5uIiwiaWF0IjoxNzQ1ODQ2ODc3LCJleHAiOjE3NDU4NTQwNzd9.TX8Q5Tdp3IFVJzFuhkfwlgipimV8SEjCHIr0iRPkCrc
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW5uIiwiaWF0IjoxNzQ1ODUxNTgzLCJleHAiOjE3NDU4NTg3ODN9.mI3pO1z52NThJ-PINHIjCxEscEltgRiJ5VbGJzdwEo0
 
 ### Register a user
 POST http://localhost:3000/register
@@ -51,11 +50,11 @@ GET http://localhost:3000/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/me/messages/13
+GET http://localhost:3000/me/messages/16
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/13
+POST http://localhost:3000/me/messages/16
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -79,8 +78,8 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "title": "",
-  "content" : "",
+  "title": "e",
+  "content" : "e",
   "skill_id" : 11
 }
 
@@ -153,3 +152,11 @@ Content-Type: application/json
 {
   "content" : ""
 }
+
+###
+DELETE http://localhost:3000/me
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/me/follow/11
+Authorization: Bearer {{token}}
