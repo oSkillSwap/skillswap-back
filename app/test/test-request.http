@@ -1,9 +1,13 @@
+
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTg0MjE0NywiZXhwIjoxNzQ1ODQ5MzQ3fQ.IcTINFyN_Mp-rNFOVb_pz7n9hHzHQV-aborGuH-HWH0
+
+
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
+
   "username": "Erwan",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
@@ -20,6 +24,7 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
+
   "email": "erwan@gmail.com",
   "password": "ErwanMettouchi1234+"
 }
@@ -50,7 +55,7 @@ GET http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/5
+POST http://localhost:3000/me/messages/11
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -59,7 +64,7 @@ Content-Type: application/json
 }
 
 ### GET all posts written by 1 user
-GET http://localhost:3000/posts/50
+GET http://localhost:3000/posts/5
 
 ### GET all posts
 GET http://localhost:3000/posts
@@ -80,7 +85,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/users/follows/50
+GET http://localhost:3000/users/follows/1
 
 ###
 GET http://localhost:3000/me/follows
@@ -91,8 +96,6 @@ GET http://localhost:3000/skills
 
 ###
 GET http://localhost:3000/propositions/1
-
-
 
 
 
@@ -130,6 +133,21 @@ Content-Type: application/json
 
 ### Update All fields at once
 PATCH http://localhost:3000/me
+
+###
+GET http://localhost:3000/users/500
+
+###
+GET http://localhost:3000/me/users
+Authorization: Bearer {{token}}
+
+###
+GET http://localhost:3000/me/propositions
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/me/propositions/33
+
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -141,6 +159,7 @@ Content-Type: application/json
   "avatar": "/avatars/avatar2.png",
   "description": "Je suis toujours en train de bosser update"
 }
+
 
 
 

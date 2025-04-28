@@ -12,6 +12,11 @@ Post.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    isClosed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      default: false,
+    },
   },
   {
     sequelize,

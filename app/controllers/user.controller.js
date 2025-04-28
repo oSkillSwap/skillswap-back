@@ -170,8 +170,49 @@ export const userController = {
 		return res.status(200).json({ user });
 	},
 	getOneUser: async (req, res, next) => {
-		// TODO : récupérer les informations de l'utilisateur (disponibilités, intérêts, compétences, description, nombre de reviews faites sur lui, note moyenne, username, s'il est disponible ou non)
-	},
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId, {
+      attributes: {
+        exclude: ["password", "email"],
+        include: [
+          [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
+          [
+            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
+            "nbOfReviews",
+          ],
+        ],
+      },
+      include: [
+        {
+          association: "Skills",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+        {
+          association: "WantedSkills",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+        {
+          association: "Availabilities",
+          attributes: ["day_of_the_week", "time_slot"],
+          through: { attributes: [] },
+        },
+        {
+          association: "Reviews",
+          attributes: [],
+        },
+      ],
+      group: ["User.id", "Skills.id", "WantedSkills.id", "Availabilities.id"],
+    });
+
+    if (!user) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
+
+    return res.status(200).json({ user });
+  },
 
 	updateUser: async (req, res, next) => {
 		const userId = req.user.id; // Get the user ID from the token
@@ -282,4 +323,5 @@ export const userController = {
 
 		return res.status(200).json({ message: "Compte supprimé avec succès" });
 	},
+
 };

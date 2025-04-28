@@ -1,6 +1,8 @@
 import sanitize from "sanitize-html";
 import { Op } from "sequelize";
+import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
+import { ValidationError } from "../errors/validation-error.js";
 import { Message, User } from "../models/associations.js";
 import { messageSchema } from "../schemas/message.schema.js";
 
@@ -84,15 +86,17 @@ export const messageController = {
     }
 
     if (senderId.toString() === userId) {
-      return res
-        .status(403)
-        .json({ message: "Impossible d'envoyer un message à soi-même" });
+      return next(
+        new ForbiddenError("Impossible d'envoyer un message à soi-même")
+      );
     }
 
     if (!sanitizedMessage || !sanitizedMessage.trim()) {
-      return res
-        .status(400)
-        .json({ message: "Le message invalide après suppression des balises" });
+      return next(
+        new ValidationError(
+          "Le message est invalide après suppression des balises"
+        )
+      );
     }
 
     const newMessage = await Message.create({
