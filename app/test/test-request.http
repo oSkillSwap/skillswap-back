@@ -1,4 +1,5 @@
 
+
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW5uIiwiaWF0IjoxNzQ1ODUzNzc1LCJleHAiOjE3NDU4NjA5NzV9.ImFIj1awAT_uxt-5SmXkThA3RD-l6kIbbNpTNXmXvh4
 
 
@@ -51,11 +52,11 @@ GET http://localhost:3000/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/me/messages/13
+GET http://localhost:3000/me/messages/16
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/13
+POST http://localhost:3000/me/messages/16
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -79,6 +80,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
+
   "title": "un test de post",
   "content" : "un texte de test",
   "skill_id" : 11
@@ -87,9 +89,7 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/users/follows/1
 
-###
-GET http://localhost:3000/me/follows
-Authorization: Bearer {{token}}
+
 
 ###
 GET http://localhost:3000/skills
@@ -149,7 +149,6 @@ Authorization: Bearer {{token}}
 POST http://localhost:3000/me/propositions/31
 Authorization: Bearer {{token}}
 Content-Type: application/json
-
 {
   "content" : "une proposition"
 }
@@ -164,7 +163,6 @@ Content-Type: application/json
 POST http://localhost:3000/reviews
 Authorization: Bearer {{token}}
 Content-Type: application/json
-
 {
   "title": "Super collaboration",
   "postId": 31,
@@ -172,3 +170,21 @@ Content-Type: application/json
   "grade": 5,
   "comment": "Super collaboration, très professionnel !"
 }
+ 
+
+###
+DELETE http://localhost:3000/me
+Authorization: Bearer {{token}}
+
+###
+GET http://localhost:3000/me/follows
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/me/follow/11
+Authorization: Bearer {{token}}
+
+###
+DELETE http://localhost:3000/me/follow/12
+Authorization: Bearer {{token}}
+
