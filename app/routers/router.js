@@ -178,4 +178,11 @@ router.post(
   controllerwrapper(userController.followUser)
 );
 
+router.delete(
+  "/me/follow/:userId",
+  authenticate,
+  validateParams("userId"),
+  controllerwrapper(userController.unfollowUser)
+);
+
 router.use(errorMiddleware);
