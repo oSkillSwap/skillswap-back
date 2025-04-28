@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { availabilityController } from "../controllers/availability.controller.js";
-import { categoryontroller } from "../controllers/category.controller.js";
+import { categoryController } from "../controllers/category.controller.js";
 import { messageController } from "../controllers/message.controller.js";
 import { postController } from "../controllers/post.controller.js";
 import { propositionController } from "../controllers/proposition.controller.js";
@@ -37,7 +37,7 @@ router.get(
   controllerwrapper(reviewController.getReviewsFromUser)
 );
 
-router.get("/categories", controllerwrapper(categoryontroller.getCategories));
+router.get("/categories", controllerwrapper(categoryController.getCategories));
 
 router.get("/me", authenticate, (req, res) => {
   res.status(200).json({
@@ -98,9 +98,20 @@ router.get("/me/follows", authenticate, async (req, res, next) => {
 });
 
 router.get("/skills", controllerwrapper(skillController.getSkills));
+// router.get(
+//   "/propositions/:userId",
+//   controllerwrapper(propositionController.getSentAndReceivedPropositions)
+// );
+
 router.get(
-  "/propositions/:userId",
-  controllerwrapper(propositionController.getSentAndReceivedPropositions)
+  "/users/:userId",
+  validateParams("userId"),
+  controllerwrapper(userController.getOneUser)
 );
+
+router.get("/me/users", authenticate, async (req, res, next) => {
+  req.params.userId = req.user.id;
+  return userController.getOneUser(req, res, next);
+});
 
 router.use(errorMiddleware);
