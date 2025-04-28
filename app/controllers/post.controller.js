@@ -1,6 +1,8 @@
 import sanitize from "sanitize-html";
 import { Op, Sequelize } from "sequelize";
 import validator from "validator";
+import { BadRequestError } from "../errors/badrequest-error.js";
+import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import {
   Post,
@@ -140,16 +142,14 @@ export const postController = {
   },
 
   // Create a new post
-  createPost: async (req, res, _) => {
+  createPost: async (req, res, next) => {
     const user = req.user; // Get the logged-in user
     const { content, title, skill_id } = req.validatedData; // Extract validated data from the request
 
     // Check if the skill exists
     const skill = await Skill.findByPk(skill_id);
     if (!skill) {
-      return res
-        .status(400)
-        .json({ message: "skill_id invalide: Compétence non trouvée" });
+      return next(new NotFoundError("Compétence non trouvée"));
     }
 
     // Check if the user already has a post with the same skill
@@ -167,16 +167,19 @@ export const postController = {
     });
 
     if (userPostCount >= maxPostsPerUser) {
-      return res.status(400).json({
-        message: `Limite de ${maxPostsPerUser} posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.`,
-      });
+      return next(
+        new ForbiddenError(
+          `Limite de ${maxPostsPerUser} posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.`
+        )
+      );
     }
 
     if (existingPost) {
-      return res.status(400).json({
-        message:
-          "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
-      });
+      return next(
+        new BadRequestError(
+          "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence."
+        )
+      );
     }
 
     // Sanitize the content and title to prevent XSS attacks
@@ -189,6 +192,7 @@ export const postController = {
       title: sanitizedTitle,
       skill_id,
       user_id: user.id,
+      isClosed: false,
     });
 
     return res.status(201).json({

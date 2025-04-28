@@ -126,6 +126,7 @@ for (const user of users) {
       await Post.create({
         title: faker.company.catchPhrase(),
         content: faker.lorem.paragraph(),
+        isClosed: false,
         skill_id: randomSkill.id, // Assigner une compétence au post
         user_id: user.id,
       })

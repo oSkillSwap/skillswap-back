@@ -49,12 +49,14 @@ export const userController = {
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ message: "Identifiants incorrects" });
+      return next(new UnauthorizedError("Identifiants incorrects"));
     }
 
     const isPasswordValid = await argon2.verify(user.password, password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Mot de passe incorrect" });
+      return next(
+        new UnauthorizedError("Email et/ou mot de passe incorrect(s)")
+      );
     }
 
     const token = generateToken({
