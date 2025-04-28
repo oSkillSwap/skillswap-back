@@ -4,7 +4,7 @@
   "description": "Backend api SkillSwap",
   "main": "main.js",
   "scripts": {
-    "test": "test",
+    "test": "jest",
     "dev": "node --watch --env-file=.env main.js",
     "db:create": "node --env-file=.env ./app/data/create-tables.js",
     "db:seed": "node --env-file=.env ./app/data/seed-tables.js",
@@ -35,6 +35,7 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
     "@biomejs/biome": "1.9.4",
     "jest": "^29.7.0",
     "node-mocks-http": "^1.16.2",

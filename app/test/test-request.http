@@ -1,10 +1,10 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5tZXR0b3VjaGlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyNzg3MywiZXhwIjoxNzQ1ODM1MDczfQ.hxjUFuC2qTwvqbx_Yogr5anakoqJjq_nY_xV4jX17VA
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5tZXR0b3VjaEBnbWFpbC5jb20iLCJ1c2VybmFtZSI6ImVyd2FuIiwiaWF0IjoxNzQ1ODQyODkzLCJleHAiOjE3NDU4NTAwOTN9.PyS_nGsjRuOcoQVzoYjz9RVek5RejmcsWZMtC4llY-A
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "Winnblaser",
+  "username": "erwann",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
   "email": "erwanmettouchi@gmail.com",
@@ -20,7 +20,7 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "erwanmettouchi@gmail.com",
+  "email": "erwanmettouch@gmail.com",
   "password": "Erwan1234+"
 }
 
@@ -50,16 +50,16 @@ GET http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/5
+POST http://localhost:3000/me/messages/11
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "message" : "<b>Bonjour 2</b>"
+  "message" : "<script></script>"
 }
 
 ### GET all posts written by 1 user
-GET http://localhost:3000/posts/1
+GET http://localhost:3000/posts/5
 
 ### GET all posts
 GET http://localhost:3000/posts
@@ -80,7 +80,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/users/follows/50
+GET http://localhost:3000/users/follows/1
 
 ###
 GET http://localhost:3000/me/follows
@@ -93,8 +93,21 @@ GET http://localhost:3000/skills
 GET http://localhost:3000/propositions/1
 
 ###
-GET http://localhost:3000/users/5
+GET http://localhost:3000/users/500
 
 ###
 GET http://localhost:3000/me/users
 Authorization: Bearer {{token}}
+
+###
+GET http://localhost:3000/me/propositions
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/me/propositions/33
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content" : "<b>bonjour</b>"
+}

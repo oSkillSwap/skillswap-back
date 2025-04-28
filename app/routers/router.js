@@ -14,6 +14,7 @@ import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
 import { messageSchema } from "../schemas/message.schema.js";
 import { postSchema } from "../schemas/post.schema.js";
+import { propositionSchema } from "../schemas/proposition.schema.js";
 import { loginSchema, registerSchema } from "../schemas/user.schema.js";
 
 export const router = Router();
@@ -113,5 +114,19 @@ router.get("/me/users", authenticate, async (req, res, next) => {
   req.params.userId = req.user.id;
   return userController.getOneUser(req, res, next);
 });
+
+router.get(
+  "/me/propositions",
+  authenticate,
+  controllerwrapper(propositionController.getUserSentPropositions)
+);
+
+router.post(
+  "/me/propositions/:postId",
+  authenticate,
+  validateParams("postId"),
+  validate(propositionSchema),
+  controllerwrapper(propositionController.sendPropositionToPost)
+);
 
 router.use(errorMiddleware);
