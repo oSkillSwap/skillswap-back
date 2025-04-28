@@ -1,6 +1,7 @@
 import argon2 from "argon2";
 import { Sequelize } from "sequelize";
 import validator from "validator";
+import { NotFoundError } from "../errors/not-found-error.js";
 import { generateToken } from "../helpers/jwt.js";
 import { Category, User } from "../models/associations.js";
 
@@ -124,7 +125,7 @@ export const userController = {
     });
     return res.status(200).json({ users });
   },
-  getFollowersAndFollowsFromUser: async (req, res) => {
+  getFollowersAndFollowsFromUser: async (req, res, next) => {
     const { id } = req.params;
     const user = await User.findByPk(id, {
       attributes: [],
@@ -143,10 +144,12 @@ export const userController = {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+      return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     return res.status(200).json({ user });
   },
-  getOneUser: async (req, res) => {},
+  getOneUser: async (req, res, next) => {
+    // TODO : récupérer les informations de l'utilisateur (disponibilités, intérêts, compétences, description, nombre de reviews faites sur lui, note moyenne, username, s'il est disponible ou non)
+  },
 };

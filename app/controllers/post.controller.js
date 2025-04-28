@@ -1,6 +1,7 @@
 import sanitize from "sanitize-html";
 import { Op, Sequelize } from "sequelize";
 import validator from "validator";
+import { NotFoundError } from "../errors/not-found-error.js";
 import {
   Post,
   Proposition,
@@ -18,7 +19,7 @@ export const postController = {
     const user = await User.findByPk(id);
     if (!user) {
       // If user is not found, return a 404 error
-      return res.status(404).json({ message: "Aucun utilisateur trouvé" });
+      return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     // Find all posts created by the user

@@ -59,7 +59,7 @@ Content-Type: application/json
 }
 
 ### GET all posts written by 1 user
-GET http://localhost:3000/posts/4
+GET http://localhost:3000/posts/50
 
 ### GET all posts
 GET http://localhost:3000/posts
@@ -80,7 +80,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/users/follows/2
+GET http://localhost:3000/users/follows/50
 
 ###
 GET http://localhost:3000/me/follows
@@ -88,3 +88,6 @@ Authorization: Bearer {{token}}
 
 ###
 GET http://localhost:3000/skills
+
+###
+GET http://localhost:3000/propositions/1

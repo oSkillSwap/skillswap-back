@@ -1,5 +1,6 @@
 import sanitize from "sanitize-html";
 import { Op } from "sequelize";
+import { NotFoundError } from "../errors/not-found-error.js";
 import { Message, User } from "../models/associations.js";
 import { messageSchema } from "../schemas/message.schema.js";
 
@@ -38,7 +39,7 @@ export const messageController = {
     const conversationPartner = await User.findByPk(userId);
 
     if (!conversationPartner) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+      return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     const conversation = await Message.findAll({
@@ -79,7 +80,7 @@ export const messageController = {
     const sanitizedMessage = sanitize(message).trim();
 
     if (!conversationPartner) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+      return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     if (senderId.toString() === userId) {
