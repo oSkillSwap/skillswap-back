@@ -3,11 +3,13 @@ import { availabilityController } from "../controllers/availability.controller.j
 import { categoryontroller } from "../controllers/category.controller.js";
 import { messageController } from "../controllers/message.controller.js";
 import { postController } from "../controllers/post.controller.js";
+import { propositionController } from "../controllers/proposition.controller.js";
 import { reviewController } from "../controllers/review.controller.js";
 import { skillController } from "../controllers/skill.controller.js";
 import { userController } from "../controllers/user.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
+import { errorMiddleware } from "../middlewares/error.middleware.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
 import { messageSchema } from "../schemas/message.schema.js";
@@ -96,3 +98,9 @@ router.get("/me/follows", authenticate, async (req, res, next) => {
 });
 
 router.get("/skills", controllerwrapper(skillController.getSkills));
+router.get(
+  "/propositions/:userId",
+  controllerwrapper(propositionController.getSentAndReceivedPropositions)
+);
+
+router.use(errorMiddleware);

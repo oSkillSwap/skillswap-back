@@ -1,4 +1,5 @@
 import { Op } from "sequelize";
+import { NotFoundError } from "../errors/not-found-error.js";
 import { Post, Proposition, Review, User } from "../models/associations.js";
 
 export const reviewController = {
@@ -35,7 +36,7 @@ export const reviewController = {
     const user = await User.findByPk(id);
 
     if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+      return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     const reviews = await Review.findAll({
