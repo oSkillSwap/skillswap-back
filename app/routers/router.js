@@ -114,4 +114,10 @@ router.get("/me/users", authenticate, async (req, res, next) => {
   return userController.getOneUser(req, res, next);
 });
 
+router.get(
+  "/me/propositions",
+  authenticate,
+  controllerwrapper(propositionController.getUserSentPropositions)
+);
+
 router.use(errorMiddleware);

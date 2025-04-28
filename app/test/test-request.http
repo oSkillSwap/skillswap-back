@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5tZXR0b3VjaGlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgyNzg3MywiZXhwIjoxNzQ1ODM1MDczfQ.hxjUFuC2qTwvqbx_Yogr5anakoqJjq_nY_xV4jX17VA
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5tZXR0b3VjaGlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTgzNDg0NSwiZXhwIjoxNzQ1ODQyMDQ1fQ.kQT63ZD4G5o5hen_1legTTOP1LH2lh1JfkDc0i6Y2Ns
 ### Register a user
 POST http://localhost:3000/register
 Content-Type: application/json
@@ -50,7 +50,7 @@ GET http://localhost:3000/me/messages/5
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/me/messages/5
+POST http://localhost:3000/me/messages/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -76,11 +76,11 @@ Content-Type: application/json
 {
   "title": "J'aimerais apprendre React!",
   "content" : "<b>Bonjour 2</b>",
-  "skill_id" : 11
+  "skill_id" : 10
 }
 
 ###
-GET http://localhost:3000/users/follows/50
+GET http://localhost:3000/users/follows/1
 
 ###
 GET http://localhost:3000/me/follows
@@ -97,4 +97,8 @@ GET http://localhost:3000/users/5
 
 ###
 GET http://localhost:3000/me/users
+Authorization: Bearer {{token}}
+
+###
+GET http://localhost:3000/me/propositions
 Authorization: Bearer {{token}}

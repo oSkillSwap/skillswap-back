@@ -109,9 +109,11 @@ export const userController = {
         // Excluse password, email, updatedAt and createdAt fields
         exclude: ["password", "email", "updatedAt", "createdAt"],
         include: [
-          // Calculate the average grade of the user from their reviews
-          Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), // averageGrade
-          Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")), // nbOfReviews
+          [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
+          [
+            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
+            "nbOfReviews",
+          ],
         ],
       },
       include: [skillsAndCategory, wantedSkills, reviews],
