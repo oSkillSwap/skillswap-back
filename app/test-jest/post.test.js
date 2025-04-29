@@ -1,8 +1,10 @@
 import { Sequelize } from "sequelize";
 import { postController } from "../controllers/post.controller.js";
-import { Post, User, Proposition } from "../models/associations.js";
+import { Post, User, Proposition, Skill } from "../models/associations.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
+import { BadRequestError } from "../errors/badrequest-error.js";
+import { ForbiddenError } from "../errors/forbidden-error.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 
 jest.mock("../models/associations.js");
@@ -387,6 +389,170 @@ describe("Post module", () => {
 			const [error] = next.mock.calls[0];
 			expect(error).toBeInstanceOf(UnauthorizedError);
 			expect(error.message).toBe("Utilisateur non authentifié");
+		});
+
+		test("Quand un post n'a pas de propositions, il doit quand même retourner un status 200", async () => {
+			const req = { user: { id: 1 } };
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			const mockPosts = [
+				{
+					id: 1,
+					title: "Post sans proposition",
+					SkillWanted: { id: 2, name: "Compétence Vue.js" },
+					Author: { id: 1, username: "JohnDoe" },
+					Propositions: [], // Aucune proposition
+				},
+			];
+
+			Post.findAll.mockResolvedValueOnce(mockPosts);
+
+			await postController.getPostFromLoggedUser(req, res, next);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({ posts: mockPosts });
+		});
+
+		test("Les champs sender_id, receiver_id et post_id doivent être exclus dans les propositions", async () => {
+			const req = { user: { id: 1 } };
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Post.findAll.mockResolvedValueOnce([]);
+
+			await postController.getPostFromLoggedUser(req, res, next);
+
+			// Exclusion des IDs sensible dans la proposition
+			expect(Post.findAll).toHaveBeenCalledWith(
+				expect.objectContaining({
+					include: expect.arrayContaining([
+						expect.objectContaining({
+							model: Proposition,
+							attributes: expect.objectContaining({
+								exclude: expect.arrayContaining([
+									"sender_id",
+									"receiver_id",
+									"post_id",
+								]),
+							}),
+						}),
+					]),
+				}),
+			);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({ posts: [] });
+		});
+	});
+
+	// ----------------------------------- TEST DE CREATION DE POST D'UN UTILISATEUR CONNECTE -------------------------------------------
+	describe("Création de post par un utilisateur connecté", () => {
+		test("Quand la compétence n'existe pas, une NotFoundError doit être renvoyée", async () => {
+			const req = {
+				user: { id: 1, username: "JohnDoe" }, // Utilisateur connecté
+				validatedData: { content: "Contenu", title: "Titre", skill_id: 99 }, // skill_id qui n'existe pas
+			};
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Skill.findByPk.mockResolvedValueOnce(null); // Simuler que la compétence n'existe pas
+
+			await postController.createPost(req, res, next);
+
+			expect(Skill.findByPk).toHaveBeenCalledWith(99);
+			expect(next).toHaveBeenCalledTimes(1);
+
+			const [error] = next.mock.calls[0];
+			expect(error).toBeInstanceOf(NotFoundError);
+			expect(error.message).toBe("Compétence non trouvée");
+		});
+
+		test("Quand l'utilisateur a déjà un post avec cette compétence, une BadRequestError doit être renvoyée", async () => {
+			const req = {
+				user: { id: 1, username: "JohnDoe" },
+				validatedData: { content: "Contenu", title: "Titre", skill_id: 5 },
+			};
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Skill.findByPk.mockResolvedValueOnce({ id: 5 }); // Compétence trouvée
+			Post.findOne.mockResolvedValueOnce({ id: 10 }); // Un post existe déjà avec cette compétence
+
+			await postController.createPost(req, res, next);
+
+			expect(Skill.findByPk).toHaveBeenCalledWith(5);
+			expect(Post.findOne).toHaveBeenCalledWith({
+				where: { skill_id: 5, user_id: 1 },
+			});
+			expect(next).toHaveBeenCalledTimes(1);
+
+			const [error] = next.mock.calls[0];
+			expect(error).toBeInstanceOf(BadRequestError);
+			expect(error.message).toBe(
+				"Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
+			);
+		});
+
+		test("Quand l'utilisateur a atteint la limite maximale de posts, une ForbiddenError doit être renvoyée", async () => {
+			const req = {
+				user: { id: 1, username: "JohnDoe" },
+				validatedData: { content: "Contenu", title: "Titre", skill_id: 5 },
+			};
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Skill.findByPk.mockResolvedValueOnce({ id: 5 }); // Compétence trouvée
+			Post.findOne.mockResolvedValueOnce(null); // Aucun post existant avec la compétence
+			Post.count.mockResolvedValueOnce(10); // L'utilisateur a déjà 10 posts
+
+			await postController.createPost(req, res, next);
+
+			expect(Skill.findByPk).toHaveBeenCalledWith(5);
+			expect(Post.findOne).toHaveBeenCalledWith({
+				where: { skill_id: 5, user_id: 1 },
+			});
+			expect(Post.count).toHaveBeenCalledWith({
+				where: { user_id: 1 },
+			});
+
+			expect(next).toHaveBeenCalledTimes(1);
+
+			const [error] = next.mock.calls[0];
+			expect(error).toBeInstanceOf(ForbiddenError);
+			expect(error.message).toBe(
+				"Limite de 10 posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.",
+			);
+		});
+
+		test("Quand l'utilisateur a déjà un post avec cette compétence, une BadRequestError doit être renvoyée", async () => {
+			const req = {
+				user: { id: 1, username: "JohnDoe" },
+				validatedData: {
+					content: "Contenu test",
+					title: "Titre test",
+					skill_id: 10,
+				},
+			};
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			// Simulation : la compétence existe
+			Skill.findByPk.mockResolvedValueOnce({ id: 10 });
+
+			// Simulation : l'utilisateur a déjà un post avec cette compétence
+			Post.findOne.mockResolvedValueOnce({ id: 1 });
+
+			// Appel du contrôleur
+			await postController.createPost(req, res, next);
+
+			// Vérification que next est appelé avec une BadRequestError
+			expect(next).toHaveBeenCalledTimes(1);
+			const [error] = next.mock.calls[0];
+			expect(error).toBeInstanceOf(BadRequestError);
+			expect(error.message).toBe(
+				"Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
+			);
 		});
 	});
 });
