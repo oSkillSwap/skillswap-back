@@ -293,31 +293,6 @@ export const userController = {
       .status(200)
       .json({ message: "Compétences mises à jour avec succès" });
   },
-
-  updateReview: async (req, res, next) => {
-    const { reviewId } = req.params;
-    const { grade, content } = req.validatedData;
-    const userId = req.user.id;
-
-    const review = await Review.findByPk(reviewId);
-
-    if (!review) {
-      return next(new NotFoundError("Review non trouvée"));
-    }
-
-    if (review.user_id !== userId) {
-      return next(
-        new ForbiddenError("Vous ne pouvez modifier que vos propres reviews")
-      );
-    }
-
-    await review.update({ grade, content });
-
-    return res
-      .status(200)
-      .json({ message: "Review mise à jour avec succès", review });
-  },
-
   deleteUser: async (req, res, next) => {
     const userId = req.user.id; // Get the user ID from the token
     const user = await User.findByPk(userId);
@@ -379,7 +354,7 @@ export const userController = {
 
     const isFollowing = await user.hasFollows(targetUser);
     if (!isFollowing) {
-      return next(new BadRequestError("Vous ne suivez pas cet utilisateur"));
+      return next(new ConflictError("Vous ne suivez pas cet utilisateur"));
     }
 
     await user.removeFollows(targetUser);
