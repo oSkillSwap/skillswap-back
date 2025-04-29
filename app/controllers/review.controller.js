@@ -58,6 +58,7 @@ export const reviewController = {
 						attributes: ["id", "title"],
 						include: {
 							association: "Author",
+							attributes: ["id", "username", "avatar", "description"],
 						},
 					},
 				},
@@ -94,7 +95,7 @@ export const reviewController = {
 	createReview: async (req, res, next) => {
 		const userId = req.user.id;
 
-		//Zod Validation
+		// Zod Validation
 		const result = reviewSchema.safeParse(req.body);
 		if (!result.success) {
 			const errors = result.error.errors.map((e) => e.message).join(", ");
@@ -111,7 +112,7 @@ export const reviewController = {
 
 		if (!post.isClosed) {
 			return next(
-				new ForbiddenError("L'annonce doit etre fermée pour laisser un avis"),
+				new ForbiddenError("L'annonce doit être fermée pour laisser un avis"),
 			);
 		}
 
@@ -137,17 +138,58 @@ export const reviewController = {
 			);
 		}
 
-		// Create the review
+		// User to review
+		const reviewedId = proposition.sender_id;
+
+		// Check if a review already exists (avoid multiple reviews for the same proposition)
+		const existingReview = await Review.findOne({
+			where: {
+				user_id: userId,
+				proposition_id: proposition.id,
+			},
+		});
+
+		if (existingReview) {
+			return next(
+				new ForbiddenError(
+					"Vous avez déjà laissé un avis pour cette annonce et cette proposition.",
+				),
+			);
+		}
+
+		// Check if a review already exists for the same reviewed user
+		const existingReviewForUser = await Review.findOne({
+			where: {
+				user_id: userId,
+			},
+			include: {
+				model: Proposition,
+				required: true,
+				where: {
+					sender_id: reviewedId,
+				},
+			},
+		});
+
+		if (existingReviewForUser) {
+			return next(
+				new ForbiddenError(
+					"Vous avez déjà laissé un avis pour cet utilisateur.",
+				),
+			);
+		}
+
+		// Create the review (linking to the user and the proposition)
 		const review = await Review.create({
 			grade,
 			title,
 			content: comment,
-			reviewer_id: userId,
-			reviewed_id: proposition.sender_id,
-			post_id: postId,
+			user_id: userId,
+			reviewed_id: reviewedId,
 			proposition_id: proposition.id,
 		});
 
+		// Successfully created the review
 		res.status(201).json(review);
 	},
 };

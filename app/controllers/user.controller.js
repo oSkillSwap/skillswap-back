@@ -310,7 +310,6 @@ export const userController = {
 				new ForbiddenError("Vous ne pouvez modifier que vos propres reviews"),
 			);
 		}
-
 		await review.update({ grade, content });
 
 		return res
@@ -325,11 +324,10 @@ export const userController = {
 		if (!user) {
 			return next(new NotFoundError("Utilisateur non trouvé"));
 		}
-
 		await user.destroy(); // Delete User
-
 		return res.status(200).json({ message: "Compte supprimé avec succès" });
 	},
+
 	followUser: async (req, res, next) => {
 		const { userId } = req.params;
 		const userLoggedIn = req.user;
@@ -357,11 +355,11 @@ export const userController = {
 		}
 
 		await user.addFollows(targetUser);
-
 		return res
 			.status(200)
 			.json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
 	},
+
 	unfollowUser: async (req, res, next) => {
 		const userLoggedIn = req.user;
 		const { userId } = req.params;
