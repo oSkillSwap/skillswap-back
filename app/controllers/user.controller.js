@@ -1,11 +1,7 @@
 import argon2 from "argon2";
-import sanitize from "sanitize-html";
 import { Sequelize } from "sequelize";
-import validator from "validator";
-import { sequelize } from "../data/client.js";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ConflictError } from "../errors/conflict-error.js";
-import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
@@ -14,7 +10,7 @@ import {
 	sanitizeOptionalString,
 	sanitizeString,
 } from "../helpers/sanitize.js";
-import { Category, Review, User } from "../models/associations.js";
+import { Category, User } from "../models/associations.js";
 
 export const userController = {
 	register: async (req, res, next) => {
@@ -364,4 +360,5 @@ export const userController = {
 			message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
 		});
 	},
+
 };
