@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 import { postController } from "../controllers/post.controller.js";
 import { Post, User } from "../models/associations.js";
 import { NotFoundError } from "../errors/not-found-error.js";
@@ -108,6 +109,134 @@ describe("Post module", () => {
 			expect(res.json).toHaveBeenCalledWith({
 				message: "Une erreur inattendue est survenue. Veuillez réessayez.",
 			});
+		});
+	});
+
+	// ------------------------------------------ TEST RECUPERATION DE TOUS LES POSTS -------------------------------------------
+	describe("Récupérer tous les posts", () => {
+		test("Quand tout se passe bien, doit retourner la liste complète des posts avec les skills et auteur", async () => {
+			const req = {};
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			// Mock de Post.findAll pour simuler la réponse complète
+			Post.findAll.mockResolvedValue([
+				{
+					id: 1,
+					title: "Post 1",
+					SkillWanted: { id: 101, name: "JavaScript" },
+					Author: {
+						id: 11,
+						username: "Alice",
+						averageGrade: 4.8,
+						nbOfReviews: 10,
+					},
+				},
+				{
+					id: 2,
+					title: "Post 2",
+					SkillWanted: { id: 102, name: "Python" },
+					Author: {
+						id: 12,
+						username: "Bob",
+						averageGrade: 4.5,
+						nbOfReviews: 8,
+					},
+				},
+			]);
+
+			// Appel du contrôleur
+			await postController.getPosts(req, res, next);
+
+			// Vérifications
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({
+				posts: [
+					{
+						id: 1,
+						title: "Post 1",
+						SkillWanted: { id: 101, name: "JavaScript" },
+						Author: {
+							id: 11,
+							username: "Alice",
+							averageGrade: 4.8,
+							nbOfReviews: 10,
+						},
+					},
+					{
+						id: 2,
+						title: "Post 2",
+						SkillWanted: { id: 102, name: "Python" },
+						Author: {
+							id: 12,
+							username: "Bob",
+							averageGrade: 4.5,
+							nbOfReviews: 8,
+						},
+					},
+				],
+			});
+		});
+
+		test("Quand une erreur inattendue survient, elle doit retourner une erreur 500", async () => {
+			const req = {};
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			// Simuler une erreur
+			Post.findAll.mockRejectedValueOnce(new Error("Erreur inattendue"));
+
+			await controllerwrapper(postController.getPosts)(req, res, next);
+
+			expect(res.status).toHaveBeenCalledWith(500);
+			expect(res.json).toHaveBeenCalledWith({
+				message: "Une erreur inattendue est survenue. Veuillez réessayez.",
+			});
+		});
+
+		test("Quand on récupère les posts, Post.findAll doit être appelé avec les bonnes associations et groupements", async () => {
+			// Préparation des mocks
+			const req = {}; // Pas besoin de params ici
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Post.findAll.mockResolvedValueOnce([]); // On simule une réponse vide (c'est pas le but du test ici)
+
+			// Appel de la méthode
+			await postController.getPosts(req, res, next);
+
+			// Vérification que Post.findAll a été appelé correctement
+			expect(Post.findAll).toHaveBeenCalledWith({
+				include: [
+					{
+						association: "SkillWanted",
+					},
+					{
+						association: "Author",
+						attributes: [
+							"id",
+							"username",
+							[
+								Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")),
+								"averageGrade",
+							],
+							[
+								Sequelize.fn("COUNT", Sequelize.col("Author->Reviews.grade")),
+								"nbOfReviews",
+							],
+						],
+						include: {
+							association: "Reviews",
+							attributes: [],
+						},
+					},
+				],
+				group: ["Post.id", "SkillWanted.id", "Author.id"],
+			});
+
+			// En plus, on peut vérifier que res.status(200) a été appelé (bonus)
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({ posts: [] });
 		});
 	});
 });
