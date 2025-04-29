@@ -36,7 +36,7 @@ describe("User module", () => {
     beforeEach(() => {
       res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
       next = jest.fn();
-      jest.clearAllMocks();
+      jest.resetAllMocks();
     });
 
     test("Quand l'utilisateur veut suivre un utilisateur qui n'existe pas, une NotFoundError doit être renvoyée", async () => {
@@ -89,6 +89,34 @@ describe("User module", () => {
       expect(error).toBeInstanceOf(Error);
       expect(error.name).toBe("UnauthorizedError");
       expect(error.message).toBe("Utilisateur non authentifié");
+    });
+
+    test("Quand l'utilisateur suit déjà l'utilisateur cible, une ConflictError doit être renvoyée", async () => {
+      const mockLoggedUser = {
+        id: 1,
+        hasFollows: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findByPk
+        .mockResolvedValueOnce(mockUser)
+        .mockResolvedValueOnce(mockLoggedUser);
+
+      console.log(mockUser);
+      console.log(mockLoggedUser);
+
+      const req = {
+        params: { userId: 2 },
+        user: { id: 1 },
+      };
+
+      await userController.followUser(req, res, next);
+
+      expect(mockLoggedUser.hasFollows).toHaveBeenCalledWith(mockUser);
+
+      const [error] = next.mock.calls[0];
+      expect(error).toBeInstanceOf(Error);
+      expect(error.name).toBe("ConflictError");
+      expect(error.message).toBe("Vous suivez déjà cet utilisateur");
     });
   });
 });
