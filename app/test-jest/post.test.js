@@ -1,7 +1,8 @@
 import { Sequelize } from "sequelize";
 import { postController } from "../controllers/post.controller.js";
-import { Post, User } from "../models/associations.js";
+import { Post, User, Proposition } from "../models/associations.js";
 import { NotFoundError } from "../errors/not-found-error.js";
+import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 
 jest.mock("../models/associations.js");
@@ -237,6 +238,155 @@ describe("Post module", () => {
 			// En plus, on peut vérifier que res.status(200) a été appelé (bonus)
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalledWith({ posts: [] });
+		});
+	});
+
+	// ----------------------------------- TEST RECUPERATION DE TOUS LES POSTS DE l'UTILISATEUR CONNECTE -------------------------------------------
+	describe("Récupérer tous les posts de l'utilisateur connecté", () => {
+		test("Quand un utilisateur connecté récupère ses posts, Post.findAll est appelé avec les bons paramètres", async () => {
+			const req = { user: { id: 1 } };
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Post.findAll.mockResolvedValueOnce([]);
+
+			await postController.getPostFromLoggedUser(req, res, next);
+
+			expect(Post.findAll).toHaveBeenCalledWith(
+				expect.objectContaining({
+					attributes: { exclude: ["user_id", "skill_id"] },
+					include: expect.arrayContaining([
+						expect.objectContaining({
+							association: "Author",
+							where: { id: req.user.id },
+							attributes: ["id", "username"],
+						}),
+						expect.objectContaining({ association: "SkillWanted" }),
+						expect.objectContaining({
+							model: Proposition,
+							attributes: { exclude: ["sender_id", "receiver_id", "post_id"] },
+						}),
+					]),
+					group: expect.arrayContaining([
+						"Post.id",
+						"Author.id",
+						"SkillWanted.id",
+						"Propositions.id",
+						"Propositions->Sender.id",
+						"Propositions->Sender->Reviews.id",
+					]),
+				}),
+			);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({ posts: [] });
+		});
+
+		test("Quand une erreur inattendue survient lors de la récupération des posts, elle doit retourner un status 500", async () => {
+			const req = { user: { id: 1 } };
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Post.findAll.mockRejectedValueOnce(new Error("Erreur inattendue"));
+
+			await controllerwrapper(postController.getPostFromLoggedUser)(
+				req,
+				res,
+				next,
+			);
+
+			expect(res.status).toHaveBeenCalledWith(500);
+			expect(res.json).toHaveBeenCalledWith({
+				message: "Une erreur inattendue est survenue. Veuillez réessayez.",
+			});
+		});
+
+		test("Quand tout se passe bien, il doit retourner tous les posts avec SkillWanted, Author et Propositions complets", async () => {
+			const req = { user: { id: 1 } };
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			const mockPosts = [
+				{
+					id: 1,
+					title: "Mon premier post",
+					SkillWanted: {
+						id: 2,
+						name: "Compétence en React",
+					},
+					Author: {
+						id: 1,
+						username: "JohnDoe",
+					},
+					Propositions: [
+						{
+							id: 5,
+							content: "Je suis intéressé",
+							Sender: {
+								id: 3,
+								username: "JaneDoe",
+								averageGrade: 4.5,
+								nbOfReviews: 12,
+							},
+						},
+					],
+				},
+			];
+
+			Post.findAll.mockResolvedValueOnce(mockPosts);
+
+			await postController.getPostFromLoggedUser(req, res, next);
+
+			expect(Post.findAll).toHaveBeenCalledWith(
+				expect.objectContaining({
+					include: expect.arrayContaining([
+						expect.objectContaining({
+							association: "Author",
+							where: { id: req.user.id },
+						}),
+					]),
+				}),
+			);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({ posts: mockPosts });
+		});
+
+		test("Quand aucun post n'est trouvé, il doit retourner une liste vide", async () => {
+			const req = { user: { id: 1 } };
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			Post.findAll.mockResolvedValueOnce([]);
+
+			await postController.getPostFromLoggedUser(req, res, next);
+
+			expect(Post.findAll).toHaveBeenCalledWith(
+				expect.objectContaining({
+					include: expect.arrayContaining([
+						expect.objectContaining({
+							association: "Author",
+							where: { id: req.user.id },
+						}),
+					]),
+				}),
+			);
+
+			expect(res.status).toHaveBeenCalledWith(200);
+			expect(res.json).toHaveBeenCalledWith({ posts: [] });
+		});
+
+		test("Quand l'utilisateur n'est pas connecté, une UnauthorizedError doit être renvoyée", async () => {
+			const req = { user: undefined }; // utilisateur non connecté
+			const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+			const next = jest.fn();
+
+			await postController.getPostFromLoggedUser(req, res, next);
+
+			expect(next).toHaveBeenCalledTimes(1);
+			const [error] = next.mock.calls[0];
+			expect(error).toBeInstanceOf(UnauthorizedError);
+			expect(error.message).toBe("Utilisateur non authentifié");
 		});
 	});
 });
