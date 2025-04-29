@@ -18,8 +18,7 @@ reviewRouter
 
 // /reviews/:id -> user-specific reviews
 reviewRouter.get(
-	"/me/reviews/:id",
-	authenticate,
+	"/reviews/:id",
 	validateParams("id"),
 	controllerwrapper(reviewController.getReviewsFromUser),
 );

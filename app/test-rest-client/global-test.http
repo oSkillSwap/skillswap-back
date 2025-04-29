@@ -6,7 +6,7 @@ GET http://localhost:3000/api/users
 GET http://localhost:3000/api/reviews
 
 ###GET review by author
-GET http://localhost:3000/api/reviews/5
+GET http://localhost:3000/api/reviews/12
 
 ###GET all categories
 GET http://localhost:3000/api/categories
@@ -27,5 +27,5 @@ GET http://localhost:3000/api/skills
 ### GET proposition
 GET http://localhost:3000/api/propositions/1
 
-###
+### GET Unfound user
 GET http://localhost:3000/api/users/500
