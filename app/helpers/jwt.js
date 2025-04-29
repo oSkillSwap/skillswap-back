@@ -4,10 +4,10 @@ const SECRET = process.env.JWT_SECRET;
 
 //Generate a JWT token
 export const generateToken = (payload, expiresIn = "2h") => {
-	return jwt.sign(payload, SECRET, { expiresIn });
+  return jwt.sign(payload, SECRET, { expiresIn });
 };
 
 // Verify a JWT token
 export const verifyToken = (token) => {
-	return jwt.verify(token, SECRET);
+  return jwt.verify(token, SECRET);
 };
