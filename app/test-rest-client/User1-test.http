@@ -10,7 +10,7 @@ Content-Type: application/json
   "lastName": "Mettouchi",
   "firstName": "Erwan",
   "email": "erwan@gmail.com",
-  "password": "ErwanMettouchi1234+",
+  "password": "",
   "avatar": "",
   "role": "member",
   "description": "Travail en boucle"
