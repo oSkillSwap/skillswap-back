@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NTkxNzEyNCwiZXhwIjoxNzQ1OTI0MzI0fQ.yRBaPsuPmn5GCaJDF3QoWbxzHw_F7k2dIQimGv6i-W0
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NjAwNTI4NSwiZXhwIjoxNzQ2MDEyNDg1fQ.2-Oqvk6pRKk4g3AfuGsgL99xI6jXPXmWfUwlayp92NY
 // ID User: 11
 
 ### Register a user
@@ -10,7 +10,7 @@ Content-Type: application/json
   "lastName": "Mettouchi",
   "firstName": "Erwan",
   "email": "erwan@gmail.com",
-  "password": "",
+  "password": "ErwanMettouchi1234+",
   "avatar": "",
   "role": "member",
   "description": "Travail en boucle"
@@ -107,7 +107,7 @@ GET http://localhost:3000/api/me/propositions
 Authorization: Bearer {{token}}
 
 ### POST a proposition 
-POST http://localhost:3000/api/me/propositions/38
+POST http://localhost:3000/api/me/propositions/32
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -123,8 +123,8 @@ Content-Type: application/json
 
 {
   "title": "Super collaboration",
-  "postId": 38,
-  "propositionId": 28,
+  "postId": 31,
+  "propositionId": 21,
   "grade": 5,
   "comment": "Super collaboration, très professionnel !"
 }
