@@ -1,6 +1,4 @@
-import sanitize from "sanitize-html";
 import { Op, Sequelize } from "sequelize";
-import validator from "validator";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
@@ -187,14 +185,10 @@ export const postController = {
 			);
 		}
 
-		// Sanitize the content and title to prevent XSS attacks
-		const sanitizedContent = validator.trim(content);
-		const sanitizedTitle = validator.trim(title);
-
 		// Create a new post
 		const newPost = await Post.create({
-			content: sanitizedContent,
-			title: sanitizedTitle,
+			content,
+			title,
 			skill_id,
 			user_id: user.id,
 			isClosed: false,

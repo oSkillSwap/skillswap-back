@@ -1,9 +1,7 @@
 import { Op } from "sequelize";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
-import { ValidationError } from "../errors/validation-error.js";
 import { Post, Proposition, Review, User } from "../models/associations.js";
-import { reviewSchema } from "../schemas/review.schema.js";
 
 export const reviewController = {
 	getReviews: async (req, res, next) => {
@@ -33,6 +31,7 @@ export const reviewController = {
 
 		return res.status(200).json({ reviews });
 	},
+
 	getReviewsFromUser: async (req, res, next) => {
 		const { id } = req.params;
 
@@ -95,14 +94,7 @@ export const reviewController = {
 	createReview: async (req, res, next) => {
 		const userId = req.user.id;
 
-		// Zod Validation
-		const result = reviewSchema.safeParse(req.body);
-		if (!result.success) {
-			const errors = result.error.errors.map((e) => e.message).join(", ");
-			return next(new ValidationError(errors));
-		}
-
-		const { postId, propositionId, grade, title, comment } = result.data;
+		const { postId, propositionId, grade, title, comment } = req.validatedData;
 
 		// Check Post's existence && isClosed
 		const post = await Post.findByPk(postId);

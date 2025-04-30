@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { userController } from "../controllers/user.controller.js";
-import { reviewController } from "../controllers/review.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
@@ -8,10 +7,7 @@ import { validate } from "../middlewares/validates.js";
 import {
 	loginSchema,
 	registerSchema,
-	updateReviewSchema,
 	updateUserSchema,
-	updateUserSkillsSchema,
-	updateWantedSkillsSchema,
 } from "../schemas/user.schema.js";
 
 export const userRouter = Router();
@@ -30,31 +26,6 @@ userRouter
 	)
 	// Delete user account
 	.delete(authenticate, controllerwrapper(userController.deleteUser));
-
-// /me/wanted-skills
-userRouter.put(
-	"/me/wanted-skills",
-	authenticate,
-	validate(updateWantedSkillsSchema),
-	controllerwrapper(userController.updateUserWantedSkills),
-);
-
-// /me/skills
-userRouter.patch(
-	"/me/skills",
-	authenticate,
-	validate(updateUserSkillsSchema),
-	controllerwrapper(userController.updateUserSkills),
-);
-
-// /me/reviews/:userId
-userRouter.patch(
-	"/me/reviews/:userId",
-	authenticate,
-	validateParams("userId"),
-	validate(updateReviewSchema),
-	controllerwrapper(reviewController.updateReview),
-);
 
 // /me/users -> Get user information
 userRouter.get("/me/users", authenticate, async (req, res, next) => {

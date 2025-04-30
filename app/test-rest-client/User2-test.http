@@ -1,4 +1,4 @@
-@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDU5MTcxNTMsImV4cCI6MTc0NTkyNDM1M30.4h35YN0PfTxpKvieGC7htHmmg-Dv-pNGH1BZiMekJCw
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDYwNTQ5NzgsImV4cCI6MTc0NjA2MjE3OH0.jafQFPHPiXtht_474DdMv5HcdPenx1J4Yqd0QxDqzXM
 // ID: 12
 
 ### Register a user
@@ -74,7 +74,7 @@ Authorization: Bearer {{token2}}
 
 
 ### Accept a proposition
-PATCH http://localhost:3000/api/propositions/28/accept
+PATCH http://localhost:3000/api/propositions/21/accept
 Authorization: Bearer {{token2}}
 Content-Type: application/json
 
@@ -85,12 +85,21 @@ Content-Type: application/json
 
 {
   "title": "Super collaboration",
-  "postId": 38,
-  "propositionId": 28,
+  "postId": 31,
+  "propositionId": 21,
   "grade": 5,
   "comment": "Super collaboration, très professionnel !"
 }
 
+### PATCH a review (update)
+PATCH http://localhost:3000/api/me/reviews/21
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "grade": 5,
+  "content": "Mise à jour de ma review, super expérience !"
+}
 
 ### Update my wanted skills
 PUT http://localhost:3000/api/me/wanted-skills
@@ -139,18 +148,6 @@ Content-Type: application/json
 {
   "skills": []
 }
-
-
-### PATCH a review (update)
-PATCH http://localhost:3000/api/me/reviews/3
-Authorization: Bearer {{token2}}
-Content-Type: application/json
-
-{
-  "grade": 5,
-  "content": "Mise à jour de ma review, super expérience !"
-}
-
 
 
 ###

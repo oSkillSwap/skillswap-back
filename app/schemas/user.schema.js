@@ -1,88 +1,83 @@
 import { z } from "zod";
+import sanitizeHtml from "sanitize-html";
 
-// Schema for registration with rules
+// Fonction locale pour nettoyer le contenu autorisé dans les textareas
+const sanitizeTextarea = (val) =>
+	sanitizeHtml(val.trim(), {
+		allowedTags: ["b", "i", "em", "strong", "p", "ul", "li", "ol", "br"],
+		allowedAttributes: {},
+	});
+
 export const registerSchema = z.object({
-  username: z
-    .string()
-    .min(3, { message: "Le nom d'utilisateur est requis" })
-    .max(16, { message: "Maximum 16 caractères" })
-    .regex(/^[a-zA-Z0-9-]+$/, {
-      message:
-        "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
-    }),
-  lastName: z.string().optional(),
-  firstName: z.string().optional(),
-  email: z.string().email({ message: "Adresse e-mail invalide" }),
-  password: z
-    .string()
-    .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
-    .regex(/[a-z]/, {
-      message: "Le mot de passe doit contenir au moins une lettre minuscule",
-    })
-    .regex(/[A-Z]/, {
-      message: "Le mot de passe doit contenir au moins une lettre majuscule",
-    })
-    .regex(/[0-9]/, {
-      message: "Le mot de passe doit contenir au moins un chiffre",
-    })
-    .regex(/[^a-zA-Z0-9]/, {
-      message: "Le mot de passe doit contenir au moins un caractère spécial",
-    }),
-  avatar: z.string().optional().default("/avatar/avatar1.png"),
-  role: z.enum(["admin", "member"]).optional(),
-  description: z.string().max(800).optional(),
+	username: z
+		.string()
+		.min(3, { message: "Le nom d'utilisateur est requis" })
+		.max(16, { message: "Maximum 16 caractères" })
+		.regex(/^[a-zA-Z0-9-]+$/, {
+			message:
+				"Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
+		})
+		.transform((val) => sanitizeHtml(val.trim())),
+	lastName: z
+		.string()
+		.max(50, "Maximum 50 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	firstName: z
+		.string()
+		.max(50, "Maximum 50 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	email: z.string().email({ message: "Adresse e-mail invalide" }),
+	password: z
+		.string()
+		.min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+		.regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+		.regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+		.regex(/[0-9]/, { message: "Un chiffre requis" })
+		.regex(/[^a-zA-Z0-9]/, {
+			message: "Un caractère spécial requis",
+		}),
+	avatar: z.string().optional().default("/avatar/avatar1.png"),
+	role: z.enum(["admin", "member"]).optional(),
+	description: z
+		.string()
+		.max(800, "Maximum 800 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeTextarea(val) : undefined)),
 });
 
-// schema for login with rules
 export const loginSchema = z.object({
-  email: z.string().email("Adresse e-mail invalide"),
-  password: z.string().min(1, "Mot de passe requis"),
+	email: z.string().email("Adresse e-mail invalide"),
+	password: z.string().min(1, "Mot de passe requis"),
 });
 
-// schema for updating user with rules
 export const updateUserSchema = z.object({
-  username: z
-    .string()
-    .min(3, "Le nom d'utilisateur est requis")
-    .max(16, "Maximum 16 caractères")
-    .regex(
-      /^[a-zA-Z0-9-]+$/,
-      "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets"
-    )
-    .optional(),
-  firstName: z.string().max(50, "Maximum 50 caractères").optional(),
-  lastName: z.string().max(50, "Maximum 50 caractères").optional(),
-  email: z.string().email("Adresse e-mail invalide").optional(),
-  avatar: z.string().optional(),
-  description: z.string().max(800, "Maximum 800 caractères").optional(),
-});
-
-// Schema for updating wanted skills with rules
-export const updateWantedSkillsSchema = z.object({
-  wantedSkills: z
-    .array(z.number())
-    .min(1, "Veuillez sélectionner au moins une compétence"),
-});
-
-// Schema for updated Has Skills with rules
-export const updateUserSkillsSchema = z.object({
-  skills: z
-    .array(z.number(), {
-      required_error: "Les compétences doivent être sous forme de tableau",
-    })
-    .refine((skills) => skills.length > 0, {
-      message: "Vous devez sélectionner au moins une compétence",
-    }),
-});
-
-// Schema for update Reviews with rules => Only the owner can modify his review
-export const updateReviewSchema = z.object({
-  grade: z
-    .number()
-    .min(1, "La note doit être au moins 1")
-    .max(5, "La note ne peut pas dépasser 5"),
-  content: z
-    .string()
-    .min(10, "La review doit contenir au moins 10 caractères")
-    .max(1000, "La review ne peut pas dépasser 1000 caractères"),
+	username: z
+		.string()
+		.min(3, "Le nom d'utilisateur est requis")
+		.max(16, "Maximum 16 caractères")
+		.regex(
+			/^[a-zA-Z0-9-]+$/,
+			"Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
+		)
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	firstName: z
+		.string()
+		.max(50, "Maximum 50 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	lastName: z
+		.string()
+		.max(50, "Maximum 50 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	email: z.string().email("Adresse e-mail invalide").optional(),
+	avatar: z.string().optional(),
+	description: z
+		.string()
+		.max(800, "Maximum 800 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeTextarea(val) : undefined)),
 });

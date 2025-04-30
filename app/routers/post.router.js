@@ -6,7 +6,6 @@ import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
 import { postSchema } from "../schemas/post.schema.js";
-import { propositionSchema } from "../schemas/proposition.schema.js";
 
 export const postRouter = Router();
 
@@ -16,6 +15,7 @@ postRouter.route("/posts").get(controllerwrapper(postController.getPosts));
 // /posts/:id -> user-specific posts
 postRouter.get(
 	"/posts/:id",
+	validateParams("id"),
 	controllerwrapper(postController.getPostsFromUser),
 );
 
@@ -29,27 +29,3 @@ postRouter
 		validate(postSchema),
 		controllerwrapper(postController.createPost),
 	); // Create a new post
-
-// /me/propositions -> Routes related to authenticated user's
-postRouter
-	.route("/me/propositions")
-	.get(
-		authenticate,
-		controllerwrapper(propositionController.getUserSentPropositions),
-	);
-
-// /me/propositions/:postId -> user's propositions
-postRouter.post(
-	"/me/propositions/:postId",
-	authenticate,
-	validateParams("postId"),
-	validate(propositionSchema),
-	controllerwrapper(propositionController.sendPropositionToPost),
-);
-
-// /proposition/:id/accept -> Accepting a proposition
-postRouter.patch(
-	"/propositions/:id/accept",
-	authenticate,
-	controllerwrapper(propositionController.acceptProposition),
-);

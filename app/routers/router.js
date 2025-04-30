@@ -6,6 +6,7 @@ import { messageRouter } from "./message.router.js";
 import { skillRouter } from "./skill.router.js";
 import { categoryRouter } from "./category.router.js";
 import { availabilityRouter } from "./availability.router.js";
+import { propositionRouter } from "./proposition.router.js";
 import { errorMiddleware } from "../middlewares/error.middleware.js";
 
 export const router = Router();
@@ -17,5 +18,6 @@ router.use(messageRouter);
 router.use(skillRouter);
 router.use(categoryRouter);
 router.use(availabilityRouter);
+router.use(propositionRouter);
 
 router.use(errorMiddleware);
