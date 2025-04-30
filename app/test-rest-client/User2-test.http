@@ -1,0 +1,166 @@
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDU5MTcxNTMsImV4cCI6MTc0NTkyNDM1M30.4h35YN0PfTxpKvieGC7htHmmg-Dv-pNGH1BZiMekJCw
+// ID: 12
+
+### Register a user
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "username": "Gregory",
+  "lastName": "Virmaud",
+  "firstName": "Gregory",
+  "email": "gregory@gmail.com",
+  "password": "GregoryVirmaud1234+",
+  "avatar": "",
+  "role": "member",
+  "description": "Travail sur le backend"
+}
+
+
+###login a user
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+
+  "email": "gregory@gmail.com",
+  "password": "GregoryVirmaud1234+"
+}
+
+
+### Test the JWT connexion
+GET http://localhost:3000/api/me
+Authorization: Bearer {{token2}}
+
+### DELETE myself
+DELETE http://localhost:3000/api/me
+Authorization: Bearer {{token2}}
+
+###GET all my messages
+GET http://localhost:3000/api/me/messages
+Authorization: Bearer  {{token2}}
+
+###GET messages with user
+GET http://localhost:3000/api/me/messages/11
+Authorization: Bearer {{token2}}
+
+###
+POST http://localhost:3000/api/me/messages/11
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "message" : "Un message de test à destination de Erwan"
+}
+
+### GET all My posts
+GET http://localhost:3000/api/me/posts
+Authorization: Bearer {{token2}}
+
+### create new post
+POST http://localhost:3000/api/me/posts
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "title": "un test de post fais par Gregory",
+  "content" : "un texte de contenu test",
+  "skill_id" : 3
+}
+
+### GET all propositions from a user
+GET http://localhost:3000/api/me/propositions
+Authorization: Bearer {{token2}}
+
+
+### Accept a proposition
+PATCH http://localhost:3000/api/propositions/28/accept
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+### Create a review
+POST http://localhost:3000/api/me/reviews
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "title": "Super collaboration",
+  "postId": 38,
+  "propositionId": 28,
+  "grade": 5,
+  "comment": "Super collaboration, très professionnel !"
+}
+
+
+### Update my wanted skills
+PUT http://localhost:3000/api/me/wanted-skills
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "wantedSkills": [1, 2, 3, 4, 5]
+}
+
+### Try to send invalid wantedSkills
+PUT http://localhost:3000/api/me/wanted-skills
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "wantedSkills": ["javascript", "node"]
+}
+
+
+### Try to send an empty wantedSkills array
+PUT http://localhost:3000/api/me/wanted-skills
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "wantedSkills": []
+}
+
+
+
+### PATCH user skills (update user_has_skill table)
+PATCH http://localhost:3000/api/me/skills
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "skills": [1, 3, 5] 
+}
+
+### PATCH user skills - remove all skills
+PATCH http://localhost:3000/api/me/skills
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "skills": []
+}
+
+
+### PATCH a review (update)
+PATCH http://localhost:3000/api/me/reviews/3
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "grade": 5,
+  "content": "Mise à jour de ma review, super expérience !"
+}
+
+
+
+###
+GET http://localhost:3000/api/me/follows
+Authorization: Bearer {{token2}}
+
+###
+POST http://localhost:3000/api/me/follow/11
+Authorization: Bearer {{token2}}
+
+###
+DELETE http://localhost:3000/api/me/follow/12
+Authorization: Bearer {{token2}}
