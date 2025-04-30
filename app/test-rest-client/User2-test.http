@@ -1,4 +1,4 @@
-@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDYwMDUzMDMsImV4cCI6MTc0NjAxMjUwM30.bIf688DiZzoiMkHmvVYDI81Pxqj1cewy-aybMTfnXec
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDYwMTIwODcsImV4cCI6MTc0NjAxOTI4N30.7mGr2fqdCgnnAIXDwy9M7IHP7dB45HwihyE5Sa8KLV0
 // ID: 12
 
 ### Register a user
@@ -50,7 +50,7 @@ Authorization: Bearer {{token2}}
 Content-Type: application/json
 
 {
-  "message" : "Un troisieme message de test à destination de Erwan"
+  "message" : "Un message de test à destination de Erwan"
 }
 
 ### GET all My posts
@@ -65,7 +65,7 @@ Content-Type: application/json
 {
   "title": "un test de post fais par Gregory",
   "content" : "un texte de contenu test",
-  "skill_id" : 2
+  "skill_id" : 9
 }
 
 ### GET all propositions from a user
@@ -74,7 +74,7 @@ Authorization: Bearer {{token2}}
 
 
 ### Accept a proposition
-PATCH http://localhost:3000/api/propositions/22/accept
+PATCH http://localhost:3000/api/propositions/21/accept
 Authorization: Bearer {{token2}}
 Content-Type: application/json
 
@@ -85,8 +85,8 @@ Content-Type: application/json
 
 {
   "title": "Super collaboration",
-  "postId": 32,
-  "propositionId": 22,
+  "postId": 31,
+  "propositionId": 21,
   "grade": 5,
   "comment": "Super collaboration, très professionnel !"
 }

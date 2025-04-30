@@ -76,12 +76,9 @@ export const messageController = {
 	createMessage: async (req, res, next) => {
 		const { userId } = req.params;
 		const senderId = req.user.id;
-		const { message } = req.validatedData;
+		const { message } = req.validatedData; // already sanitized by Zod
 
 		const conversationPartner = await User.findByPk(userId);
-
-		const sanitizedMessage = sanitizeString(message);
-
 		if (!conversationPartner) {
 			return next(new NotFoundError("Utilisateur non trouvé"));
 		}
@@ -92,18 +89,11 @@ export const messageController = {
 			);
 		}
 
-		if (!sanitizedMessage || !sanitizedMessage.trim()) {
-			return next(
-				new ValidationError(
-					"Le message est invalide après suppression des balises",
-				),
-			);
-		}
-
+		// Message already sanitized via Zod schema
 		const newMessage = await Message.create({
 			sender_id: senderId,
 			receiver_id: userId,
-			content: sanitizedMessage,
+			content: message,
 		});
 
 		return res.status(201).json({

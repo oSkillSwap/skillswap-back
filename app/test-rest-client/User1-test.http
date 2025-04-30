@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NjAwNTI4NSwiZXhwIjoxNzQ2MDEyNDg1fQ.2-Oqvk6pRKk4g3AfuGsgL99xI6jXPXmWfUwlayp92NY
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NjAxMjA0MiwiZXhwIjoxNzQ2MDE5MjQyfQ.cenqtfKXtnGysmnmGJf8jT_7sksYpCpRHpWZlPCO6FY
 // ID User: 11
 
 ### Register a user
@@ -107,7 +107,7 @@ GET http://localhost:3000/api/me/propositions
 Authorization: Bearer {{token}}
 
 ### POST a proposition 
-POST http://localhost:3000/api/me/propositions/32
+POST http://localhost:3000/api/me/propositions/31
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -177,18 +177,6 @@ Content-Type: application/json
 {
   "skills": []
 }
-
-
-### PATCH a review (update)
-PATCH http://localhost:3000/api/me/reviews/3
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "grade": 5,
-  "content": "Mise à jour de ma review, super expérience !"
-}
-
 
 
 ###
