@@ -1,11 +1,8 @@
-import sanitize from "sanitize-html";
 import { Op } from "sequelize";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { ValidationError } from "../errors/validation-error.js";
-import { sanitizeString } from "../helpers/sanitize.js";
 import { Message, User } from "../models/associations.js";
-import { messageSchema } from "../schemas/message.schema.js";
 
 export const messageController = {
 	getMessages: async (req, res, next) => {
@@ -80,8 +77,6 @@ export const messageController = {
 
 		const conversationPartner = await User.findByPk(userId);
 
-		const sanitizedMessage = sanitizeString(message);
-
 		if (!conversationPartner) {
 			return next(new NotFoundError("Utilisateur non trouvé"));
 		}
@@ -92,7 +87,7 @@ export const messageController = {
 			);
 		}
 
-		if (!sanitizedMessage || !sanitizedMessage.trim()) {
+		if (!message) {
 			return next(
 				new ValidationError(
 					"Le message est invalide après suppression des balises",
@@ -103,7 +98,7 @@ export const messageController = {
 		const newMessage = await Message.create({
 			sender_id: senderId,
 			receiver_id: userId,
-			content: sanitizedMessage,
+			content: message,
 		});
 
 		return res.status(201).json({

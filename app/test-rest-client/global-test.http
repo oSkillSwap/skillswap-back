@@ -25,7 +25,11 @@ GET http://localhost:3000/api/users/follows/1
 GET http://localhost:3000/api/skills
 
 ### GET proposition
-GET http://localhost:3000/api/propositions/1
+GET http://localhost:3000/api/propositions/12
 
 ### GET Unfound user
 GET http://localhost:3000/api/users/500
+
+
+### GET avalabilities
+GET http://localhost:3000/api/availabilities
