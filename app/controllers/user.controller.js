@@ -5,7 +5,7 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, User } from "../models/associations.js";
+import { Category, User, Post } from "../models/associations.js";
 
 export const userController = {
 	register: async (req, res, next) => {
@@ -15,10 +15,11 @@ export const userController = {
 			firstName,
 			email,
 			password,
-			role = "member",
 			avatar = "/avatar/avatar1.png",
 			description,
 		} = req.validatedData;
+
+		const role = "member";
 
 		// Email have to be unique
 		const existingEmail = await User.findOne({ where: { email } });
@@ -67,6 +68,7 @@ export const userController = {
 			id: user.id,
 			email: user.email,
 			username: user.username,
+			role: user.role,
 		});
 
 		res.status(200).json({
@@ -158,10 +160,10 @@ export const userController = {
 	},
 
 	getOneUser: async (req, res, next) => {
-		const { userId } = req.params;
+		const userId = req.user?.id;
 
 		// biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
-		if (!userId || isNaN(userId)) {
+		if (!userId || isNaN(Number(userId))) {
 			return next(new BadRequestError("Identifiant utilisateur invalide"));
 		}
 

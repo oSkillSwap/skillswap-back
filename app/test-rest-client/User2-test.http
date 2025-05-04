@@ -12,7 +12,6 @@ Content-Type: application/json
   "email": "gregory@gmail.com",
   "password": "GregoryVirmaud1234+",
   "avatar": "",
-  "role": "member",
   "description": "Travail sur le backend"
 }
 

@@ -15,8 +15,10 @@ export const userRouter = Router();
 // /me
 userRouter
 	.route("/me")
-	.get(authenticate, (req, res) => {
-		res.status(200).json({ message: "Utilisateur connecté", user: req.user });
+	.get(authenticate, (req, res, next) => {
+		res
+			.status(200)
+			.json({ message: `Bonjour ${req.user.username}`, user: req.user });
 	})
 	// Update user information
 	.patch(
@@ -28,10 +30,11 @@ userRouter
 	.delete(authenticate, controllerwrapper(userController.deleteUser));
 
 // /me/users -> Get user information
-userRouter.get("/me/users", authenticate, async (req, res, next) => {
-	req.params.userId = req.user.id;
-	return userController.getOneUser(req, res, next);
-});
+userRouter.get(
+	"/me/users",
+	authenticate,
+	controllerwrapper(userController.getOneUser),
+);
 
 // /users -> Get all users
 userRouter.get("/users", controllerwrapper(userController.getUsers));

@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsImlhdCI6MTc0NjA1NDk1NiwiZXhwIjoxNzQ2MDYyMTU2fQ.jfaYaed_90vcclZONhLv19iAY4AW5sQgEpO7YdZbBW8
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsInJvbGUiOiJtZW1iZXIiLCJpYXQiOjE3NDYyMDA1MTMsImV4cCI6MTc0NjIwNzcxM30.ZlTQsW7rfbcwNXZHzK2GdpwSV8iGuiMOXdmZepkp-kc
 // ID User: 11
 
 ### Register a user
@@ -12,7 +12,6 @@ Content-Type: application/json
   "email": "erwan@gmail.com",
   "password": "ErwanMettouchi1+",
   "avatar": "",
-  "role": "member",
   "description": "Travail en boucle"
 }
 
@@ -24,6 +23,7 @@ Content-Type: application/json
   "email": "erwan@gmail.com",
   "password": "ErwanMettouchi1+"
 }
+
 
 ###Test the JWT connexion
 GET http://localhost:3000/api/me
@@ -68,9 +68,9 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "username": "ErwanUpdate",
-  "firstname": "ErwanUpdate",
-  "lastname": "Metouchi2",
+  "username": "ErwanSecondUpdate",
+  "firstName": "ErwanSecUpdate",
+  "lastName": "Metouchi2",
   "email": "erwan2@gmail.com",
   "avatar": "/avatars/avatar2.png",
   "description": "Je suis toujours en train de bosser meme la nuit"
@@ -129,6 +129,19 @@ Content-Type: application/json
   "comment": "Super collaboration, très professionnel !"
 }
  
+ }
+
+
+### PATCH a review (update) -> Don't have access
+PATCH http://localhost:3000/api/me/reviews/21
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grade": 5,
+  "content": "Mise à jour de ma review, super expérience !"
+}
+
 
 ### Update my wanted skills
 PUT http://localhost:3000/api/me/wanted-skills
@@ -178,19 +191,6 @@ Content-Type: application/json
   "skills": []
 }
 
-
-### PATCH a review (update)
-PATCH http://localhost:3000/api/me/reviews/21
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "grade": 5,
-  "content": "Mise à jour de ma review, super expérience !"
-}
-
-
-
 ###
 GET http://localhost:3000/api/me/follows
 Authorization: Bearer {{token}}
@@ -202,3 +202,21 @@ Authorization: Bearer {{token}}
 ###
 DELETE http://localhost:3000/api/me/follow/12
 Authorization: Bearer {{token}}
+
+
+
+### Dashboard Admin -> Access Denied
+GET http://localhost:3000/api/admin/dashboard
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Dashboard User Admin
+GET http://localhost:3000/api/admin/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+
+### Dashboard User Admin
+GET http://localhost:3000/api/admin/users/4
+Authorization: Bearer {{token}}
+Content-Type: application/json
