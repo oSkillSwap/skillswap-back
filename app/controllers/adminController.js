@@ -215,9 +215,46 @@ export const adminController = {
 	},
 
 	getCategories: async (req, res, next) => {
-		// TODO
+		const Categories = await Category.findAll({
+			order: [["createdAt", "DESC"]],
+		});
+		res.status(200).json({ Categories });
 	},
 
+	updateCategories: async (req, res, next) => {
+		const id = req.params.id;
+		const data = req.validatedData;
+
+		if (Number.isNaN(Number(id))) {
+			return next(new BadRequestError("Catégorie non trouvée"));
+		}
+
+		const category = await Category.findByPk(id);
+
+		const { name, icon } = data;
+
+		const updateFields = {
+			name: name ?? category.name,
+			icon: icon ?? category.icon,
+		};
+
+		await category.update(updateFields);
+
+		return res.status(200).json({ message: "Catégorie mise à jour", category });
+	},
+
+	deleteCategories: async (req, res, next) => {
+		const id = Number(req.params.id);
+		const category = await Category.findByPk(id);
+
+		if (!category) {
+			return next(new NotFoundError("Categorie non trouvée"));
+		}
+
+		await category.destroy(); // Delete User
+
+		return res.status(200).json({ message: "Catégorie supprimée avec succès" });
+	},
 	// TODO => UPDATE & CREATE & DELETE CATEGORIES
 	// 		=> UPDATE & DELETE POST
 	// 		=> UPDATE & CREATE & DELETE COMPETENCES

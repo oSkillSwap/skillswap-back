@@ -5,7 +5,10 @@ import { adminController } from "../controllers/adminController.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
-import { updateUserAdminSchema } from "../schemas/admin.schema.js";
+import {
+	updateUserAdminSchema,
+	updateCategoryAdminSchema,
+} from "../schemas/admin.schema.js";
 
 export const adminRouter = Router();
 
@@ -46,3 +49,20 @@ adminRouter.get(
 	isAdmin,
 	controllerwrapper(adminController.getCategories),
 );
+
+adminRouter
+	.patch(
+		"/admin/category/:id",
+		authenticate,
+		isAdmin,
+		validateParams("id"),
+		validate(updateCategoryAdminSchema),
+		controllerwrapper(adminController.updateCategories),
+	)
+	.delete(
+		"/admin/category/:id",
+		authenticate,
+		isAdmin,
+		validateParams("id"),
+		controllerwrapper(adminController.deleteCategories),
+	);
