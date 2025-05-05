@@ -8,7 +8,6 @@ import { validate } from "../middlewares/validates.js";
 import {
 	loginSchema,
 	registerSchema,
-	updateReviewSchema,
 	updateUserSchema,
 	updateUserSkillsSchema,
 	updateWantedSkillsSchema,
@@ -16,89 +15,9 @@ import {
 
 export const userRouter = Router();
 
-// /me
-userRouter
-	.route("/me")
-	.get(authenticate, (req, res) => {
-		res.status(200).json({ message: "Utilisateur connecté", user: req.user });
-	})
-	// Update user information
-	.patch(
-		authenticate,
-		validate(updateUserSchema),
-		controllerwrapper(userController.updateUser),
-	)
-	// Delete user account
-	.delete(authenticate, controllerwrapper(userController.deleteUser));
-
-// /me/wanted-skills
-userRouter.put(
-	"/me/wanted-skills",
-	authenticate,
-	validate(updateWantedSkillsSchema),
-	controllerwrapper(userController.updateUserWantedSkills),
-);
-
-// /me/skills
-userRouter.patch(
-	"/me/skills",
-	authenticate,
-	validate(updateUserSkillsSchema),
-	controllerwrapper(userController.updateUserSkills),
-);
-
-// /me/reviews/:userId
-userRouter.patch(
-	"/me/reviews/:userId",
-	authenticate,
-	validateParams("userId"),
-	validate(updateReviewSchema),
-	controllerwrapper(reviewController.updateReview),
-);
-
-// /me/users -> Get user information
-userRouter.get("/me/users", authenticate, async (req, res, next) => {
-	req.params.userId = req.user.id;
-	return userController.getOneUser(req, res, next);
-});
-
-// /users -> Get all users
-userRouter.get("/users", controllerwrapper(userController.getUsers));
-
-// /users/follows/:id
-userRouter.get(
-	"/users/follows/:id",
-	validateParams("id"),
-	controllerwrapper(userController.getFollowersAndFollowsFromUser),
-);
-
-// /me/follows
-userRouter.get("/me/follows", authenticate, async (req, res, next) => {
-	req.params.id = req.user.id;
-	return userController.getFollowersAndFollowsFromUser(req, res, next);
-});
-// /me/follow/:userId
-userRouter
-	.route("/me/follow/:userId")
-	.post(
-		authenticate,
-		validateParams("userId"),
-		controllerwrapper(userController.followUser),
-	)
-	.delete(
-		authenticate,
-		validateParams("userId"),
-		controllerwrapper(userController.unfollowUser),
-	);
-
-// /users/:userId
-userRouter.get(
-	"/users/:userId",
-	validateParams("userId"),
-	controllerwrapper(userController.getOneUser),
-);
-
-// Auth
+//
+// AUTHENTICATION ROUTES
+//
 userRouter.post(
 	"/register",
 	validate(registerSchema),
@@ -109,4 +28,89 @@ userRouter.post(
 	"/login",
 	validate(loginSchema),
 	controllerwrapper(userController.login),
+);
+
+//
+// AUTHENTICATED USER ROUTES (/me)
+//
+userRouter.get("/me", authenticate, (req, res) =>
+	res.status(200).json({ message: "Authenticated user", user: req.user }),
+);
+
+userRouter.patch(
+	"/me",
+	authenticate,
+	validate(updateUserSchema),
+	controllerwrapper(userController.updateUser),
+);
+
+userRouter.delete(
+	"/me",
+	authenticate,
+	controllerwrapper(userController.deleteUser),
+);
+
+// Update wanted skills
+userRouter.put(
+	"/me/wanted-skills",
+	authenticate,
+	validate(updateWantedSkillsSchema),
+	controllerwrapper(userController.updateUserWantedSkills),
+);
+
+// Update owned skills
+userRouter.patch(
+	"/me/skills",
+	authenticate,
+	validate(updateUserSkillsSchema),
+	controllerwrapper(userController.updateUserSkills),
+);
+
+// Get current authenticated user's full info
+userRouter.get("/me/users", authenticate, async (req, res, next) => {
+	req.params.userId = req.user.id;
+	return userController.getOneUser(req, res, next);
+});
+
+//
+// GENERAL USERS ROUTES
+//
+userRouter.get("/users", controllerwrapper(userController.getUsers));
+
+userRouter.get(
+	"/users/:userId",
+	validateParams("userId"),
+	controllerwrapper(userController.getOneUser),
+);
+
+//
+// FOLLOWING / FOLLOWERS ROUTES
+//
+// Get followers and followings of a given user
+userRouter.get(
+	"/users/follows/:id",
+	validateParams("id"),
+	controllerwrapper(userController.getFollowersAndFollowsFromUser),
+);
+
+// Get followers and followings of the authenticated user
+userRouter.get("/me/follows", authenticate, async (req, res, next) => {
+	req.params.id = req.user.id;
+	return userController.getFollowersAndFollowsFromUser(req, res, next);
+});
+
+// Follow a user
+userRouter.post(
+	"/me/follow/:userId",
+	authenticate,
+	validateParams("userId"),
+	controllerwrapper(userController.followUser),
+);
+
+// Unfollow a user
+userRouter.delete(
+	"/me/follow/:userId",
+	authenticate,
+	validateParams("userId"),
+	controllerwrapper(userController.unfollowUser),
 );
