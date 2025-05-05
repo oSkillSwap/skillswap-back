@@ -5,318 +5,325 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, User, Post } from "../models/associations.js";
+import { Category, Post, User } from "../models/associations.js";
 
 export const userController = {
-	register: async (req, res, next) => {
-		const {
-			username,
-			lastName,
-			firstName,
-			email,
-			password,
-			avatar = "/avatar/avatar1.png",
-			description,
-		} = req.validatedData;
+  register: async (req, res, next) => {
+    const users = await User.findAll();
 
-		const role = "member";
+    const lastId = users[users.length - 1].id;
+    const newId = lastId + 1;
 
-		// Email have to be unique
-		const existingEmail = await User.findOne({ where: { email } });
-		if (existingEmail) {
-			return next(new ConflictError("Cet email est déjà utilisé"));
-		}
+    const {
+      username,
+      lastName,
+      firstName,
+      email,
+      password,
+      avatar = `https://robohash.org/${newId}`,
+      description,
+    } = req.validatedData;
 
-		// username have to be unique
-		const existingUsername = await User.findOne({ where: { username } });
-		if (existingUsername) {
-			return next(new ConflictError("Ce nom d'utilisateur est déjà utilisé"));
-		}
+    const role = "member";
 
-		// Hash password
-		const hashedPassword = await argon2.hash(password);
+    // Email have to be unique
+    const existingEmail = await User.findOne({ where: { email } });
+    if (existingEmail) {
+      return next(new ConflictError("Cet email est déjà utilisé"));
+    }
 
-		const newUser = await User.create({
-			username,
-			lastName,
-			firstName,
-			email,
-			password: hashedPassword,
-			role,
-			avatar,
-			description,
-		});
+    // username have to be unique
+    const existingUsername = await User.findOne({ where: { username } });
+    if (existingUsername) {
+      return next(new ConflictError("Ce nom d'utilisateur est déjà utilisé"));
+    }
 
-		res.status(201).json({ message: "Utilisateur créé", user: newUser });
-	},
+    // Hash password
+    const hashedPassword = await argon2.hash(password);
 
-	// Login function to authenticate users
-	login: async (req, res, next) => {
-		const { email, password } = req.validatedData;
+    const newUser = await User.create({
+      username,
+      lastName,
+      firstName,
+      email,
+      password: hashedPassword,
+      role,
+      avatar,
+      description,
+    });
 
-		const user = await User.findOne({ where: { email } });
-		if (!user) {
-			return next(new UnauthorizedError("Identifiants incorrects"));
-		}
+    res
+      .status(201)
+      .json({ message: "Utilisateur créé avec succès", user: newUser });
+  },
 
-		const isPasswordValid = await argon2.verify(user.password, password);
-		if (!isPasswordValid) {
-			return next(new UnauthorizedError("Identifiants incorrects"));
-		}
+  // Login function to authenticate users
+  login: async (req, res, next) => {
+    const { email, password } = req.validatedData;
 
-		const token = generateToken({
-			id: user.id,
-			email: user.email,
-			username: user.username,
-			role: user.role,
-		});
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return next(new UnauthorizedError("Identifiants incorrects"));
+    }
 
-		res.status(200).json({
-			message: "Connexion réussie",
-			token,
-			user: {
-				id: user.id,
-				username: user.username,
-				email: user.email,
-			},
-		});
-	},
+    const isPasswordValid = await argon2.verify(user.password, password);
+    if (!isPasswordValid) {
+      return next(new UnauthorizedError("Identifiants incorrects"));
+    }
 
-	getUsers: async (req, res, next) => {
-		const whereCondition = {
-			isBanned: false, // Ensure the user is not banned
-			role: "member", // Only include users with the "member" role
-			isAvailable: true, // Ensure the user is available
-		};
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    });
 
-		const skillsAndCategory = {
-			association: "Skills", // Include the user's skills
-			attributes: ["id", "name"],
-			through: { attributes: [] }, // Exclude join table attributes
-			include: [
-				{
-					model: Category,
-				},
-			],
-		};
+    res.status(200).json({
+      message: "Connexion réussie",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  },
 
-		const wantedSkills = {
-			association: "WantedSkills", // Include the user's wanted skills
-			attributes: ["id", "name"],
-			through: { attributes: [] }, // Exclude join table attributes
-		};
+  getUsers: async (req, res, next) => {
+    const whereCondition = {
+      isBanned: false, // Ensure the user is not banned
+      role: "member", // Only include users with the "member" role
+      isAvailable: true, // Ensure the user is available
+    };
 
-		const reviews = {
-			association: "Reviews", // Include reviews
-			attributes: [], // No need to fetch review details
-		};
+    const skillsAndCategory = {
+      association: "Skills", // Include the user's skills
+      attributes: ["id", "name"],
+      through: { attributes: [] }, // Exclude join table attributes
+      include: [
+        {
+          model: Category,
+        },
+      ],
+    };
 
-		const users = await User.findAll({
-			where: whereCondition,
-			attributes: {
-				// Excluse password, email, updatedAt and createdAt fields
-				exclude: ["password", "email", "updatedAt", "createdAt"],
-				include: [
-					// Calculate the average grade of the user from their reviews
-					[Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
-					// Count the number of reviews the user has
-					[
-						Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-						"nbOfReviews",
-					],
-				],
-			},
-			include: [skillsAndCategory, wantedSkills, reviews],
-			group: ["User.id", "Skills.id", "WantedSkills.id", "Skills->Category.id"], // Group by user and related entities,
-			// Sort users based on the total number of reviews they have
-			order: [["nbOfReviews", "DESC"]],
-		});
-		return res.status(200).json({ users });
-	},
+    const wantedSkills = {
+      association: "WantedSkills", // Include the user's wanted skills
+      attributes: ["id", "name"],
+      through: { attributes: [] }, // Exclude join table attributes
+    };
 
-	getFollowersAndFollowsFromUser: async (req, res, next) => {
-		const { id } = req.params;
-		const user = await User.findByPk(id, {
-			attributes: [],
-			include: [
-				{
-					association: "Followers",
-					attributes: ["id", "username"],
-					through: { attributes: [] },
-				},
-				{
-					association: "Follows",
-					attributes: ["id", "username"],
-					through: { attributes: [] },
-				},
-			],
-		});
+    const reviews = {
+      association: "Reviews", // Include reviews
+      attributes: [], // No need to fetch review details
+    };
 
-		if (!user) {
-			return next(new NotFoundError("Utilisateur non trouvé"));
-		}
+    const users = await User.findAll({
+      where: whereCondition,
+      attributes: {
+        // Excluse password, email, updatedAt and createdAt fields
+        exclude: ["password", "email", "updatedAt", "createdAt"],
+        include: [
+          // Calculate the average grade of the user from their reviews
+          [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
+          // Count the number of reviews the user has
+          [
+            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
+            "nbOfReviews",
+          ],
+        ],
+      },
+      include: [skillsAndCategory, wantedSkills, reviews],
+      group: ["User.id", "Skills.id", "WantedSkills.id", "Skills->Category.id"], // Group by user and related entities,
+      // Sort users based on the total number of reviews they have
+      order: [["nbOfReviews", "DESC"]],
+    });
+    return res.status(200).json({ users });
+  },
 
-		return res.status(200).json({ user });
-	},
+  getFollowersAndFollowsFromUser: async (req, res, next) => {
+    const { id } = req.params;
+    const user = await User.findByPk(id, {
+      attributes: [],
+      include: [
+        {
+          association: "Followers",
+          attributes: ["id", "username"],
+          through: { attributes: [] },
+        },
+        {
+          association: "Follows",
+          attributes: ["id", "username"],
+          through: { attributes: [] },
+        },
+      ],
+    });
 
-	getOneUser: async (req, res, next) => {
-		const userId = req.user?.id;
+    if (!user) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
 
-		// biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
-		if (!userId || isNaN(Number(userId))) {
-			return next(new BadRequestError("Identifiant utilisateur invalide"));
-		}
+    return res.status(200).json({ user });
+  },
 
-		const user = await User.findByPk(userId, {
-			attributes: {
-				exclude: ["password", "email"],
-				include: [
-					[Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
-					[
-						Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-						"nbOfReviews",
-					],
-				],
-			},
-			include: [
-				{
-					association: "Skills",
-					attributes: ["id", "name"],
-					through: { attributes: [] },
-				},
-				{
-					association: "WantedSkills",
-					attributes: ["id", "name"],
-					through: { attributes: [] },
-				},
-				{
-					association: "Availabilities",
-					attributes: ["day_of_the_week", "time_slot"],
-					through: { attributes: [] },
-				},
-				{
-					association: "Reviews",
-					attributes: [],
-				},
-			],
-			group: ["User.id", "Skills.id", "WantedSkills.id", "Availabilities.id"],
-		});
+  getOneUser: async (req, res, next) => {
+    const { userId } = req.params;
 
-		if (!user) {
-			return next(new NotFoundError("Utilisateur non trouvé"));
-		}
+    // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+    if (!userId || isNaN(Number(userId))) {
+      return next(new BadRequestError("Identifiant utilisateur invalide"));
+    }
 
-		return res.status(200).json({ user });
-	},
+    const user = await User.findByPk(userId, {
+      attributes: {
+        exclude: ["password", "email"],
+        include: [
+          [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
+          [
+            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
+            "nbOfReviews",
+          ],
+        ],
+      },
+      include: [
+        {
+          association: "Skills",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+        {
+          association: "WantedSkills",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+        },
+        {
+          association: "Availabilities",
+          attributes: ["day_of_the_week", "time_slot"],
+          through: { attributes: [] },
+        },
+        {
+          association: "Reviews",
+          attributes: [],
+        },
+      ],
+      group: ["User.id", "Skills.id", "WantedSkills.id", "Availabilities.id"],
+    });
 
-	updateUser: async (req, res, next) => {
-		const userId = req.user.id; // Get the user ID from the token
-		const { username, firstName, lastName, email, avatar, description } =
-			req.validatedData; // Get the data from the request body
+    if (!user) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
 
-		// Check if no data provided
-		if (Object.keys(req.validatedData).length === 0) {
-			return next(
-				new BadRequestError("Aucune donnée fournie pour la mise à jour"),
-			);
-		}
-		const user = await User.findByPk(userId); // Find the user by ID
+    return res.status(200).json({ user });
+  },
 
-		if (!user) {
-			return next(new NotFoundError("Utilisateur non trouvé")); // If user not found, return error
-		}
+  updateUser: async (req, res, next) => {
+    const userId = req.user.id; // Get the user ID from the token
+    const { username, firstName, lastName, email, avatar, description } =
+      req.validatedData; // Get the data from the request body
 
-		if (email && email !== user.email) {
-			const existingUser = await User.findOne({ where: { email } });
-			if (existingUser) {
-				return next(new ConflictError("Cet email est déjà utilisé")); // If email already exists, return error => Can't errase existing user
-			}
-		}
+    // Check if no data provided
+    if (Object.keys(req.validatedData).length === 0) {
+      return next(
+        new BadRequestError("Aucune donnée fournie pour la mise à jour")
+      );
+    }
+    const user = await User.findByPk(userId); // Find the user by ID
 
-		const updatedFields = {
-			username: username ?? user.username,
-			firstName: firstName ?? user.firstName,
-			lastName: lastName ?? user.lastName,
-			email: email || user.email,
-			avatar: avatar || user.avatar,
-			description: description ?? user.description,
-		};
+    if (!user) {
+      return next(new NotFoundError("Utilisateur non trouvé")); // If user not found, return error
+    }
 
-		await user.update(updatedFields); // Update the user with the new data
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return next(new ConflictError("Cet email est déjà utilisé")); // If email already exists, return error => Can't errase existing user
+      }
+    }
 
-		return res.status(200).json({ message: "Utilisateur mis à jour", user }); // Return success message and updated user
-	},
+    const updatedFields = {
+      username: username ?? user.username,
+      firstName: firstName ?? user.firstName,
+      lastName: lastName ?? user.lastName,
+      email: email || user.email,
+      avatar: avatar || user.avatar,
+      description: description ?? user.description,
+    };
 
-	deleteUser: async (req, res, next) => {
-		const userId = req.user.id; // Get the user ID from the token
-		const user = await User.findByPk(userId);
+    await user.update(updatedFields); // Update the user with the new data
 
-		if (!user) {
-			return next(new NotFoundError("Utilisateur non trouvé"));
-		}
+    return res.status(200).json({ message: "Utilisateur mis à jour", user }); // Return success message and updated user
+  },
 
-		await user.destroy(); // Delete User
+  deleteUser: async (req, res, next) => {
+    const userId = req.user.id; // Get the user ID from the token
+    const user = await User.findByPk(userId);
 
-		return res.status(200).json({ message: "Compte supprimé avec succès" });
-	},
+    if (!user) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
 
-	followUser: async (req, res, next) => {
-		const { userId } = req.params;
-		const userLoggedIn = req.user;
+    await user.destroy(); // Delete User
 
-		if (!userLoggedIn) {
-			return next(new UnauthorizedError("Utilisateur non authentifié"));
-		}
+    return res.status(200).json({ message: "Compte supprimé avec succès" });
+  },
 
-		const targetUser = await User.findByPk(userId);
-		const user = await User.findByPk(userLoggedIn.id);
+  followUser: async (req, res, next) => {
+    const { userId } = req.params;
+    const userLoggedIn = req.user;
 
-		if (!targetUser) {
-			return next(new NotFoundError("Utilisateur non trouvé"));
-		}
+    if (!userLoggedIn) {
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    }
 
-		if (userLoggedIn.id === Number(userId)) {
-			return next(
-				new BadRequestError("Vous ne pouvez pas vous suivre vous-même"),
-			);
-		}
+    const targetUser = await User.findByPk(userId);
+    const user = await User.findByPk(userLoggedIn.id);
 
-		const isFollowing = await user.hasFollows(targetUser);
-		if (isFollowing) {
-			return next(new ConflictError("Vous suivez déjà cet utilisateur"));
-		}
+    if (!targetUser) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
 
-		await user.addFollows(targetUser);
+    if (userLoggedIn.id === Number(userId)) {
+      return next(
+        new BadRequestError("Vous ne pouvez pas vous suivre vous-même")
+      );
+    }
 
-		return res
-			.status(200)
-			.json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
-	},
+    const isFollowing = await user.hasFollows(targetUser);
+    if (isFollowing) {
+      return next(new ConflictError("Vous suivez déjà cet utilisateur"));
+    }
 
-	unfollowUser: async (req, res, next) => {
-		const userLoggedIn = req.user;
-		const { userId } = req.params;
+    await user.addFollows(targetUser);
 
-		if (!userLoggedIn) {
-			return next(new UnauthorizedError("Utilisateur non authentifié"));
-		}
+    return res
+      .status(200)
+      .json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
+  },
 
-		const targetUser = await User.findByPk(userId);
-		const user = await User.findByPk(userLoggedIn.id);
+  unfollowUser: async (req, res, next) => {
+    const userLoggedIn = req.user;
+    const { userId } = req.params;
 
-		if (!targetUser) {
-			return next(new NotFoundError("Utilisateur non trouvé"));
-		}
+    if (!userLoggedIn) {
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    }
 
-		const isFollowing = await user.hasFollows(targetUser);
-		if (!isFollowing) {
-			return next(new ConflictError("Vous ne suivez pas cet utilisateur"));
-		}
+    const targetUser = await User.findByPk(userId);
+    const user = await User.findByPk(userLoggedIn.id);
 
-		await user.removeFollows(targetUser);
+    if (!targetUser) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
 
-		return res.status(200).json({
-			message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
-		});
-	},
+    const isFollowing = await user.hasFollows(targetUser);
+    if (!isFollowing) {
+      return next(new ConflictError("Vous ne suivez pas cet utilisateur"));
+    }
+
+    await user.removeFollows(targetUser);
+
+    return res.status(200).json({
+      message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
+    });
+  },
 };
