@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbiIsInJvbGUiOiJtZW1iZXIiLCJpYXQiOjE3NDYyMDA1MTMsImV4cCI6MTc0NjIwNzcxM30.ZlTQsW7rfbcwNXZHzK2GdpwSV8iGuiMOXdmZepkp-kc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ2NDUzOTUyLCJleHAiOjE3NDY0NjExNTJ9.JfkCyvzi3wPcXLqMfHGM0tqQHTnfRrZxqPeb8sASVN8
 // ID User: 11
 
 ### Register a user
@@ -6,10 +6,10 @@ POST http://localhost:3000/api/register
 Content-Type: application/json
 
 {
-  "username": "Erwan",
+  "username": "Erwannnnn",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
-  "email": "erwan@gmail.com",
+  "email": "erwannnn@gmail.com",
   "password": "ErwanMettouchi1+",
   "avatar": "",
   "description": "Travail en boucle"
@@ -20,13 +20,13 @@ POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
-  "email": "erwan@gmail.com",
+  "email": "erwannnn@gmail.com",
   "password": "ErwanMettouchi1+"
 }
 
 
 ###Test the JWT connexion
-GET http://localhost:3000/api/me
+GET http://localhost:3000/api/me/users
 Authorization: Bearer {{token}}
 
 ### DELETE myself
