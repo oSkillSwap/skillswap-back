@@ -65,3 +65,8 @@ export const updateUserAdminSchema = z.object({
 		)
 		.optional(),
 });
+
+export const updateCategoryAdminSchema = z.object({
+	name: z.string().optional(),
+	icon: z.string().optional(),
+});
