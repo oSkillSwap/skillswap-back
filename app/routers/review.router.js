@@ -3,33 +3,37 @@ import { reviewController } from "../controllers/review.controller.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { reviewSchema, updateReviewSchema } from "../schemas/review.schema.js";
 import { validate } from "../middlewares/validates.js";
-import { reviewSchema } from "../schemas/review.schema.js";
 
 export const reviewRouter = Router();
 
-//
-// PUBLIC REVIEWS ROUTES
-//
+//  /reviews
+reviewRouter
+	.route("/reviews")
+	.get(controllerwrapper(reviewController.getReviews)); // Get all reviews
 
-// Get latest public reviews (with content)
-reviewRouter.get("/reviews", controllerwrapper(reviewController.getReviews));
+// Create a review
+reviewRouter
+	.route("/me/reviews")
+	.post(
+		authenticate,
+		validate(reviewSchema),
+		controllerwrapper(reviewController.createReview),
+	);
 
-// Get all reviews related to a specific user ID
+// /reviews/:id -> user-specific reviews
 reviewRouter.get(
 	"/reviews/:id",
 	validateParams("id"),
 	controllerwrapper(reviewController.getReviewsFromUser),
 );
 
-//
-// AUTHENTICATED USER REVIEWS ROUTES
-//
-
-// Create a new review as the authenticated user
-reviewRouter.post(
-	"/me/reviews",
+// /me/reviews/:userId -> update review I made
+reviewRouter.patch(
+	"/me/reviews/:reviewId",
 	authenticate,
-	validate(reviewSchema),
-	controllerwrapper(reviewController.createReview),
+	validateParams("reviewId"),
+	validate(updateReviewSchema),
+	controllerwrapper(reviewController.updateReview),
 );

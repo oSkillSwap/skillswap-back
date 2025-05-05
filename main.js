@@ -10,18 +10,31 @@ app.use(express.static(path.join(import.meta.dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "https://localhost:3000"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+
+const corsOptions = {
+	origin: (origin, callback) => {
+		// En développement ou si frontend pas encore prêt, autoriser tout
+		if (process.env.FRONTEND_URL === "*" || !origin) {
+			return callback(null, true);
+		}
+
+		// Sinon, n'autoriser que les origines précises
+		if (origin === process.env.FRONTEND_URL) {
+			return callback(null, true);
+		}
+
+		// Sinon, bloquer
+		return callback(new Error("Not allowed by CORS"));
+	},
+	credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use("/api", router);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(
-    `✨🌟⭐ API SkillSwap lancée sur http://localhost:${port} ╰(*°▽°*)╯ ⭐🌟✨`
-  );
+	console.log(
+		`✨🌟⭐ API SkillSwap lancée sur http://localhost:${port} ╰(*°▽°*)╯ ⭐🌟✨`,
+	);
 });
