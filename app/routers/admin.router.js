@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
-import { adminController } from "../controllers/adminController.js";
+import { adminController } from "../controllers/admin.controller.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";

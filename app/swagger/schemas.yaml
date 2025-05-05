@@ -1,0 +1,189 @@
+openapi: 3.0.0
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+        lastName:
+          type: string
+          example: Doe
+        firstName:
+          type: string
+          example: John
+        role:
+          type: string
+          enum: [ admin, member ]
+          example: member
+        isBanned:
+          type: boolean
+          example: false
+        isAvailable:
+          type: boolean
+          example: true
+        description:
+          type: string
+          example: Développeur passionné
+        avatar:
+          type: string
+          format: uri
+          example: http://example.com/avatar.jpg
+        avergageGrade:
+          type: number
+          format: float
+          example: 4.5
+        nbOfReviews:
+          type: integer
+          format: int32
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        Skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Skill'
+        WantedSkills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Skill'
+
+    DetailedUser:
+      allOf:
+      - $ref: '#/components/schemas/User'
+      - type: object
+        properties:
+          Availabilities:
+            type: array
+            items:
+              $ref: '#/components/schemas/Availability'
+
+    NonDetailedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+
+    Skill:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: JavaScript
+
+    Availability:
+      type: object
+      required:
+      - id
+      - day_of_the_week
+      - time_slot
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        day_of_the_week:
+          type: string
+          enum: [ Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche ]
+        time_slot:
+          type: string
+          enum: [ matin, midi, apres-midi, soir ]
+
+    FollowsAndFollowers:
+      type: object
+      properties:
+        Followers:
+          type: array
+          items:
+            $ref: '#/components/schemas/NonDetailedUser'
+        Follows:
+          type: array
+          items:
+            $ref: '#/components/schemas/NonDetailedUser'
+
+    RegisterUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: Password1234+
+        email:
+          type: string
+          format: email
+          example: johndoe@gmail.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+      required:
+      - username
+      - password
+      - email
+
+    LoginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: johndoe@gmail.com
+        password:
+          type: string
+          example: Password1234+
+      required:
+      - email
+      - password
+
+    UpdateUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: Password1234+
+        email:
+          type: string
+          format: email
+          example: johndoe@gmail.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        description:
+          type: string
+          example: Développeur passionné
+        avatar:
+          type: string
+          format: uri
+          example: http://example.com/avatar.jpg
