@@ -10,6 +10,7 @@ app.use(express.static(path.join(import.meta.dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 const corsOptions = {
 	origin: (origin, callback) => {
 		// En développement ou si frontend pas encore prêt, autoriser tout
