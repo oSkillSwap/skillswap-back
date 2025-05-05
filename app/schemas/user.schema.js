@@ -1,69 +1,84 @@
-import sanitizeHtml from "sanitize-html";
 import { z } from "zod";
+import sanitizeHtml from "sanitize-html";
 
-const cleanHTML = (val) =>
-  sanitizeHtml(val.trim(), {
-    allowedTags: ["b", "i", "em", "strong", "p", "ul", "li", "br"],
-    allowedAttributes: {},
-    disallowedTagsMode: "discard",
-  });
+// Fonction locale pour nettoyer le contenu autorisé dans les textareas
+const sanitizeTextarea = (val) =>
+	sanitizeHtml(val.trim(), {
+		allowedTags: ["b", "i", "em", "strong", "p", "ul", "li", "ol", "br"],
+		allowedAttributes: {},
+	});
 
-export const registerSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3)
-    .max(16)
-    .regex(/^[a-zA-Z0-9-]+$/),
-  lastName: z.string().trim().max(50).optional(),
-  firstName: z.string().trim().max(50).optional(),
-  email: z.string().trim().email(),
-  password: z
-    .string()
-    .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
-    .regex(/[a-z]/, {
-      message: "Le mot de passe doit contenir au moins une lettre minuscule",
-    })
-    .regex(/[A-Z]/, {
-      message: "Le mot de passe doit contenir au moins une lettre majuscule",
-    })
-    .regex(/[0-9]/, {
-      message: "Le mot de passe doit contenir au moins un chiffre",
-    })
-    .regex(/[^a-zA-Z0-9]/, {
-      message: "Le mot de passe doit contenir au moins un caractère spécial",
-    }),
-  avatar: z.string().optional().default("/avatar/avatar1.png"),
-  role: z.enum(["admin", "member"]).optional(),
-  description: z.string().trim().max(800).transform(cleanHTML).optional(),
-});
+export const registerSchema = z
+	.object({
+		username: z
+			.string()
+			.min(3, { message: "Le nom d'utilisateur est requis" })
+			.max(25, { message: "Maximum 25 caractères" })
+			.regex(/^[a-zA-Z0-9-]+$/, {
+				message:
+					"Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
+			})
+			.transform((val) => sanitizeHtml(val.trim())),
+		lastName: z
+			.string()
+			.max(50, "Maximum 50 caractères")
+			.optional()
+			.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+		firstName: z
+			.string()
+			.max(50, "Maximum 50 caractères")
+			.optional()
+			.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+		email: z.string().email({ message: "Adresse e-mail invalide" }),
+		password: z
+			.string()
+			.min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+			.regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+			.regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+			.regex(/[0-9]/, { message: "Un chiffre requis" })
+			.regex(/[^a-zA-Z0-9]/, {
+				message: "Un caractère spécial requis",
+			}),
+		avatar: z.string().optional().default("/avatar/avatar1.png"),
+		description: z
+			.string()
+			.max(800, "Maximum 800 caractères")
+			.optional()
+			.transform((val) => (val ? sanitizeTextarea(val) : undefined)),
+	})
+	.strict({ message: "Vous avez essayé de faire une action non autorisée" });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email(),
-  password: z.string().min(1),
+	email: z.string().email("Adresse e-mail invalide"),
+	password: z.string().min(1, "Mot de passe requis"),
 });
 
 export const updateUserSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3)
-    .max(16)
-    .regex(/^[a-zA-Z0-9-]+$/)
-    .optional(),
-  firstName: z.string().trim().max(50).optional(),
-  lastName: z.string().trim().max(50).optional(),
-  email: z.string().trim().email().optional(),
-  avatar: z.string().optional(),
-  description: z.string().trim().max(800).transform(cleanHTML).optional(),
-});
-
-export const updateWantedSkillsSchema = z.object({
-  wantedSkills: z.array(z.number()).min(1),
-});
-
-export const updateUserSkillsSchema = z.object({
-  skills: z
-    .array(z.number())
-    .min(1, "Vous devez sélectionner au moins une compétence"),
+	username: z
+		.string()
+		.min(3, "Le nom d'utilisateur est requis")
+		.max(25, "Maximum 16 caractères")
+		.regex(
+			/^[a-zA-Z0-9-]+$/,
+			"Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
+		)
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	firstName: z
+		.string()
+		.max(50, "Maximum 50 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	lastName: z
+		.string()
+		.max(50, "Maximum 50 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
+	email: z.string().email("Adresse e-mail invalide").optional(),
+	avatar: z.string().optional(),
+	description: z
+		.string()
+		.max(800, "Maximum 800 caractères")
+		.optional()
+		.transform((val) => (val ? sanitizeTextarea(val) : undefined)),
 });

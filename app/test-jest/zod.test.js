@@ -1,147 +1,160 @@
 import { ZodError } from "zod";
 import { registerSchema } from "../schemas/user.schema.js";
 
-describe("Schema d'incription utilisateur zod", () => {
-  let input;
-  beforeEach(() => {
-    input = {
-      username: "User1",
-      lastName: "userlastname",
-      firstName: "userfirstname",
-      email: "user@gmail.com",
-      password: "User1234+",
-      avatar: "/",
-      role: "member",
-      description: ".....",
-    };
-  });
-  describe("Tests du mot de passe", () => {
-    test("Si le mot de passe ne fait pas minimum 8 caractères, doit renvoyer un message disant: 'Le mot de passe doit faire au moins 8 caractères'", () => {
-      input.password = "User12+";
+describe("Schéma d'inscription utilisateur", () => {
+	let validData;
 
-      const result = registerSchema.safeParse(input);
+	beforeEach(() => {
+		validData = {
+			username: "Jean-Test",
+			lastName: "Dupont",
+			firstName: "Jean",
+			email: "jean.dupont@example.com",
+			password: "Motdepasse1!",
+			avatar: "/avatar/avatar1.png",
+			description: "<p>Bonjour <strong>tout</strong> le monde</p>",
+		};
+	});
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(ZodError);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["password"],
-            message: "Le mot de passe doit faire au moins 8 caractères",
-          }),
-        ])
-      );
-    });
-    test("Si le mot de passe ne contient pas au moins une lettre minuscule, doit renvoyer un message disant: Le mot de passe doit contenir au moins une lettre minuscule", () => {
-      input.password = "USER1234+";
+	test("valide des données complètes et valides", () => {
+		const result = registerSchema.safeParse(validData);
+		expect(result.success).toBe(true);
+	});
 
-      const result = registerSchema.safeParse(input);
+	describe("Tests du mot de passe", () => {
+		test("rejette un mot de passe sans majuscule", () => {
+			validData.password = "motdepasse1!";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["password"],
+						message: "Une lettre majuscule requise",
+					}),
+				]),
+			);
+		});
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(ZodError);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["password"],
-            message:
-              "Le mot de passe doit contenir au moins une lettre minuscule",
-          }),
-        ])
-      );
-    });
-    test("Si le mot de passe ne contient pas au moins une lettre majuscule, doit renvoyer un message disant: Le mot de passe doit contenir au moins une lettre majuscule", () => {
-      input.password = "user1234+";
+		test("rejette un mot de passe sans minuscule", () => {
+			validData.password = "MOTDEPASSE1!";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["password"],
+						message: "Une lettre minuscule requise",
+					}),
+				]),
+			);
+		});
 
-      const result = registerSchema.safeParse(input);
+		test("rejette un mot de passe sans chiffre", () => {
+			validData.password = "Motdepasse!";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["password"],
+						message: "Un chiffre requis",
+					}),
+				]),
+			);
+		});
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(ZodError);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["password"],
-            message:
-              "Le mot de passe doit contenir au moins une lettre majuscule",
-          }),
-        ])
-      );
-    });
-    test("Si le mot de passe ne contient pas au moins un caractère spécial, doit renvoyer un message disant: Le mot de passe doit contenir au moins un caractère spécial", () => {
-      input.password = "User12345";
+		test("rejette un mot de passe sans caractère spécial", () => {
+			validData.password = "Motdepasse1";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["password"],
+						message: "Un caractère spécial requis",
+					}),
+				]),
+			);
+		});
 
-      const result = registerSchema.safeParse(input);
+		test("rejette un mot de passe trop court", () => {
+			validData.password = "Aa1!";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["password"],
+						message: "Le mot de passe doit faire au moins 8 caractères",
+					}),
+				]),
+			);
+		});
+	});
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(ZodError);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["password"],
-            message:
-              "Le mot de passe doit contenir au moins un caractère spécial",
-          }),
-        ])
-      );
-    });
-    test("Quand le mot de passe fait 8 caractères minimum, contient au moins une minuscule, une majuscule et un caractère spécial, l'opération doit réussir", () => {
-      input.password = "User1234+";
-      const result = registerSchema.safeParse(input);
-      expect(result.success).toBe(true);
-    });
-  });
-  describe("Tests du username", () => {
-    test("Si le username contient moins de 3 caractères, doit renvoyer un code 'too_short'", () => {
-      input.username = "az";
-      const result = registerSchema.safeParse(input);
+	describe("Tests du champ username", () => {
+		test("rejette un username trop court", () => {
+			validData.username = "ab";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["username"],
+						message: "Le nom d'utilisateur est requis",
+					}),
+				]),
+			);
+		});
 
-      expect(result.success).toBe(false);
+		test("rejette un username avec caractères spéciaux", () => {
+			validData.username = "jean$test";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["username"],
+						message:
+							"Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
+					}),
+				]),
+			);
+		});
+	});
 
-      expect(result.error).toBeInstanceOf(ZodError);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["username"],
-            code: "too_small",
-          }),
-        ])
-      );
-    });
-    test("Si le username contient plus de 16 caractères, doit renvoyer un code 'too_big'", () => {
-      input.username = "azertyuiopqsdfghjklmwxcvbn";
-      const result = registerSchema.safeParse(input);
+	describe("Tests de l'email", () => {
+		test("rejette un email invalide", () => {
+			validData.email = "pas-un-mail";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(false);
+			expect(result.error.issues).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						path: ["email"],
+						message: "Adresse e-mail invalide",
+					}),
+				]),
+			);
+		});
+	});
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(ZodError);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["username"],
-            code: "too_big",
-          }),
-        ])
-      );
-    });
-    test("Si le username ne contient pas que des chiffres, lettres et tirets, doit renvoyer un code 'invalid_string'", () => {
-      input.username = "bonjour++";
-      const result = registerSchema.safeParse(input);
+	describe("Tests des champs optionnels", () => {
+		test("autorise une description vide", () => {
+			validData.description = "";
+			const result = registerSchema.safeParse(validData);
+			expect(result.success).toBe(true);
+		});
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(ZodError);
-      console.log(result.error.issues);
-      expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            path: ["username"],
-            code: "invalid_string",
-          }),
-        ])
-      );
-    });
-    test("Si le username contient au moins un 3 caractères et maximum 16 caractères, l'opération doit réussir", () => {
-      input.username = "Oui";
-      const result = registerSchema.safeParse(input);
-
-      expect(result.success).toBe(true);
-    });
-  });
+		test("autorise un nom sans lastName ni firstName", () => {
+			const partialData = {
+				...validData,
+				lastName: undefined,
+				firstName: undefined,
+			};
+			const result = registerSchema.safeParse(partialData);
+			expect(result.success).toBe(true);
+		});
+	});
 });

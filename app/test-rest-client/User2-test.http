@@ -1,4 +1,4 @@
-@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDYwMTIwODcsImV4cCI6MTc0NjAxOTI4N30.7mGr2fqdCgnnAIXDwy9M7IHP7dB45HwihyE5Sa8KLV0
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDYwNTQ5NzgsImV4cCI6MTc0NjA2MjE3OH0.jafQFPHPiXtht_474DdMv5HcdPenx1J4Yqd0QxDqzXM
 // ID: 12
 
 ### Register a user
@@ -12,7 +12,6 @@ Content-Type: application/json
   "email": "gregory@gmail.com",
   "password": "GregoryVirmaud1234+",
   "avatar": "",
-  "role": "member",
   "description": "Travail sur le backend"
 }
 
@@ -65,7 +64,7 @@ Content-Type: application/json
 {
   "title": "un test de post fais par Gregory",
   "content" : "un texte de contenu test",
-  "skill_id" : 9
+  "skill_id" : 3
 }
 
 ### GET all propositions from a user
@@ -91,6 +90,15 @@ Content-Type: application/json
   "comment": "Super collaboration, très professionnel !"
 }
 
+### PATCH a review (update)
+PATCH http://localhost:3000/api/me/reviews/21
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{
+  "grade": 5,
+  "content": "Mise à jour de ma review, super expérience !"
+}
 
 ### Update my wanted skills
 PUT http://localhost:3000/api/me/wanted-skills
@@ -98,7 +106,7 @@ Authorization: Bearer {{token2}}
 Content-Type: application/json
 
 {
-  "wantedSkills": [1, 2, 4, 5]
+  "wantedSkills": [1, 2, 3, 4, 5]
 }
 
 ### Try to send invalid wantedSkills
@@ -141,24 +149,12 @@ Content-Type: application/json
 }
 
 
-### PATCH a review (update)
-PATCH http://localhost:3000/api/me/reviews/21
-Authorization: Bearer {{token2}}
-Content-Type: application/json
-
-{
-  "grade": 3,
-  "content": "Mise à jour de ma review, super expérience !"
-}
-
-
-
 ###
 GET http://localhost:3000/api/me/follows
 Authorization: Bearer {{token2}}
 
 ###
-POST http://localhost:3000/api/me/follow/12
+POST http://localhost:3000/api/me/follow/11
 Authorization: Bearer {{token2}}
 
 ###

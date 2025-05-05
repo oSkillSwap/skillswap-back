@@ -1,0 +1,108 @@
+@token3 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJBZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NjQzNjg5NiwiZXhwIjoxNzQ2NDQ0MDk2fQ.pTQ0J-FUmn653rwzZP2-NPSxyVakzkK9y66Z--LyUOE
+
+### Forbidden a role admin in req.body
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "username": "Admin",
+  "lastName": "gregadmin",
+  "firstName": "gregadmin",
+  "email": "admin@gmail.com",
+  "password": "Admin1234+",
+  "avatar": "",
+  "description": "Admin du site"
+}
+
+//node set-user-admin.js
+
+### Create a member then admin in SQL
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "username": "Admin",
+  "lastName": "gregadmin",
+  "firstName": "gregadmin",
+  "email": "admin@gmail.com",
+  "password": "Admin1234+",
+  "avatar": "",
+  "description": "Admin du site"
+}
+
+
+###login a user
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "Admin1234+"
+}
+
+
+### Dashboard Admin
+GET http://localhost:3000/api/admin/dashboard
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+### Dashboard Admin -> All Users
+GET http://localhost:3000/api/admin/users
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+
+### Dashboard Admin -> One User
+GET http://localhost:3000/api/admin/users/8
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+
+### Admin Update User's informations
+PATCH http://localhost:3000/api/admin/users/8
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+{
+  "username": "Albert",
+  "firstName": "Jean",
+  "lastName": "Bon",
+  "avatar": "/avatars/avatar1.png",
+  "description": "<p>Utilisateur <strong>mis à jour</strong> par l'admin</p>",
+  "role": "admin",
+  "isBanned": true,
+  "isAvailable": false,
+
+  "messages": [
+    { "id": 29, "action": "delete" },
+    { "id": 30, "action": "update", "content": "Message corrigé" }
+  ],
+
+  "reviews": [
+    { "id": 16, "action": "update", "grade": 5, "content": "Nouvelle note" },
+    { "id": 15, "action": "delete" }
+  ]
+}
+
+
+### Admin GET All Categories
+GET http://localhost:3000/api/admin/category
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+
+
+### Admin Update category
+PATCH http://localhost:3000/api/admin/category/2
+Authorization: Bearer {{token3}}
+Content-Type: application/json
+
+{
+  "name": "Developpement",
+  "icon": "icon de developpement"
+}
+
+### Admin Delete category
+DELETE http://localhost:3000/api/admin/category/2
+Authorization: Bearer {{token3}}
+Content-Type: application/json
