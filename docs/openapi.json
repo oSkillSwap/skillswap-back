@@ -1,0 +1,43 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "SkillSwap API",
+    "version": "1.0.0",
+    "description": "API for SkillSwap, une plateforme d'échange de compétences entre utilisateurs.",
+    "contact": {
+      "name": "Erwan Mettouchi, Gregory Virmaud, Olivier Renard"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Serveur de développement"
+      },
+      {
+        "url": "https://skillswap-hknk.onrender.com/",
+        "description": "Serveur de production"
+      }
+    ],
+    "paths": {
+      "/api/users": {
+        "get": {
+          "summary": "Récupérer tous les utilisateurs",
+          "responses": {
+            "200": {
+              "description": "Liste d'utilisateurs",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

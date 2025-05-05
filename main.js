@@ -10,24 +10,12 @@ app.use(express.static(path.join(import.meta.dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // En développement ou si frontend pas encore prêt, autoriser tout
-    if (process.env.FRONTEND_URL === "*" || !origin) {
-      return callback(null, true);
-    }
-
-    // Sinon, n'autoriser que les origines précises
-    if (origin === process.env.FRONTEND_URL) {
-      return callback(null, true);
-    }
-
-    // Sinon, bloquer
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 
 app.use("/api", router);
 
