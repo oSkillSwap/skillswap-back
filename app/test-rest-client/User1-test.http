@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ2NDUzOTUyLCJleHAiOjE3NDY0NjExNTJ9.JfkCyvzi3wPcXLqMfHGM0tqQHTnfRrZxqPeb8sASVN8
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ2NTE3OTA5LCJleHAiOjE3NDY1MjUxMDl9.Eq6qQZnNvkqKhSnJMrRIUmQ8qs_WZzluq2L6QL69K5w
 // ID User: 11
 
 ### Register a user
@@ -142,6 +142,9 @@ Content-Type: application/json
   "content": "Mise à jour de ma review, super expérience !"
 }
 
+###
+GET http://localhost:3000/api/me/users
+Authorization: Bearer {{token}}
 
 ### Update my wanted skills
 PUT http://localhost:3000/api/me/wanted-skills

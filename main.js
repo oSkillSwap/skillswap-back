@@ -27,7 +27,7 @@ const corsOptions = {
     "https://localhost:3000",
     "http://localhost:300",
   ],
-  methods: ["GET", "POST", "PATCH", "DELETE"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   credentials: true,
 };
 app.use(cors(corsOptions));
