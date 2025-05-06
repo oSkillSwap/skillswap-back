@@ -1,11 +1,11 @@
 import argon2 from "argon2";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ConflictError } from "../errors/conflict-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, User } from "../models/associations.js";
+import { Category, Review, User } from "../models/associations.js";
 
 export const userController = {
   register: async (req, res, next) => {
@@ -167,23 +167,22 @@ export const userController = {
   },
 
   getOneUser: async (req, res, next) => {
-    const { userId } = req.params;
+    const { userIdOrUsername } = req.params;
 
     // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
-    if (!userId || isNaN(Number(userId))) {
-      return next(new BadRequestError("Identifiant utilisateur invalide"));
-    }
-
-    const user = await User.findByPk(userId, {
+    const isNumeric = !isNaN(userIdOrUsername); // Check if the parameter is numeric (user ID) or not (username)
+    const whereCondition = isNumeric
+      ? {
+          [Op.or]: [
+            { id: Number(userIdOrUsername) },
+            { username: userIdOrUsername },
+          ],
+        }
+      : { username: userIdOrUsername };
+    const user = await User.findOne({
+      where: whereCondition,
       attributes: {
         exclude: ["password", "email"],
-        include: [
-          [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
-          [
-            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-            "nbOfReviews",
-          ],
-        ],
       },
       include: [
         {
@@ -201,17 +200,24 @@ export const userController = {
           attributes: ["day_of_the_week", "time_slot"],
           through: { attributes: [] },
         },
-        {
-          association: "Reviews",
-          attributes: [],
-        },
       ],
-      group: ["User.id", "Skills.id", "WantedSkills.id", "Availabilities.id"],
     });
 
     if (!user) {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
+
+    const reviewStats = await Review.findOne({
+      where: { user_id: user.id },
+      attributes: [
+        [Sequelize.fn("AVG", Sequelize.col("grade")), "averageGrade"],
+        [Sequelize.fn("COUNT", Sequelize.col("grade")), "nbOfReviews"],
+      ],
+      raw: true,
+    });
+
+    user.setDataValue("averageGrade", reviewStats.averageGrade);
+    user.setDataValue("nbOfReviews", reviewStats.nbOfReviews);
 
     return res.status(200).json({ user });
   },
