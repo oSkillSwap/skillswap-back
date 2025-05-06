@@ -207,3 +207,224 @@ components:
             type: integer
             format: int64
           example: [ 1, 2, 3, 4, 5 ]
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Très bon développeur !
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        Reviewer:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            username:
+              type: string
+              example: johndoe
+            lastName:
+              type: string
+              example: Doe
+            firstName:
+              type: string
+              example: John
+            email:
+              type: string
+              format: email
+              example: johndoe@gmail.com
+            role:
+              type: string
+              enum: [ admin, member ]
+              example: member
+            isBanned:
+              type: boolean
+              example: false
+            isAvailable:
+              type: boolean
+              example: true
+            description:
+              type: string
+              example: Développeur passionné
+            avatar:
+              type: string
+              format: uri
+              example: http://example.com/avatar.jpg
+            createdAt:
+              type: string
+              format: date-time
+              example: 2023-01-01T00:00:00Z
+            updatedAt:
+              type: string
+              format: date-time
+              example: 2023-01-01T00:00:00Z
+
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+        avatar:
+          type: string
+          format: uri
+          example: http://example.com/avatar.jpg
+        description:
+          type: string
+          example: Développeur passionné
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Mon premier post !
+        Author:
+          $ref: '#/components/schemas/Author'
+
+    Proposition:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: Proposition de projet
+        state:
+          type: string
+          enum: [ en attente, acceptée, refusée ]
+          example: en attente
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        sender_id:
+          type: integer
+          format: int64
+          example: 1
+        receiver_id:
+          type: integer
+          format: int64
+          example: 2
+        post_id:
+          type: integer
+          format: int64
+          example: 1
+        Post:
+          $ref: '#/components/schemas/Post'
+
+    Reviewer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+
+    ReviewFromUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Très bon développeur !
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+        proposition_id:
+          type: integer
+          format: int64
+          example: 1
+        Reviewer:
+          $ref: '#/components/schemas/Reviewer'
+        Proposition:
+          $ref: '#/components/schemas/Proposition'
+
+    UpdateReview:
+      type: object
+      properties:
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+
+    CreateReview:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Très bon développeur !
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+        proposition_id:
+          type: integer
+          format: int64
+          example: 1
+        reviewed_id:
+          type: integer
+          format: int64
+          example: 1
