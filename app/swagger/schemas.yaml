@@ -187,3 +187,23 @@ components:
           type: string
           format: uri
           example: http://example.com/avatar.jpg
+
+    UpdateWantedSkills:
+      type: object
+      properties:
+        wantedSkills:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [ 1, 2, 3, 4, 5 ]
+
+    UpdateSkills:
+      type: object
+      properties:
+        skills:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [ 1, 2, 3, 4, 5 ]

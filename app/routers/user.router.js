@@ -644,7 +644,6 @@ userRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-
   .patch(
     authenticate,
     validate(updateUserSchema),
