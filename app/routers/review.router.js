@@ -227,11 +227,11 @@ reviewRouter
  *         content:
  *           application/json:
  *             schema:
- *             type: Object
- *             properties:
- *               message:
- *                 type: string
- *                 example: "Token invalide ou expiré"
+ *               type: Object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Token invalide ou expiré"
  *       403:
  *         description: Accès interdit
  *         content:
