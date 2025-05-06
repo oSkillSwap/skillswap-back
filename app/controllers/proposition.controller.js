@@ -1,184 +1,213 @@
 import { Op, Sequelize } from "sequelize";
-import { NotFoundError } from "../errors/not-found-error.js";
-import { ForbiddenError } from "../errors/forbidden-error.js";
 import { BadRequestError } from "../errors/badrequest-error.js";
+import { ConflictError } from "../errors/conflict-error.js";
+import { ForbiddenError } from "../errors/forbidden-error.js";
+import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { Post, Proposition, User } from "../models/associations.js";
 
 export const propositionController = {
-	// Get all user's proposition
-	getProposition: async (req, res, next) => {
-		const { userId } = req.params;
-		const user = await User.findByPk(userId);
-		if (!user) return next(new NotFoundError("Utilisateur non trouvé"));
+  // Get all user's proposition
+  getProposition: async (req, res, next) => {
+    const { userId } = req.params;
+    const user = await User.findByPk(userId);
+    if (!user) return next(new NotFoundError("Utilisateur non trouvé"));
 
-		const propositions = await Proposition.findAll({
-			where: {
-				[Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
-			},
-			include: [
-				{
-					model: Post,
-					attributes: ["id", "title"],
-					include: {
-						association: "SkillWanted",
-						attributes: ["id", "name"],
-					},
-				},
-				{
-					association: "Sender",
-					attributes: ["id", "username", "avatar"],
-				},
-				{
-					association: "Receiver",
-					attributes: ["id", "username", "avatar"],
-				},
-			],
-			order: [["createdAt", "DESC"]],
-		});
+    const propositions = await Proposition.findAll({
+      where: {
+        [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
+      },
+      include: [
+        {
+          model: Post,
+          attributes: ["id", "title"],
+          include: {
+            association: "SkillWanted",
+            attributes: ["id", "name"],
+          },
+        },
+        {
+          association: "Sender",
+          attributes: ["id", "username", "avatar"],
+        },
+        {
+          association: "Receiver",
+          attributes: ["id", "username", "avatar"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
 
-		return res.status(200).json({ propositions });
-	},
+    return res.status(200).json({ propositions });
+  },
 
-	// user send proposition
-	getUserSentPropositions: async (req, res, next) => {
-		const user = req.user;
-		if (!user)
-			return next(new UnauthorizedError("Utilisateur non authentifié"));
+  // user send proposition
+  getUserSentPropositions: async (req, res, next) => {
+    const user = req.user;
+    if (!user)
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
 
-		const propositions = await Proposition.findAll({
-			where: { sender_id: user.id },
-			include: [
-				{
-					required: true,
-					association: "Receiver",
-					attributes: [
-						"id",
-						"username",
-						"avatar",
-						"description",
-						[
-							Sequelize.fn("AVG", Sequelize.col("Receiver->Reviews.grade")),
-							"averageGrade",
-						],
-						[
-							Sequelize.fn("COUNT", Sequelize.col("Receiver->Reviews.grade")),
-							"nbOfReviews",
-						],
-					],
-					include: {
-						association: "Reviews",
-						attributes: [],
-					},
-				},
-				{
-					model: Post,
-					include: {
-						association: "SkillWanted",
-						attributes: ["id", "name"],
-					},
-				},
-			],
-			group: [
-				"Proposition.id",
-				"Receiver.id",
-				"Post.id",
-				"Post->SkillWanted.id",
-			],
-		});
+    const propositions = await Proposition.findAll({
+      where: { sender_id: user.id },
+      include: [
+        {
+          required: true,
+          association: "Receiver",
+          attributes: [
+            "id",
+            "username",
+            "avatar",
+            "description",
+            [
+              Sequelize.fn("AVG", Sequelize.col("Receiver->Reviews.grade")),
+              "averageGrade",
+            ],
+            [
+              Sequelize.fn("COUNT", Sequelize.col("Receiver->Reviews.grade")),
+              "nbOfReviews",
+            ],
+          ],
+          include: {
+            association: "Reviews",
+            attributes: [],
+          },
+        },
+        {
+          model: Post,
+          include: {
+            association: "SkillWanted",
+            attributes: ["id", "name"],
+          },
+        },
+      ],
+      group: [
+        "Proposition.id",
+        "Receiver.id",
+        "Post.id",
+        "Post->SkillWanted.id",
+      ],
+    });
 
-		return res.status(200).json({ propositions });
-	},
+    return res.status(200).json({ propositions });
+  },
 
-	// Send a proposition to a specific post
-	sendPropositionToPost: async (req, res, next) => {
-		const { postId } = req.params;
-		const user = req.user;
-		if (!user)
-			return next(new UnauthorizedError("Utilisateur non authentifié"));
+  // Send a proposition to a specific post
+  sendPropositionToPost: async (req, res, next) => {
+    const { postId } = req.params;
+    const user = req.user;
+    if (!user)
+      return next(new UnauthorizedError("Utilisateur non authentifié"));
 
-		const post = await Post.findByPk(postId);
-		if (!post) return next(new NotFoundError("Annonce non trouvée"));
-		if (post.user_id === user.id) {
-			return next(
-				new BadRequestError(
-					"Vous ne pouvez pas envoyer une proposition à votre propre annonce",
-				),
-			);
-		}
-		if (post.isClosed) {
-			return next(
-				new ForbiddenError("Cette annonce n'accepte plus de proposition"),
-			);
-		}
+    const post = await Post.findByPk(postId);
+    if (!post) return next(new NotFoundError("Annonce non trouvée"));
+    if (post.user_id === user.id) {
+      return next(
+        new BadRequestError(
+          "Vous ne pouvez pas envoyer une proposition à votre propre annonce"
+        )
+      );
+    }
+    if (post.isClosed) {
+      return next(
+        new ForbiddenError("Cette annonce n'accepte plus de proposition")
+      );
+    }
 
-		const alreadySent = await Proposition.findOne({
-			where: {
-				sender_id: user.id,
-				receiver_id: post.user_id,
-				post_id: post.id,
-				state: "en attente",
-			},
-		});
-		if (alreadySent) {
-			return next(
-				new BadRequestError(
-					"Vous avez déjà envoyé une proposition pour cette annonce",
-				),
-			);
-		}
+    const alreadySent = await Proposition.findOne({
+      where: {
+        sender_id: user.id,
+        receiver_id: post.user_id,
+        post_id: post.id,
+        state: "en attente",
+      },
+    });
+    if (alreadySent) {
+      return next(
+        new BadRequestError(
+          "Une proposition en attente a déjà été envoyée à cette annonce"
+        )
+      );
+    }
 
-		const { content } = req.validatedData;
+    const { content } = req.validatedData;
 
-		const newProposition = await Proposition.create({
-			content,
-			state: "en attente",
-			sender_id: user.id,
-			post_id: post.id,
-			receiver_id: post.user_id,
-		});
+    const newProposition = await Proposition.create({
+      content,
+      state: "en attente",
+      sender_id: user.id,
+      post_id: post.id,
+      receiver_id: post.user_id,
+    });
 
-		return res.status(201).json({
-			message: `Proposition bien envoyé à l'annonce: ${post.title}`,
-			newProposition,
-		});
-	},
+    return res.status(201).json({
+      message: `Proposition bien envoyé à l'annonce: ${post.title}`,
+      newProposition,
+    });
+  },
 
-	// Accept a proposition for a specific post
-	acceptProposition: async (req, res, next) => {
-		const propositionId = Number(req.params.id);
-		const userId = req.user.id;
+  // Accept a proposition for a specific post
+  acceptProposition: async (req, res, next) => {
+    const propositionId = Number(req.params.id);
+    const userId = req.user.id;
 
-		const proposition = await Proposition.findByPk(propositionId, {
-			include: [{ model: Post }],
-		});
-		if (!proposition) return next(new NotFoundError("Proposition non trouvée"));
+    const proposition = await Proposition.findByPk(propositionId, {
+      include: [{ model: Post }],
+    });
+    if (!proposition) return next(new NotFoundError("Proposition non trouvée"));
 
-		const post = proposition.Post;
-		if (post.user_id !== userId) {
-			return next(
-				new ForbiddenError("Vous n'etes pas le propriétaire de cette annonce"),
-			);
-		}
+    const post = proposition.Post;
+    if (post.user_id !== userId) {
+      return next(
+        new ForbiddenError("Vous n'etes pas le propriétaire de cette annonce")
+      );
+    }
 
-		proposition.state = "acceptée";
-		await proposition.save();
+    if (proposition.receiver_id !== userId) {
+      return next(
+        new ForbiddenError("Vous ne pouvez pas accepter cette proposition")
+      );
+    }
 
-		await Proposition.update(
-			{ state: "refusée" },
-			{
-				where: {
-					post_id: post.id,
-					id: { [Op.ne]: propositionId },
-				},
-			},
-		);
+    if (proposition.sender_id === userId) {
+      return next(
+        new BadRequestError(
+          "Vous ne pouvez pas accepter votre propre proposition"
+        )
+      );
+    }
 
-		post.isClosed = true;
-		await post.save();
+    if (proposition.state === "acceptée") {
+      return next(new ConflictError("Cette proposition a déjà été acceptée"));
+    }
 
-		res
-			.status(200)
-			.json({ message: "Proposition acceptée and Annonce fermée." });
-	},
+    if (proposition.state === "refusée") {
+      return next(new ConflictError("Cette proposition a déjà été refusée"));
+    }
+
+    if (post.isClosed) {
+      return next(
+        new ForbiddenError("Cette annonce n'accepte plus de proposition")
+      );
+    }
+
+    proposition.state = "acceptée";
+    await proposition.save();
+
+    await Proposition.update(
+      { state: "refusée" },
+      {
+        where: {
+          post_id: post.id,
+          id: { [Op.ne]: propositionId },
+        },
+      }
+    );
+
+    post.isClosed = true;
+    await post.save();
+
+    res
+      .status(200)
+      .json({ message: "Proposition acceptée et annonce fermée." });
+  },
 };
