@@ -119,9 +119,9 @@ messageRouter
    *     requestBody:
    *       required: true
    *       content:
-   *       application/json:
-   *         schema:
-   *           $ref: '#/components/schemas/CreateMessage'
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateMessage'
    *     responses:
    *       201:
    *         description: Message envoyé avec succès
