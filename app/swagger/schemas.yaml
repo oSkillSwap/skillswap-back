@@ -34,7 +34,7 @@ components:
           type: string
           format: uri
           example: http://example.com/avatar.jpg
-        avergageGrade:
+        averageGrade:
           type: number
           format: float
           example: 4.5
