@@ -5,7 +5,7 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, Post, User } from "../models/associations.js";
+import { Category, User } from "../models/associations.js";
 
 export const userController = {
   register: async (req, res, next) => {
