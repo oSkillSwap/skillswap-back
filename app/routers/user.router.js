@@ -42,19 +42,23 @@ userRouter.get("/users", controllerwrapper(userController.getUsers));
 
 /**
  * @swagger
- * /api/users/{userId}:
+ * /api/users/{userIdOrUsername}:
  *   get:
- *     summary: Récupérer un utilisateur par son ID
+ *     summary: Récupérer un utilisateur par son ID ou son nom d'utilisateur
+ *     description: Permet de récupérer les informations d'un utilisateur en utilisant son ID ou son nom d'utilisateur
  *     tags: [Users]
  *     parameters:
- *       - name: userId
+ *       - name: userIdOrUsername
  *         in: path
  *         required: true
- *         description: ID de l'utilisateur
+ *         description: ID ou username de l'utilisateur
  *         schema:
- *           type: integer
- *           format: int64
- *           example: 1
+ *           oneOf:
+ *             - type: string
+ *               format: int64
+ *             - type: string
+ *           example: johndoe
+ *           description: Nom d'utilisateur ou ID de l'utilisateur
  *     responses:
  *       200:
  *         description: Utilisateur trouvé
@@ -84,8 +88,7 @@ userRouter.get("/users", controllerwrapper(userController.getUsers));
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
 userRouter.get(
-  "/users/:userId",
-  validateParams("userId"),
+  "/users/:userIdOrUsername",
   controllerwrapper(userController.getOneUser)
 );
 
