@@ -123,13 +123,11 @@ Content-Type: application/json
 
 {
   "title": "Super collaboration",
-  "postId": 31,
+  "postId": 8,
   "propositionId": 21,
   "grade": 5,
   "comment": "Super collaboration, très professionnel !"
 }
- 
- }
 
 
 ### PATCH a review (update) -> Don't have access
