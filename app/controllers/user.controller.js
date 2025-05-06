@@ -148,12 +148,12 @@ export const userController = {
       include: [
         {
           association: "Followers",
-          attributes: ["id", "username"],
+          attributes: ["id", "username", "avatar"],
           through: { attributes: [] },
         },
         {
           association: "Follows",
-          attributes: ["id", "username"],
+          attributes: ["id", "username", "avatar"],
           through: { attributes: [] },
         },
       ],
