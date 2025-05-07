@@ -108,7 +108,8 @@ export const userController = {
     };
 
     const wantedSkills = {
-      association: "WantedSkills", // Include the user's wanted skills
+      association: "WantedSkills", // Include the user's wanted skills,
+      attributes: ["id", "name", "category_id"],
       through: { attributes: [] }, // Exclude join table attributes
     };
 
@@ -186,10 +187,12 @@ export const userController = {
       include: [
         {
           association: "Skills",
+          attributes: ["id", "name", "category_id"],
           through: { attributes: [] },
         },
         {
           association: "WantedSkills",
+          attributes: ["id", "name", "category_id"],
           through: { attributes: [] },
         },
         {

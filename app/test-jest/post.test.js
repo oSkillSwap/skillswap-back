@@ -213,6 +213,11 @@ describe("Post module", () => {
         include: [
           {
             association: "SkillWanted",
+            attributes: ["id", "name", "category_id"],
+            include: {
+              association: "Category",
+              attributes: ["id", "name"],
+            },
           },
           {
             association: "Author",
@@ -234,7 +239,12 @@ describe("Post module", () => {
             },
           },
         ],
-        group: ["Post.id", "SkillWanted.id", "Author.id"],
+        group: [
+          "Post.id",
+          "SkillWanted.id",
+          "Author.id",
+          "SkillWanted->Category.id",
+        ],
       });
 
       // En plus, on peut vérifier que res.status(200) a été appelé (bonus)
