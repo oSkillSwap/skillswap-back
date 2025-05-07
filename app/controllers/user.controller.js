@@ -111,6 +111,11 @@ export const userController = {
       association: "WantedSkills", // Include the user's wanted skills,
       attributes: ["id", "name", "category_id"],
       through: { attributes: [] }, // Exclude join table attributes
+      include: [
+        {
+          model: Category,
+        },
+      ],
     };
 
     const reviews = {
