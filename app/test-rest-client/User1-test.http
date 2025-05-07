@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ2NTE3OTA5LCJleHAiOjE3NDY1MjUxMDl9.Eq6qQZnNvkqKhSnJMrRIUmQ8qs_WZzluq2L6QL69K5w
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ2NjIwNDQ2LCJleHAiOjE3NDY2Mjc2NDZ9.lBgIYARu13MUJTbN97wGj7-Od0-BA3pM4o9rcq2VNNM
 // ID User: 11
 
 ### Register a user
@@ -40,7 +40,11 @@ Content-Type: application/json
 
 {
   "username": "ErwanMisAJour",
-  "description": "Nouvelle description après mise à jour"
+  "description": "Nouvelle description après mise à jour",
+  "availabilities": [
+    { "day_of_the_week": "Mardi", "time_slot": "midi" },
+    { "day_of_the_week": "Jeudi", "time_slot": "matin" }
+  ]
 }
 
 ###
