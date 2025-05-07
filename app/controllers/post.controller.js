@@ -46,6 +46,11 @@ export const postController = {
       include: [
         {
           association: "SkillWanted", // Include the skill wanted in the post
+          attributes: ["id", "name", "category_id"], // Only return id and name of the skill,
+          include: {
+            association: "Category",
+            attributes: ["id", "name"],
+          },
         },
         {
           association: "Author", // Include the author of the post
@@ -70,7 +75,12 @@ export const postController = {
         },
       ],
       // Group by these fields to avoid duplicate rows
-      group: ["Post.id", "SkillWanted.id", "Author.id"],
+      group: [
+        "Post.id",
+        "SkillWanted.id",
+        "Author.id",
+        "SkillWanted->Category.id",
+      ],
     });
 
     return res.status(200).json({ posts }); // Return the posts as JSON
