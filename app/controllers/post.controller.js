@@ -57,6 +57,7 @@ export const postController = {
           attributes: [
             "id",
             "username",
+            "avatar",
             // Calculate the average grade of the author's reviews
             [
               Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")),

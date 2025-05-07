@@ -224,6 +224,7 @@ describe("Post module", () => {
             attributes: [
               "id",
               "username",
+              "avatar",
               [
                 Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")),
                 "averageGrade",
