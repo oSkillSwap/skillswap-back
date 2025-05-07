@@ -47,6 +47,7 @@ Content-Type: application/json
   ]
 }
 
+
 ###
 ### Fail to change already Used email
 PATCH http://localhost:3000/api/me
