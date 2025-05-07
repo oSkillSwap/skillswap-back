@@ -34,7 +34,6 @@ export const postController = {
           where: { id }, // Filter posts by the user id
         },
         {
-          attributes: ["id", "name"], // Only return id and name of the skill
           association: "SkillWanted", // Include the skill wanted in the post
         },
       ],
