@@ -134,7 +134,13 @@ export const userController = {
         ],
       },
       include: [skillsAndCategory, wantedSkills, reviews],
-      group: ["User.id", "Skills.id", "WantedSkills.id", "Skills->Category.id"], // Group by user and related entities,
+      group: [
+        "User.id",
+        "Skills.id",
+        "WantedSkills.id",
+        "Skills->Category.id",
+        "WantedSkills->Category.id",
+      ], // Group by user and related entities,
       // Sort users based on the total number of reviews they have
       order: [["nbOfReviews", "DESC"]],
     });
