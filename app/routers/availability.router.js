@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { availabilityController } from "../controllers/availability.controller.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
+import { updateAvailabilitiesSchema } from "../schemas/availability.schema.js";
+import { validate } from "../middlewares/validates.js";
+import { authenticate } from "../middlewares/authenticate.js";
 
 export const availabilityRouter = Router();
 
@@ -31,5 +34,12 @@ export const availabilityRouter = Router();
  */
 availabilityRouter.get(
   "/availabilities",
-  controllerwrapper(availabilityController.getAvailabilities)
+  controllerwrapper(availabilityController.getAvailabilities),
+);
+
+availabilityRouter.patch(
+  "/availabilities",
+  authenticate,
+  validate(updateAvailabilitiesSchema),
+  controllerwrapper(availabilityController.updateUserAvailabilities),
 );
