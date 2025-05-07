@@ -45,7 +45,7 @@ export const reviewController = {
       include: [
         {
           association: "Reviewer",
-          attributes: ["id", "username"],
+          attributes: ["id", "username", "avatar"],
         },
         {
           model: Proposition,
@@ -79,16 +79,12 @@ export const reviewController = {
     }
 
     if (review.user_id !== userId) {
-      return next(
-        new ForbiddenError("Vous ne pouvez modifier que vos propres reviews")
-      );
+      return next(new ForbiddenError("Vous ne pouvez modifier que vos propres reviews"));
     }
 
     await review.update({ grade, content });
 
-    return res
-      .status(200)
-      .json({ message: "Review mise à jour avec succès", review });
+    return res.status(200).json({ message: "Review mise à jour avec succès", review });
   },
 
   createReview: async (req, res, next) => {
@@ -103,9 +99,7 @@ export const reviewController = {
     }
 
     if (!post.isClosed) {
-      return next(
-        new ForbiddenError("L'annonce doit être fermée pour laisser un avis")
-      );
+      return next(new ForbiddenError("L'annonce doit être fermée pour laisser un avis"));
     }
 
     // Check Accepted proposition belongs to the post
@@ -127,9 +121,7 @@ export const reviewController = {
     // Check user is the post owner
     if (post.user_id !== userId) {
       return next(
-        new ForbiddenError(
-          "Vous n'avez pas le droit de laisser un avis sur cette annonce"
-        )
+        new ForbiddenError("Vous n'avez pas le droit de laisser un avis sur cette annonce"),
       );
     }
 
@@ -147,8 +139,8 @@ export const reviewController = {
     if (existingReview) {
       return next(
         new ForbiddenError(
-          "Vous avez déjà laissé un avis pour cette annonce et cette proposition."
-        )
+          "Vous avez déjà laissé un avis pour cette annonce et cette proposition.",
+        ),
       );
     }
 
@@ -167,11 +159,7 @@ export const reviewController = {
     });
 
     if (existingReviewForUser) {
-      return next(
-        new ForbiddenError(
-          "Vous avez déjà laissé un avis pour cet utilisateur."
-        )
-      );
+      return next(new ForbiddenError("Vous avez déjà laissé un avis pour cet utilisateur."));
     }
 
     // Create the review (linking to the user and the proposition)

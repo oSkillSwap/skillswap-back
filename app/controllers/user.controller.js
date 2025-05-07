@@ -52,9 +52,7 @@ export const userController = {
       description,
     });
 
-    res
-      .status(201)
-      .json({ message: "Utilisateur créé avec succès", user: newUser });
+    res.status(201).json({ message: "Utilisateur créé avec succès", user: newUser });
   },
 
   // Login function to authenticate users
@@ -85,6 +83,7 @@ export const userController = {
         id: user.id,
         username: user.username,
         email: user.email,
+        avatar: user.avatar,
       },
     });
   },
@@ -127,10 +126,7 @@ export const userController = {
           // Calculate the average grade of the user from their reviews
           [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
           // Count the number of reviews the user has
-          [
-            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-            "nbOfReviews",
-          ],
+          [Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")), "nbOfReviews"],
         ],
       },
       include: [skillsAndCategory, wantedSkills, reviews],
@@ -173,10 +169,7 @@ export const userController = {
     const isNumeric = !isNaN(userIdOrUsername); // Check if the parameter is numeric (user ID) or not (username)
     const whereCondition = isNumeric
       ? {
-          [Op.or]: [
-            { id: Number(userIdOrUsername) },
-            { username: userIdOrUsername },
-          ],
+          [Op.or]: [{ id: Number(userIdOrUsername) }, { username: userIdOrUsername }],
         }
       : { username: userIdOrUsername };
     const user = await User.findOne({
@@ -224,14 +217,11 @@ export const userController = {
 
   updateUser: async (req, res, next) => {
     const userId = req.user.id; // Get the user ID from the token
-    const { username, firstName, lastName, email, avatar, description } =
-      req.validatedData; // Get the data from the request body
+    const { username, firstName, lastName, email, avatar, description } = req.validatedData; // Get the data from the request body
 
     // Check if no data provided
     if (Object.keys(req.validatedData).length === 0) {
-      return next(
-        new BadRequestError("Aucune donnée fournie pour la mise à jour")
-      );
+      return next(new BadRequestError("Aucune donnée fournie pour la mise à jour"));
     }
     const user = await User.findByPk(userId); // Find the user by ID
 
@@ -289,9 +279,7 @@ export const userController = {
     }
 
     if (userLoggedIn.id === Number(userId)) {
-      return next(
-        new BadRequestError("Vous ne pouvez pas vous suivre vous-même")
-      );
+      return next(new BadRequestError("Vous ne pouvez pas vous suivre vous-même"));
     }
 
     const isFollowing = await user.hasFollows(targetUser);
@@ -301,9 +289,7 @@ export const userController = {
 
     await user.addFollows(targetUser);
 
-    return res
-      .status(200)
-      .json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
+    return res.status(200).json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
   },
 
   unfollowUser: async (req, res, next) => {
