@@ -23,7 +23,6 @@ export const propositionController = {
           attributes: ["id", "title"],
           include: {
             association: "SkillWanted",
-            attributes: ["id", "name"],
           },
         },
         {
@@ -76,7 +75,6 @@ export const propositionController = {
           model: Post,
           include: {
             association: "SkillWanted",
-            attributes: ["id", "name"],
           },
         },
       ],
