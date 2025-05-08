@@ -79,6 +79,7 @@ export const updateUserSchema = z.object({
     .optional()
     .transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
   email: z.string().email("Adresse e-mail invalide").optional(),
+  isAvailable: z.boolean().optional(),
   avatar: z.string().optional(),
   description: z
     .string()

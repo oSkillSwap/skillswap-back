@@ -227,8 +227,16 @@ export const userController = {
 
   updateUser: async (req, res, next) => {
     const userId = req.user.id; // Get the user ID from the token
-    const { username, firstName, lastName, email, avatar, availabilities, description } =
-      req.validatedData; // Get the data from the request body
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      avatar,
+      availabilities,
+      isAvailable,
+      description,
+    } = req.validatedData; // Get the data from the request body
 
     // Check if no data provided
     if (Object.keys(req.validatedData).length === 0) {
@@ -254,6 +262,7 @@ export const userController = {
       email: email || user.email,
       avatar: avatar || user.avatar,
       description: description ?? user.description,
+      isAvailable: isAvailable ?? user.isAvailable,
     };
 
     await user.update(updatedFields); // Update the user with the new data
