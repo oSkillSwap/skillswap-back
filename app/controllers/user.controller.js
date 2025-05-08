@@ -238,6 +238,7 @@ export const userController = {
       description,
     } = req.validatedData; // Get the data from the request body
 
+
     // Check if no data provided
     if (Object.keys(req.validatedData).length === 0) {
       return next(new BadRequestError("Aucune donnée fournie pour la mise à jour"));
