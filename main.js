@@ -1,14 +1,17 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
+import { createServer } from "node:http";
 import cors from "cors";
 import express from "express";
+import { Server } from "socket.io";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
+
 import { router } from "./app/routers/router.js";
+import messageSocketHandlers from "./app/sockets/message.socket.js";
 
 const app = express();
 
+// Express config
 app.set("view engine", "ejs");
 app.set("views", "./app/views");
 
@@ -19,6 +22,7 @@ app.get("/", (req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// CORS config
 const corsOptions = {
   origin: [
     "http://localhost:5173",
@@ -32,7 +36,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Chargez le fichier YAML contenant les schémas
+// Swagger doc config
 const swaggerSchemas = YAML.load("./app/swagger/schemas.yaml");
 
 const swaggerOptions = {
@@ -51,7 +55,6 @@ const swaggerOptions = {
           bearerFormat: "JWT",
         },
       },
-      // Placez les schémas directement sous components.schemas
       schemas: swaggerSchemas.components.schemas,
     },
   },
@@ -59,17 +62,22 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocs, { explorer: true })
-);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
 
+// Router
 app.use("/api", router);
 
+// Socket.IO integration
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: corsOptions,
+});
+
+// Socket.IO server logic
+messageSocketHandlers(io);
+
+// Server launch
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(
-    `✨🌟⭐ API SkillSwap lancée sur http://localhost:${port} ╰(*°▽°*)╯ ⭐🌟✨`
-  );
+httpServer.listen(port, () => {
+  console.log(`✨🌟⭐ API SkillSwap lancée sur http://localhost:${port} ⭐🌟✨`);
 });
