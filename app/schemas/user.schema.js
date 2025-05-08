@@ -1,12 +1,16 @@
 import sanitizeHtml from "sanitize-html";
 import { z } from "zod";
 
-// Fonction locale pour nettoyer le contenu autorisé dans les textareas
+// clean textareas && inputs
 const sanitizeTextarea = (val) =>
   sanitizeHtml(val.trim(), {
     allowedTags: ["b", "i", "em", "strong", "p", "ul", "li", "ol", "br"],
     allowedAttributes: {},
   });
+
+// SLot for availabilities
+const validDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const validSlots = ["matin", "midi", "après-midi", "soir"];
 
 export const registerSchema = z
   .object({
@@ -60,7 +64,7 @@ export const updateUserSchema = z.object({
     .max(25, "Maximum 16 caractères")
     .regex(
       /^[a-zA-Z0-9-]+$/,
-      "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets"
+      "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
     )
     .optional()
     .transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
@@ -81,4 +85,12 @@ export const updateUserSchema = z.object({
     .max(800, "Maximum 800 caractères")
     .optional()
     .transform((val) => (val ? sanitizeTextarea(val) : undefined)),
+  availabilities: z
+    .array(
+      z.object({
+        day_of_the_week: z.enum(validDays),
+        time_slot: z.enum(validSlots),
+      }),
+    )
+    .optional(),
 });

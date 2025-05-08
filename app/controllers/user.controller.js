@@ -5,7 +5,7 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, Review, User } from "../models/associations.js";
+import { Category, Review, User, Availability } from "../models/associations.js";
 
 export const userController = {
   register: async (req, res, next) => {
@@ -52,9 +52,7 @@ export const userController = {
       description,
     });
 
-    res
-      .status(201)
-      .json({ message: "Utilisateur créé avec succès", user: newUser });
+    res.status(201).json({ message: "Utilisateur créé avec succès", user: newUser });
   },
 
   // Login function to authenticate users
@@ -132,10 +130,7 @@ export const userController = {
           // Calculate the average grade of the user from their reviews
           [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
           // Count the number of reviews the user has
-          [
-            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-            "nbOfReviews",
-          ],
+          [Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")), "nbOfReviews"],
         ],
       },
       include: [skillsAndCategory, wantedSkills, reviews],
@@ -184,10 +179,7 @@ export const userController = {
     const isNumeric = !isNaN(userIdOrUsername); // Check if the parameter is numeric (user ID) or not (username)
     const whereCondition = isNumeric
       ? {
-          [Op.or]: [
-            { id: Number(userIdOrUsername) },
-            { username: userIdOrUsername },
-          ],
+          [Op.or]: [{ id: Number(userIdOrUsername) }, { username: userIdOrUsername }],
         }
       : { username: userIdOrUsername };
     const user = await User.findOne({
@@ -235,14 +227,12 @@ export const userController = {
 
   updateUser: async (req, res, next) => {
     const userId = req.user.id; // Get the user ID from the token
-    const { username, firstName, lastName, email, avatar, description } =
+    const { username, firstName, lastName, email, avatar, availabilities, description } =
       req.validatedData; // Get the data from the request body
 
     // Check if no data provided
     if (Object.keys(req.validatedData).length === 0) {
-      return next(
-        new BadRequestError("Aucune donnée fournie pour la mise à jour")
-      );
+      return next(new BadRequestError("Aucune donnée fournie pour la mise à jour"));
     }
     const user = await User.findByPk(userId); // Find the user by ID
 
@@ -268,7 +258,41 @@ export const userController = {
 
     await user.update(updatedFields); // Update the user with the new data
 
-    return res.status(200).json({ message: "Utilisateur mis à jour", user }); // Return success message and updated user
+    const updatedUser = await User.findByPk(user.id, {
+      attributes: {
+        exclude: ["password"],
+      },
+      include: [
+        {
+          association: "Availabilities",
+          attributes: ["day_of_the_week", "time_slot"],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    if (availabilities && Array.isArray(availabilities)) {
+      await user.setAvailabilities([]); // delete old
+
+      const availabilityInstances = await Promise.all(
+        availabilities.map(async ({ day_of_the_week, time_slot }) => {
+          // find the availability
+          const availability = await Availability.findOne({
+            where: { day_of_the_week, time_slot },
+          });
+
+          if (!availability) {
+            throw new BadRequestError(`Disponibilité invalide : ${day_of_the_week} - ${time_slot}`);
+          }
+
+          return availability;
+        }),
+      );
+
+      await user.addAvailabilities(availabilityInstances); // add news
+    }
+
+    return res.status(200).json({ message: "Utilisateur mis à jour", user: updatedUser }); // Return success message and updated user
   },
 
   deleteUser: async (req, res, next) => {
@@ -300,9 +324,7 @@ export const userController = {
     }
 
     if (userLoggedIn.id === Number(userId)) {
-      return next(
-        new BadRequestError("Vous ne pouvez pas vous suivre vous-même")
-      );
+      return next(new BadRequestError("Vous ne pouvez pas vous suivre vous-même"));
     }
 
     const isFollowing = await user.hasFollows(targetUser);
@@ -312,9 +334,7 @@ export const userController = {
 
     await user.addFollows(targetUser);
 
-    return res
-      .status(200)
-      .json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
+    return res.status(200).json({ message: `Vous suivez l'utilisateur ${targetUser.username}` });
   },
 
   unfollowUser: async (req, res, next) => {
