@@ -175,13 +175,13 @@ export const userController = {
   getOneUser: async (req, res, next) => {
     const { userIdOrUsername } = req.params;
 
-    // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
-    const isNumeric = !isNaN(userIdOrUsername); // Check if the parameter is numeric (user ID) or not (username)
+    const isNumeric = /^\d+$/.test(userIdOrUsername);
     const whereCondition = isNumeric
       ? {
           [Op.or]: [{ id: Number(userIdOrUsername) }, { username: userIdOrUsername }],
         }
       : { username: userIdOrUsername };
+
     const user = await User.findOne({
       where: whereCondition,
       attributes: {
@@ -235,6 +235,7 @@ export const userController = {
       avatar,
       availabilities,
       isAvailable,
+      password,
       description,
     } = req.validatedData; // Get the data from the request body
 
@@ -259,6 +260,7 @@ export const userController = {
       username: username ?? user.username,
       firstName: firstName ?? user.firstName,
       lastName: lastName ?? user.lastName,
+      password: password || user.password,
       email: email || user.email,
       avatar: avatar || user.avatar,
       description: description ?? user.description,
@@ -302,6 +304,30 @@ export const userController = {
     }
 
     return res.status(200).json({ message: "Utilisateur mis à jour", user: updatedUser }); // Return success message and updated user
+  },
+
+  updatePassword: async (req, res, next) => {
+    const userId = req.user.id;
+    const { currentPassword, newPassword, confirmPassword } = req.validatedData;
+
+    if (newPassword !== confirmPassword) {
+      return next(new BadRequestError("Les mots de passe ne correspondent pas"));
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return next(new NotFoundError("Utilisateur non trouvé"));
+    }
+
+    const isPasswordValid = await argon2.verify(user.password, currentPassword);
+    if (!isPasswordValid) {
+      return next(new UnauthorizedError("Mot de passe actuel incorrect"));
+    }
+
+    const hashedNewPassword = await argon2.hash(newPassword);
+    await user.update({ password: hashedNewPassword });
+
+    return res.status(200).json({ message: "Mot de passe mis à jour avec succès" });
   },
 
   deleteUser: async (req, res, next) => {
