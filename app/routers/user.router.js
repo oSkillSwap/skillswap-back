@@ -8,6 +8,7 @@ import {
   loginSchema,
   registerSchema,
   updateUserSchema,
+  updatePasswordSchema,
 } from "../schemas/user.schema.js";
 
 export const userRouter = Router();
@@ -87,10 +88,7 @@ userRouter.get("/users", controllerwrapper(userController.getUsers));
  *                   type: string
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
-userRouter.get(
-  "/users/:userIdOrUsername",
-  controllerwrapper(userController.getOneUser)
-);
+userRouter.get("/users/:userIdOrUsername", controllerwrapper(userController.getOneUser));
 
 /**
  * @swagger
@@ -138,7 +136,7 @@ userRouter.get(
 userRouter.get(
   "/users/follows/:id",
   validateParams("id"),
-  controllerwrapper(userController.getFollowersAndFollowsFromUser)
+  controllerwrapper(userController.getFollowersAndFollowsFromUser),
 );
 
 /**
@@ -185,7 +183,7 @@ userRouter.get(
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
 userRouter.get("/me/users", authenticate, async (req, res, next) => {
-  req.params.userId = req.user.id;
+  req.params = { userIdOrUsername: req.user.username };
   return userController.getOneUser(req, res, next);
 });
 
@@ -287,11 +285,7 @@ userRouter.get("/me/follows", authenticate, async (req, res, next) => {
  *                   type: string
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
-userRouter.post(
-  "/register",
-  validate(registerSchema),
-  controllerwrapper(userController.register)
-);
+userRouter.post("/register", validate(registerSchema), controllerwrapper(userController.register));
 
 /**
  * @swagger
@@ -350,11 +344,7 @@ userRouter.post(
  *                   type: string
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
-userRouter.post(
-  "/login",
-  validate(loginSchema),
-  controllerwrapper(userController.login)
-);
+userRouter.post("/login", validate(loginSchema), controllerwrapper(userController.login));
 
 userRouter
   .route("/me/follow/:userId")
@@ -435,11 +425,7 @@ userRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-  .post(
-    authenticate,
-    validateParams("userId"),
-    controllerwrapper(userController.followUser)
-  )
+  .post(authenticate, validateParams("userId"), controllerwrapper(userController.followUser))
   /**
    * @swagger
    * /api/me/follow/{userId}:
@@ -507,11 +493,7 @@ userRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-  .delete(
-    authenticate,
-    validateParams("userId"),
-    controllerwrapper(userController.unfollowUser)
-  );
+  .delete(authenticate, validateParams("userId"), controllerwrapper(userController.unfollowUser));
 
 userRouter
   .route("/me")
@@ -647,8 +629,11 @@ userRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-  .patch(
-    authenticate,
-    validate(updateUserSchema),
-    controllerwrapper(userController.updateUser)
-  );
+  .patch(authenticate, validate(updateUserSchema), controllerwrapper(userController.updateUser));
+
+userRouter.patch(
+  "/me/password",
+  authenticate,
+  validate(updatePasswordSchema),
+  userController.updatePassword,
+);
