@@ -209,4 +209,70 @@ export const postController = {
       newPost,
     });
   },
+  deletePost: async (req, res, next) => {
+    const { id } = req.params; // Get the post ID from the request parameters
+    const user = req.user; // Get the logged-in user
+
+    // Find the post by its ID
+    const post = await Post.findByPk(id);
+    if (!post) {
+      return next(new NotFoundError("Post non trouvé"));
+    }
+
+    // Check if the logged-in user is the author of the post
+    if (Number(post.user_id) !== Number(user.id)) {
+      return next(
+        new ForbiddenError("Vous n'êtes pas autorisé à supprimer ce post")
+      );
+    }
+
+    // Check if the post has any propositions
+    const propositions = await Proposition.findAll({
+      where: {
+        post_id: id,
+      },
+    });
+
+    if (propositions && propositions.length > 0) {
+      await propositions.destroy();
+    }
+
+    // Delete the post
+    await post.destroy();
+
+    return res.status(200).json({ message: "Post supprimé avec succès" });
+  },
+  updatePost: async (req, res, next) => {
+    const { id } = req.params; // Get the post ID from the request parameters
+    const user = req.user; // Get the logged-in user
+    const { content, title, skill_id } = req.validatedData; // Extract validated data from the request
+    const post = await Post.findByPk(id);
+    if (!post) {
+      return next(new NotFoundError("Post non trouvé"));
+    }
+
+    // Check if the logged-in user is the author of the post
+    if (Number(post.user_id) !== Number(user.id)) {
+      return next(
+        new ForbiddenError("Vous n'êtes pas autorisé à modifier ce post")
+      );
+    }
+
+    if (Object.keys(req.validatedData).length === 0) {
+      return next(new BadRequestError("Aucune donnée à mettre à jour"));
+    }
+
+    const updatedFields = {
+      title: title ?? post.title,
+      content: content ?? post.content,
+      skill_id: post.skill_id,
+    };
+
+    // Update the post with the new data
+    const updatedPost = await post.update(updatedFields);
+
+    return res
+      .status(200)
+      .json({ message: "Post modifié avec succès", updatedPost });
+  },
 };
