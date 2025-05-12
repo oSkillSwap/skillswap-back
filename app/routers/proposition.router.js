@@ -45,7 +45,7 @@ export const propositionRouter = Router();
 propositionRouter.get(
   "/propositions/:userId",
   validateParams("userId"),
-  controllerwrapper(propositionController.getProposition)
+  controllerwrapper(propositionController.getProposition),
 );
 
 // /me/propositions -> Routes related to authenticated user's
@@ -80,10 +80,7 @@ propositionRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-  .get(
-    authenticate,
-    controllerwrapper(propositionController.getUserSentPropositions)
-  );
+  .get(authenticate, controllerwrapper(propositionController.getUserSentPropositions));
 
 /**
  * @swagger
@@ -184,7 +181,7 @@ propositionRouter.post(
   authenticate,
   validateParams("postId"),
   validate(propositionSchema),
-  controllerwrapper(propositionController.sendPropositionToPost)
+  controllerwrapper(propositionController.sendPropositionToPost),
 );
 
 /**
@@ -280,5 +277,12 @@ propositionRouter.patch(
   "/propositions/:id/accept",
   authenticate,
   validateParams("id"),
-  controllerwrapper(propositionController.acceptProposition)
+  controllerwrapper(propositionController.acceptProposition),
+);
+
+// Proposition who belongs to me -> Sender or reciever
+propositionRouter.get(
+  "/me/all-propositions",
+  authenticate,
+  controllerwrapper(propositionController.getMyPropositions),
 );

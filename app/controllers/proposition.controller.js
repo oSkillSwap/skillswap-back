@@ -162,7 +162,6 @@ export const propositionController = {
     proposition.state = "acceptée";
     await proposition.save();
 
-    // Refuse the others
     await Proposition.update(
       { state: "refusée" },
       {
@@ -173,12 +172,21 @@ export const propositionController = {
       },
     );
 
-    // Close the post
     post.isClosed = true;
     await post.save();
 
-    // Proposition accepted with informations
-    const updated = await Proposition.findByPk(proposition.id, {
+    res.status(200).json({ message: "Proposition acceptée et annonce fermée." });
+  },
+
+  // Get all propositions where user is sender OR receiver
+  getMyPropositions: async (req, res, next) => {
+    const user = req.user;
+    if (!user) return next(new UnauthorizedError("Utilisateur non authentifié"));
+
+    const propositions = await Proposition.findAll({
+      where: {
+        [Op.or]: [{ sender_id: user.id }, { receiver_id: user.id }],
+      },
       include: [
         {
           model: Post,
@@ -196,11 +204,9 @@ export const propositionController = {
           attributes: ["id", "username", "avatar"],
         },
       ],
+      order: [["createdAt", "DESC"]],
     });
 
-    return res.status(200).json({
-      message: "Proposition acceptée et annonce fermée.",
-      updatedProposition: updated,
-    });
+    return res.status(200).json({ propositions });
   },
 };
