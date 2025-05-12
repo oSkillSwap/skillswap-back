@@ -187,6 +187,9 @@ export const propositionController = {
       where: {
         [Op.or]: [{ sender_id: user.id }, { receiver_id: user.id }],
       },
+      attributes: {
+        include: ["isFinishedBySender", "isFinishedByReceiver"], // 👈 ajoute ça
+      },
       include: [
         {
           model: Post,
