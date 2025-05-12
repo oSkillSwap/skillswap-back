@@ -43,8 +43,7 @@ export const propositionController = {
   // user send proposition
   getUserSentPropositions: async (req, res, next) => {
     const user = req.user;
-    if (!user)
-      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    if (!user) return next(new UnauthorizedError("Utilisateur non authentifié"));
 
     const propositions = await Proposition.findAll({
       where: { sender_id: user.id },
@@ -57,14 +56,8 @@ export const propositionController = {
             "username",
             "avatar",
             "description",
-            [
-              Sequelize.fn("AVG", Sequelize.col("Receiver->Reviews.grade")),
-              "averageGrade",
-            ],
-            [
-              Sequelize.fn("COUNT", Sequelize.col("Receiver->Reviews.grade")),
-              "nbOfReviews",
-            ],
+            [Sequelize.fn("AVG", Sequelize.col("Receiver->Reviews.grade")), "averageGrade"],
+            [Sequelize.fn("COUNT", Sequelize.col("Receiver->Reviews.grade")), "nbOfReviews"],
           ],
           include: {
             association: "Reviews",
@@ -78,12 +71,7 @@ export const propositionController = {
           },
         },
       ],
-      group: [
-        "Proposition.id",
-        "Receiver.id",
-        "Post.id",
-        "Post->SkillWanted.id",
-      ],
+      group: ["Proposition.id", "Receiver.id", "Post.id", "Post->SkillWanted.id"],
     });
 
     return res.status(200).json({ propositions });
@@ -93,22 +81,17 @@ export const propositionController = {
   sendPropositionToPost: async (req, res, next) => {
     const { postId } = req.params;
     const user = req.user;
-    if (!user)
-      return next(new UnauthorizedError("Utilisateur non authentifié"));
+    if (!user) return next(new UnauthorizedError("Utilisateur non authentifié"));
 
     const post = await Post.findByPk(postId);
     if (!post) return next(new NotFoundError("Annonce non trouvée"));
     if (post.user_id === user.id) {
       return next(
-        new BadRequestError(
-          "Vous ne pouvez pas envoyer une proposition à votre propre annonce"
-        )
+        new BadRequestError("Vous ne pouvez pas envoyer une proposition à votre propre annonce"),
       );
     }
     if (post.isClosed) {
-      return next(
-        new ForbiddenError("Cette annonce n'accepte plus de proposition")
-      );
+      return next(new ForbiddenError("Cette annonce n'accepte plus de proposition"));
     }
 
     const alreadySent = await Proposition.findOne({
@@ -121,9 +104,7 @@ export const propositionController = {
     });
     if (alreadySent) {
       return next(
-        new BadRequestError(
-          "Une proposition en attente a déjà été envoyée à cette annonce"
-        )
+        new BadRequestError("Une proposition en attente a déjà été envoyée à cette annonce"),
       );
     }
 
@@ -155,23 +136,15 @@ export const propositionController = {
 
     const post = proposition.Post;
     if (post.user_id !== userId) {
-      return next(
-        new ForbiddenError("Vous n'etes pas le propriétaire de cette annonce")
-      );
+      return next(new ForbiddenError("Vous n'etes pas le propriétaire de cette annonce"));
     }
 
     if (proposition.receiver_id !== userId) {
-      return next(
-        new ForbiddenError("Vous ne pouvez pas accepter cette proposition")
-      );
+      return next(new ForbiddenError("Vous ne pouvez pas accepter cette proposition"));
     }
 
     if (proposition.sender_id === userId) {
-      return next(
-        new BadRequestError(
-          "Vous ne pouvez pas accepter votre propre proposition"
-        )
-      );
+      return next(new BadRequestError("Vous ne pouvez pas accepter votre propre proposition"));
     }
 
     if (proposition.state === "acceptée") {
@@ -183,9 +156,7 @@ export const propositionController = {
     }
 
     if (post.isClosed) {
-      return next(
-        new ForbiddenError("Cette annonce n'accepte plus de proposition")
-      );
+      return next(new ForbiddenError("Cette annonce n'accepte plus de proposition"));
     }
 
     proposition.state = "acceptée";
@@ -198,14 +169,44 @@ export const propositionController = {
           post_id: post.id,
           id: { [Op.ne]: propositionId },
         },
-      }
+      },
     );
 
     post.isClosed = true;
     await post.save();
 
-    res
-      .status(200)
-      .json({ message: "Proposition acceptée et annonce fermée." });
+    res.status(200).json({ message: "Proposition acceptée et annonce fermée." });
+  },
+
+  // Get all propositions where user is sender OR receiver
+  getMyPropositions: async (req, res, next) => {
+    const user = req.user;
+    if (!user) return next(new UnauthorizedError("Utilisateur non authentifié"));
+
+    const propositions = await Proposition.findAll({
+      where: {
+        [Op.or]: [{ sender_id: user.id }, { receiver_id: user.id }],
+      },
+      include: [
+        {
+          model: Post,
+          attributes: ["id", "title", "content", "createdAt", "user_id"],
+          include: {
+            association: "SkillWanted",
+          },
+        },
+        {
+          association: "Sender",
+          attributes: ["id", "username", "avatar"],
+        },
+        {
+          association: "Receiver",
+          attributes: ["id", "username", "avatar"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json({ propositions });
   },
 };
