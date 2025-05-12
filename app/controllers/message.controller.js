@@ -16,11 +16,11 @@ export const messageController = {
       include: [
         {
           association: "Sender",
-          attributes: ["id", "username"],
+          attributes: ["id", "username", "avatar"],
         },
         {
           association: "Receiver",
-          attributes: ["id", "username"],
+          attributes: ["id", "username", "avatar"],
         },
       ],
     });
