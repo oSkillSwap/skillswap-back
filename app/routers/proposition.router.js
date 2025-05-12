@@ -189,7 +189,7 @@ propositionRouter.post(
 
 /**
  * @swagger
- * /api/propositions/{id}:
+ * /api/propositions/{id}/accept:
  *   patch:
  *     summary: Mettre à jour l'état d'une proposition en "acceptée"
  *     tags: [Propositions]

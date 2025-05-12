@@ -5,7 +5,7 @@ import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
-import { postSchema } from "../schemas/post.schema.js";
+import { postSchema, updatePostSchema } from "../schemas/post.schema.js";
 
 export const postRouter = Router();
 
@@ -205,3 +205,148 @@ postRouter
     validate(postSchema),
     controllerwrapper(postController.createPost)
   ); // Create a new post
+
+/**
+ * @swagger
+ * /api/me/posts/{id}:
+ *   delete:
+ *     summary: Supprimer un post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID du post à supprimer
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Post supprimé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Post supprimé avec succès"
+ *       401:
+ *         description: Non autorisé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Non autorisé"
+ *       404:
+ *         description: Post non trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Post non trouvé"
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
+ */
+postRouter.delete(
+  "/me/posts/:id",
+  authenticate,
+  controllerwrapper(postController.deletePost)
+);
+
+/**
+ * @swagger
+ * /api/me/posts/{id}:
+ *   patch:
+ *     summary: Mettre à jour un post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID du post à mettre à jour
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdatePost'
+ *     responses:
+ *       200:
+ *         description: Post mis à jour avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Post mis à jour avec succès"
+ *       400:
+ *         description: Erreur de validation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Erreur de validation des données"
+ *       401:
+ *         description: Non autorisé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Non autorisé"
+ *       404:
+ *         description: Post non trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Post non trouvé"
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
+ */
+postRouter.patch(
+  "/me/posts/:id",
+  authenticate,
+  validate(updatePostSchema),
+  controllerwrapper(postController.updatePost)
+);

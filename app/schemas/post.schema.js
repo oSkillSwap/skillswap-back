@@ -1,3 +1,4 @@
+import sanitize from "sanitize-html";
 import sanitizeHtml from "sanitize-html";
 import { z } from "zod";
 
@@ -28,5 +29,19 @@ export const postSchema = z.object({
     })
     .positive({
       message: "L'identifiant de la compétence doit être un nombre positif",
+    }),
+});
+
+export const updatePostSchema = z.object({
+  title: sanitizeTextarea(z.string())
+    .trim()
+    .min(1, { message: "Le titre ne peut pas être vide" })
+    .max(40, { message: "Le titre ne peut pas dépasser 40 caractères" })
+    .optional(),
+  content: sanitizeTextarea(z.string())
+    .trim()
+    .min(1, { message: "Le contenu ne peut pas être vide" })
+    .max(500, {
+      message: "Le contenu ne peut pas dépasser 200 caractères",
     }),
 });
