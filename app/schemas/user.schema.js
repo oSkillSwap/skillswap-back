@@ -41,7 +41,6 @@ export const registerSchema = z
       .max(50, "Maximum 50 caractères")
       .optional()
       .transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
-    email: z.string().email({ message: "Adresse e-mail invalide" }),
     password: z
       .string()
       .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
@@ -51,6 +50,7 @@ export const registerSchema = z
       .regex(/[^a-zA-Z0-9]/, {
         message: "Un caractère spécial requis",
       }),
+    email: z.string().email({ message: "Adresse e-mail invalide" }),
     avatar: z.string().optional(),
     description: z
       .string()
@@ -102,4 +102,34 @@ export const updateUserSchema = z.object({
       })
     )
     .optional(),
+});
+
+export const updatePasswordSchema = z.object({
+  currentPassword: z
+    .string()
+    .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+    .regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+    .regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+    .regex(/[0-9]/, { message: "Un chiffre requis" })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Un caractère spécial requis",
+    }),
+  newPassword: z
+    .string()
+    .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+    .regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+    .regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+    .regex(/[0-9]/, { message: "Un chiffre requis" })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Un caractère spécial requis",
+    }),
+  confirmPassword: z
+    .string()
+    .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+    .regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+    .regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+    .regex(/[0-9]/, { message: "Un chiffre requis" })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Un caractère spécial requis",
+    }),
 });

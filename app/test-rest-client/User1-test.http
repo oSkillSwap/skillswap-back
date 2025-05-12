@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ2NjIwNDQ2LCJleHAiOjE3NDY2Mjc2NDZ9.lBgIYARu13MUJTbN97wGj7-Od0-BA3pM4o9rcq2VNNM
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MDUyMzUwLCJleHAiOjE3NDcwNTk1NTB9.Y-qAFM0drJPxaCFATrr-rRacosHzLSnrHS4U9yDFUA4
 // ID User: 11
 
 ### Register a user
@@ -21,13 +21,24 @@ Content-Type: application/json
 
 {
   "email": "erwannnn@gmail.com",
-  "password": "ErwanMettouchi1+"
+  "password": "ErwanMettouchi1234+"
 }
 
 
 ###Test the JWT connexion
 GET http://localhost:3000/api/me/users
 Authorization: Bearer {{token}}
+
+### Password Update
+PATCH http://localhost:3000/api/me/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "ErwanMettouchi1+",
+  "newPassword": "ErwanMettouchi1+",
+  "confirmPassword": "ErwanMettouchi1+"
+}
 
 ### DELETE myself
 DELETE http://localhost:3000/api/me
