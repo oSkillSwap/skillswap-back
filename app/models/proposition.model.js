@@ -10,9 +10,17 @@ Proposition.init(
     state: {
       type: DataTypes.ENUM("en attente", "acceptée", "refusée"),
     },
+    isFinishedBySender: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    isFinishedByReceiver: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
     tableName: "proposition",
-  }
+  },
 );
