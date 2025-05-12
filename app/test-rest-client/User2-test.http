@@ -1,4 +1,4 @@
-@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJpYXQiOjE3NDYwNTQ5NzgsImV4cCI6MTc0NjA2MjE3OH0.jafQFPHPiXtht_474DdMv5HcdPenx1J4Yqd0QxDqzXM
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MDUyMzc0LCJleHAiOjE3NDcwNTk1NzR9.pcAhumrmi05KVB3xd3PkA9bOyebZdS4enAPSdB1BM84
 // ID: 12
 
 ### Register a user
@@ -68,7 +68,7 @@ Content-Type: application/json
 }
 
 ### GET all propositions from a user
-GET http://localhost:3000/api/me/propositions
+GET http://localhost:3000/api/me/propositions/
 Authorization: Bearer {{token2}}
 
 
