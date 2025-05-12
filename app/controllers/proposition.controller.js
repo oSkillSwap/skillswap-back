@@ -209,4 +209,24 @@ export const propositionController = {
 
     return res.status(200).json({ propositions });
   },
+
+  finishProposition: async (req, res, next) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const prop = await Proposition.findByPk(id);
+    if (!prop) return next(new NotFoundError("Proposition non trouvée"));
+    if (prop.state !== "acceptée") return next(new BadRequestError("Proposition non acceptée"));
+
+    if (prop.sender_id === userId) {
+      prop.isFinishedBySender = true;
+    } else if (prop.receiver_id === userId) {
+      prop.isFinishedByReceiver = true;
+    } else {
+      return next(new ForbiddenError("Vous n'êtes pas concerné par cet échange"));
+    }
+
+    await prop.save();
+    return res.status(200).json({ message: "Échange marqué comme terminé", prop });
+  },
 };

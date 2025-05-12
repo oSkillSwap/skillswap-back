@@ -286,3 +286,10 @@ propositionRouter.get(
   authenticate,
   controllerwrapper(propositionController.getMyPropositions),
 );
+
+propositionRouter.patch(
+  "/propositions/:id/finish",
+  authenticate,
+  validateParams("id"),
+  controllerwrapper(propositionController.finishProposition),
+);
