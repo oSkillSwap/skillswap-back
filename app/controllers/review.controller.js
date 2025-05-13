@@ -8,7 +8,7 @@ export const reviewController = {
     const reviews = await Review.findAll({
       where: {
         content: {
-          [Op.not]: null, // Ensures only reviews with content are fetched
+          [Op.not]: null,
         },
       },
       attributes: {
@@ -16,17 +16,17 @@ export const reviewController = {
       },
       include: [
         {
-          association: "Reviewer", // Include Reviewer
+          association: "Reviewer",
           attributes: {
-            exclude: ["password"], // Exclude sensitive password field
+            exclude: ["password"],
           },
           where: {
-            isBanned: false, // Only include reviewers who are not banned
+            isBanned: false,
           },
         },
       ],
-      order: [["createdAt", "DESC"]], // Sort reviews by grade in descending order,
-      limit: 6, // Limit to 6 reviews
+      order: [["createdAt", "DESC"]],
+      limit: 6,
     });
 
     return res.status(200).json({ reviews });
@@ -36,12 +36,14 @@ export const reviewController = {
     const { id } = req.params;
 
     const user = await User.findByPk(id);
-
     if (!user) {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     const reviews = await Review.findAll({
+      where: {
+        reviewed_id: id,
+      },
       include: [
         {
           association: "Reviewer",
@@ -53,7 +55,6 @@ export const reviewController = {
           include: {
             model: Post,
             required: true,
-            where: { user_id: id },
             attributes: ["id", "title"],
             include: {
               association: "Author",
@@ -62,6 +63,7 @@ export const reviewController = {
           },
         },
       ],
+      order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({ reviews });
@@ -73,7 +75,6 @@ export const reviewController = {
     const userId = req.user.id;
 
     const review = await Review.findByPk(reviewId);
-
     if (!review) {
       return next(new NotFoundError("Review non trouvée"));
     }
@@ -89,10 +90,8 @@ export const reviewController = {
 
   createReview: async (req, res, next) => {
     const userId = req.user.id;
-
     const { postId, propositionId, grade, title, comment } = req.validatedData;
 
-    // Check Post's existence && isClosed
     const post = await Post.findByPk(postId);
     if (!post) {
       return next(new NotFoundError("Annonce non trouvée"));
@@ -102,7 +101,6 @@ export const reviewController = {
       return next(new ForbiddenError("L'annonce doit être fermée pour laisser un avis"));
     }
 
-    // Check Accepted proposition belongs to the post
     const proposition = await Proposition.findOne({
       where: {
         id: propositionId,
@@ -118,17 +116,14 @@ export const reviewController = {
       return next(new ForbiddenError("La proposition n'est pas acceptée"));
     }
 
-    // Check user is the post owner
     if (post.user_id !== userId) {
       return next(
         new ForbiddenError("Vous n'avez pas le droit de laisser un avis sur cette annonce"),
       );
     }
 
-    // User to review
     const reviewedId = proposition.sender_id;
 
-    // Check if a review already exists (avoid multiple reviews for the same proposition)
     const existingReview = await Review.findOne({
       where: {
         user_id: userId,
@@ -144,7 +139,6 @@ export const reviewController = {
       );
     }
 
-    // Check if a review already exists for the same reviewed user
     const existingReviewForUser = await Review.findOne({
       where: {
         user_id: userId,
@@ -162,7 +156,6 @@ export const reviewController = {
       return next(new ForbiddenError("Vous avez déjà laissé un avis pour cet utilisateur."));
     }
 
-    // Create the review (linking to the user and the proposition)
     const review = await Review.create({
       grade,
       title,
@@ -172,7 +165,6 @@ export const reviewController = {
       proposition_id: proposition.id,
     });
 
-    // Successfully created the review
     res.status(201).json({ message: "Évaluation créée avec succès", review });
   },
 };

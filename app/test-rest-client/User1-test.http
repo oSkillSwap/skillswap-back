@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MDUyMzUwLCJleHAiOjE3NDcwNTk1NTB9.Y-qAFM0drJPxaCFATrr-rRacosHzLSnrHS4U9yDFUA4
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MTIwNDg3LCJleHAiOjE3NDcxMjc2ODd9.WJbzxL8hP2RdCXPYQVgdvQkNb8rKEmHTUBGiX7t9ki8
 // ID User: 11
 
 ### Register a user
@@ -21,7 +21,7 @@ Content-Type: application/json
 
 {
   "email": "erwannnn@gmail.com",
-  "password": "ErwanMettouchi1234+"
+  "password": "ErwanMettouchi1+"
 }
 
 
