@@ -42,7 +42,7 @@ export const reviewController = {
 
     const reviews = await Review.findAll({
       where: {
-        where: { reviewed_id: id },
+        user_id: id,
       },
       include: [
         {
