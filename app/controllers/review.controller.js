@@ -33,16 +33,21 @@ export const reviewController = {
   },
 
   getReviewsFromUser: async (req, res, next) => {
-    const { id } = req.params;
+    const { userIdOrUsername } = req.params;
 
-    const user = await User.findByPk(id);
+    const user = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+    });
     if (!user) {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     const reviews = await Review.findAll({
       where: {
-        user_id: id,
+        user_id: user.id,
       },
       include: [
         {

@@ -7,8 +7,8 @@ import { validate } from "../middlewares/validates.js";
 import {
   loginSchema,
   registerSchema,
-  updateUserSchema,
   updatePasswordSchema,
+  updateUserSchema,
 } from "../schemas/user.schema.js";
 
 export const userRouter = Router();
@@ -92,19 +92,22 @@ userRouter.get("/users/:userIdOrUsername", controllerwrapper(userController.getO
 
 /**
  * @swagger
- * /api/users/follows/{id}:
+ * /api/users/follows/{userIdOrUsername}:
  *   get:
  *     summary: Récupérer les follows et followers d'un utilisateur
  *     tags: [Users]
  *     parameters:
- *       - name: id
+ *       - name: userIdOrUsername
  *         in: path
  *         required: true
- *         description: ID de l'utilisateur
+ *         description: ID ou username de l'utilisateur
  *         schema:
- *           type: integer
- *           format: int64
- *           example: 1
+ *           oneOf:
+ *             - type: string
+ *               format: int64
+ *             - type: string
+ *           example: johndoe
+ *           description: Nom d'utilisateur ou ID de l'utilisateur
  *     responses:
  *       200:
  *         description: Liste des utilisateurs qui suivent et sont suivis par l'utilisateur
@@ -134,8 +137,7 @@ userRouter.get("/users/:userIdOrUsername", controllerwrapper(userController.getO
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
 userRouter.get(
-  "/users/follows/:id",
-  validateParams("id"),
+  "/users/follows/:userIdOrUsername",
   controllerwrapper(userController.getFollowersAndFollowsFromUser),
 );
 
@@ -225,7 +227,7 @@ userRouter.get("/me/users", authenticate, async (req, res, next) => {
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
 userRouter.get("/me/follows", authenticate, async (req, res, next) => {
-  req.params.id = req.user.id;
+  req.params.userIdOrUsername = req.user.id;
   return userController.getFollowersAndFollowsFromUser(req, res, next);
 });
 
@@ -347,16 +349,16 @@ userRouter.post("/register", validate(registerSchema), controllerwrapper(userCon
 userRouter.post("/login", validate(loginSchema), controllerwrapper(userController.login));
 
 userRouter
-  .route("/me/follow/:userId")
+  .route("/me/follow/:userIdOrUsername")
   /**
    * @swagger
-   * /api/me/follow/{userId}:
+   * /api/me/follow/{userIdOrUsername}:
    *   post:
    *     summary: Suivre un utilisateur
    *     description: Permet à un utilisateur authentifié de suivre un autre utilisateur
    *     tags: [Users]
    *     parameters:
-   *       - name: userId
+   *       - name: userIdOrUsername
    *         in: path
    *         required: true
    *         description: ID de l'utilisateur à suivre
@@ -425,19 +427,19 @@ userRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-  .post(authenticate, validateParams("userId"), controllerwrapper(userController.followUser))
+  .post(authenticate, controllerwrapper(userController.followUser))
   /**
    * @swagger
-   * /api/me/follow/{userId}:
+   * /api/me/follow/{userIdOrUsername}:
    *   delete:
    *     summary: Ne plus suivre un utilisateur
    *     description: Permet à un utilisateur authentifié de ne plus suivre un autre utilisateur
    *     tags: [Users]
    *     parameters:
-   *       - name: userId
+   *       - name: userIdOrUsername
    *         in: path
    *         required: true
-   *         description: ID de l'utilisateur à ne plus suivre
+   *         description: ID ou username de l'utilisateur à ne plus suivre
    *         example: 1
    *     security:
    *       - bearerAuth: []
@@ -493,7 +495,7 @@ userRouter
    *                   type: string
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
-  .delete(authenticate, validateParams("userId"), controllerwrapper(userController.unfollowUser));
+  .delete(authenticate, controllerwrapper(userController.unfollowUser));
 
 userRouter
   .route("/me")

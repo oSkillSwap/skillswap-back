@@ -19,7 +19,7 @@ GET http://localhost:3000/api/posts/5
 GET http://localhost:3000/api/posts
 
 ### GET follow user
-GET http://localhost:3000/api/users/follows/1
+GET http://localhost:3000/api/users/follows/Erwan
 
 ### GET all skills
 GET http://localhost:3000/api/skills
@@ -28,7 +28,7 @@ GET http://localhost:3000/api/skills
 GET http://localhost:3000/api/propositions/5
 
 ### GET Unfound user
-GET http://localhost:3000/api/users/1
+GET http://localhost:3000/api/users/5
 
 ### GET Unfound user
 GET http://localhost:3000/api/users/user3

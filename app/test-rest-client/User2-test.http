@@ -1,4 +1,4 @@
-@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MDUyMzc0LCJleHAiOjE3NDcwNTk1NzR9.pcAhumrmi05KVB3xd3PkA9bOyebZdS4enAPSdB1BM84
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjEwMTA5LCJleHAiOjE3NDcyMTczMDl9.BVIxBojtgo8_8f3pqed6WXSf91biXw_DXyK75rIX-sA
 // ID: 12
 
 ### Register a user
@@ -40,11 +40,11 @@ GET http://localhost:3000/api/me/messages
 Authorization: Bearer  {{token2}}
 
 ###GET messages with user
-GET http://localhost:3000/api/me/messages/11
+GET http://localhost:3000/api/me/messages/Erwan
 Authorization: Bearer {{token2}}
 
 ###
-POST http://localhost:3000/api/me/messages/11
+POST http://localhost:3000/api/me/messages/Erwan
 Authorization: Bearer {{token2}}
 Content-Type: application/json
 

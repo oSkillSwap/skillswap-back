@@ -1,24 +1,23 @@
-import { Op, Sequelize } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 
-import {
-  Post,
-  Proposition,
-  Review,
-  Skill,
-  User,
-} from "../models/associations.js";
+import { Post, Proposition, Review, Skill, User } from "../models/associations.js";
 
 export const postController = {
   // Get all posts created by a specific user
   getPostsFromUser: async (req, res, next) => {
-    const { id } = req.params;
+    const { userIdOrUsername } = req.params;
 
     // Find the user by their primary key (id)
-    const user = await User.findByPk(id);
+    const user = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+    });
     if (!user) {
       // If user is not found, return a 404 error
       return next(new NotFoundError("Utilisateur non trouvé"));
@@ -31,7 +30,7 @@ export const postController = {
         {
           association: "Author", // Include the author of the post
           attributes: [], // Only return id and username of the author
-          where: { id }, // Filter posts by the user id
+          where: { id: user.id }, // Filter posts by the user id
         },
         {
           association: "SkillWanted", // Include the skill wanted in the post
@@ -59,15 +58,9 @@ export const postController = {
             "username",
             "avatar",
             // Calculate the average grade of the author's reviews
-            [
-              Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")),
-              "averageGrade",
-            ],
+            [Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")), "averageGrade"],
             // Count the number of reviews the author has
-            [
-              Sequelize.fn("COUNT", Sequelize.col("Author->Reviews.grade")),
-              "nbOfReviews",
-            ],
+            [Sequelize.fn("COUNT", Sequelize.col("Author->Reviews.grade")), "nbOfReviews"],
           ],
           include: {
             association: "Reviews", // Include the reviews of the author
@@ -76,12 +69,7 @@ export const postController = {
         },
       ],
       // Group by these fields to avoid duplicate rows
-      group: [
-        "Post.id",
-        "SkillWanted.id",
-        "Author.id",
-        "SkillWanted->Category.id",
-      ],
+      group: ["Post.id", "SkillWanted.id", "Author.id", "SkillWanted->Category.id"],
     });
 
     return res.status(200).json({ posts }); // Return the posts as JSON
@@ -120,17 +108,11 @@ export const postController = {
               "id",
               "username",
               [
-                Sequelize.fn(
-                  "AVG",
-                  Sequelize.col("Propositions->Sender->Reviews.grade")
-                ),
+                Sequelize.fn("AVG", Sequelize.col("Propositions->Sender->Reviews.grade")),
                 "averageGrade",
               ],
               [
-                Sequelize.fn(
-                  "COUNT",
-                  Sequelize.col("Propositions->Sender->Reviews.grade")
-                ),
+                Sequelize.fn("COUNT", Sequelize.col("Propositions->Sender->Reviews.grade")),
                 "nbOfReviews",
               ],
             ],
@@ -159,8 +141,21 @@ export const postController = {
     const user = req.user; // Get the logged-in user
     const { content, title, skill_id } = req.validatedData; // Extract validated data from the request
 
+    // Check if the user has reached the maximum number of posts
+    const maxPostsPerUser = 10;
+    const userPostCount = await Post.count({
+      where: { user_id: user.id },
+    });
+
+    if (userPostCount >= maxPostsPerUser) {
+      return next(
+        new ForbiddenError(
+          "Limite de 10 posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.",
+        ),
+      );
+    }
     // Check if the skill exists
-    const skill = await Skill.findByPk(skill_id);
+    const skill = await Skill.findByPk(Number(skill_id));
     if (!skill) {
       return next(new NotFoundError("Compétence non trouvée"));
     }
@@ -173,25 +168,11 @@ export const postController = {
       },
     });
 
-    // Check if the user has reached the maximum number of posts
-    const maxPostsPerUser = 10;
-    const userPostCount = await Post.count({
-      where: { user_id: user.id },
-    });
-
-    if (userPostCount >= maxPostsPerUser) {
-      return next(
-        new ForbiddenError(
-          `Limite de ${maxPostsPerUser} posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.`
-        )
-      );
-    }
-
     if (existingPost) {
       return next(
         new BadRequestError(
-          "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence."
-        )
+          "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
+        ),
       );
     }
 
@@ -221,9 +202,7 @@ export const postController = {
 
     // Check if the logged-in user is the author of the post
     if (Number(post.user_id) !== Number(user.id)) {
-      return next(
-        new ForbiddenError("Vous n'êtes pas autorisé à supprimer ce post")
-      );
+      return next(new ForbiddenError("Vous n'êtes pas autorisé à supprimer ce post"));
     }
 
     // Check if the post has any propositions
@@ -253,9 +232,7 @@ export const postController = {
 
     // Check if the logged-in user is the author of the post
     if (Number(post.user_id) !== Number(user.id)) {
-      return next(
-        new ForbiddenError("Vous n'êtes pas autorisé à modifier ce post")
-      );
+      return next(new ForbiddenError("Vous n'êtes pas autorisé à modifier ce post"));
     }
 
     if (Object.keys(req.validatedData).length === 0) {
@@ -271,8 +248,6 @@ export const postController = {
     // Update the post with the new data
     const updatedPost = await post.update(updatedFields);
 
-    return res
-      .status(200)
-      .json({ message: "Post modifié avec succès", updatedPost });
+    return res.status(200).json({ message: "Post modifié avec succès", updatedPost });
   },
 };

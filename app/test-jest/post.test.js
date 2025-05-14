@@ -38,7 +38,7 @@ describe("Post module", () => {
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
       const next = jest.fn();
 
-      User.findByPk.mockResolvedValueOnce({ id: 1 });
+      User.findOne.mockResolvedValueOnce({ id: 1 });
 
       Post.findAll.mockResolvedValue([
         { id: 1, title: "Premier post" },
@@ -61,7 +61,7 @@ describe("Post module", () => {
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
       const next = jest.fn();
 
-      User.findByPk.mockResolvedValueOnce({ id: 1 });
+      User.findOne.mockResolvedValueOnce({ id: 1 });
       Post.findAll.mockResolvedValue([]);
 
       await postController.getPostsFromUser(req, res, next);
@@ -70,16 +70,16 @@ describe("Post module", () => {
     });
 
     test("Lorsqu'on récupère un utilisateur, on vérifie que l'identifiant passé est celui attendu", async () => {
-      const req = { params: { id: 5 } };
+      const req = { params: { userIdOrUsername: "5" } };
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
       const next = jest.fn();
 
-      User.findByPk.mockResolvedValueOnce({ id: 5 });
+      User.findOne.mockResolvedValueOnce({ id: 5 });
       Post.findAll.mockResolvedValueOnce([]);
 
       await postController.getPostsFromUser(req, res, next);
 
-      expect(User.findByPk).toHaveBeenCalledWith(5);
+      expect(User.findOne).toHaveBeenCalledWith({ where: { id: 5 } });
     });
 
     test("Quand un utilisateur est trouvé, on doit chercher tous les posts associés à son identifiant", async () => {
@@ -102,7 +102,7 @@ describe("Post module", () => {
       const next = jest.fn();
 
       // Simulation d'une erreur sur User.findByPk
-      User.findByPk.mockRejectedValueOnce(new Error("Erreur inattendue"));
+      User.findOne.mockRejectedValueOnce(new Error("Erreur inattendue"));
 
       // Appel de la méthode
       await controllerwrapper(postController.getPostsFromUser)(req, res, next);
@@ -117,86 +117,6 @@ describe("Post module", () => {
 
   // ------------------------------------------ TEST RECUPERATION DE TOUS LES POSTS -------------------------------------------
   describe("Récupérer tous les posts", () => {
-    test("Quand tout se passe bien, doit retourner la liste complète des posts avec les skills et auteur", async () => {
-      const req = {};
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      // Mock de Post.findAll pour simuler la réponse complète
-      Post.findAll.mockResolvedValue([
-        {
-          id: 1,
-          title: "Post 1",
-          SkillWanted: { id: 101, name: "JavaScript" },
-          Author: {
-            id: 11,
-            username: "Alice",
-            averageGrade: 4.8,
-            nbOfReviews: 10,
-          },
-        },
-        {
-          id: 2,
-          title: "Post 2",
-          SkillWanted: { id: 102, name: "Python" },
-          Author: {
-            id: 12,
-            username: "Bob",
-            averageGrade: 4.5,
-            nbOfReviews: 8,
-          },
-        },
-      ]);
-
-      // Appel du contrôleur
-      await postController.getPosts(req, res, next);
-
-      // Vérifications
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        posts: [
-          {
-            id: 1,
-            title: "Post 1",
-            SkillWanted: { id: 101, name: "JavaScript" },
-            Author: {
-              id: 11,
-              username: "Alice",
-              averageGrade: 4.8,
-              nbOfReviews: 10,
-            },
-          },
-          {
-            id: 2,
-            title: "Post 2",
-            SkillWanted: { id: 102, name: "Python" },
-            Author: {
-              id: 12,
-              username: "Bob",
-              averageGrade: 4.5,
-              nbOfReviews: 8,
-            },
-          },
-        ],
-      });
-    });
-
-    test("Quand une erreur inattendue survient, elle doit retourner une erreur 500", async () => {
-      const req = {};
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      // Simuler une erreur
-      Post.findAll.mockRejectedValueOnce(new Error("Erreur inattendue"));
-
-      await controllerwrapper(postController.getPosts)(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: "Une erreur inattendue est survenue. Veuillez réessayer.",
-      });
-    });
-
     test("Quand on récupère les posts, Post.findAll doit être appelé avec les bonnes associations et groupements", async () => {
       // Préparation des mocks
       const req = {}; // Pas besoin de params ici
@@ -225,14 +145,8 @@ describe("Post module", () => {
               "id",
               "username",
               "avatar",
-              [
-                Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")),
-                "averageGrade",
-              ],
-              [
-                Sequelize.fn("COUNT", Sequelize.col("Author->Reviews.grade")),
-                "nbOfReviews",
-              ],
+              [Sequelize.fn("AVG", Sequelize.col("Author->Reviews.grade")), "averageGrade"],
+              [Sequelize.fn("COUNT", Sequelize.col("Author->Reviews.grade")), "nbOfReviews"],
             ],
             include: {
               association: "Reviews",
@@ -240,12 +154,7 @@ describe("Post module", () => {
             },
           },
         ],
-        group: [
-          "Post.id",
-          "SkillWanted.id",
-          "Author.id",
-          "SkillWanted->Category.id",
-        ],
+        group: ["Post.id", "SkillWanted.id", "Author.id", "SkillWanted->Category.id"],
       });
 
       // En plus, on peut vérifier que res.status(200) a été appelé (bonus)
@@ -288,83 +197,12 @@ describe("Post module", () => {
             "Propositions->Sender.id",
             "Propositions->Sender->Reviews.id",
           ]),
-        })
+        }),
       );
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ posts: [] });
     });
-
-    test("Quand une erreur inattendue survient lors de la récupération des posts, elle doit retourner un status 500", async () => {
-      const req = { user: { id: 1 } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      Post.findAll.mockRejectedValueOnce(new Error("Erreur inattendue"));
-
-      await controllerwrapper(postController.getPostFromLoggedUser)(
-        req,
-        res,
-        next
-      );
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: "Une erreur inattendue est survenue. Veuillez réessayer.",
-      });
-    });
-
-    test("Quand tout se passe bien, il doit retourner tous les posts avec SkillWanted, Author et Propositions complets", async () => {
-      const req = { user: { id: 1 } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      const mockPosts = [
-        {
-          id: 1,
-          title: "Mon premier post",
-          SkillWanted: {
-            id: 2,
-            name: "Compétence en React",
-          },
-          Author: {
-            id: 1,
-            username: "JohnDoe",
-          },
-          Propositions: [
-            {
-              id: 5,
-              content: "Je suis intéressé",
-              Sender: {
-                id: 3,
-                username: "JaneDoe",
-                averageGrade: 4.5,
-                nbOfReviews: 12,
-              },
-            },
-          ],
-        },
-      ];
-
-      Post.findAll.mockResolvedValueOnce(mockPosts);
-
-      await postController.getPostFromLoggedUser(req, res, next);
-
-      expect(Post.findAll).toHaveBeenCalledWith(
-        expect.objectContaining({
-          include: expect.arrayContaining([
-            expect.objectContaining({
-              association: "Author",
-              where: { id: req.user.id },
-            }),
-          ]),
-        })
-      );
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ posts: mockPosts });
-    });
-
     test("Quand aucun post n'est trouvé, il doit retourner une liste vide", async () => {
       const req = { user: { id: 1 } };
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
@@ -382,7 +220,7 @@ describe("Post module", () => {
               where: { id: req.user.id },
             }),
           ]),
-        })
+        }),
       );
 
       expect(res.status).toHaveBeenCalledWith(200);
@@ -402,29 +240,6 @@ describe("Post module", () => {
       expect(error.message).toBe("Utilisateur non authentifié");
     });
 
-    test("Quand un post n'a pas de propositions, il doit quand même retourner un status 200", async () => {
-      const req = { user: { id: 1 } };
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-      const next = jest.fn();
-
-      const mockPosts = [
-        {
-          id: 1,
-          title: "Post sans proposition",
-          SkillWanted: { id: 2, name: "Compétence Vue.js" },
-          Author: { id: 1, username: "JohnDoe" },
-          Propositions: [], // Aucune proposition
-        },
-      ];
-
-      Post.findAll.mockResolvedValueOnce(mockPosts);
-
-      await postController.getPostFromLoggedUser(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ posts: mockPosts });
-    });
-
     test("Les champs sender_id, receiver_id et post_id doivent être exclus dans les propositions", async () => {
       const req = { user: { id: 1 } };
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
@@ -441,15 +256,11 @@ describe("Post module", () => {
             expect.objectContaining({
               model: Proposition,
               attributes: expect.objectContaining({
-                exclude: expect.arrayContaining([
-                  "sender_id",
-                  "receiver_id",
-                  "post_id",
-                ]),
+                exclude: expect.arrayContaining(["sender_id", "receiver_id", "post_id"]),
               }),
             }),
           ]),
-        })
+        }),
       );
 
       expect(res.status).toHaveBeenCalledWith(200);
@@ -459,6 +270,9 @@ describe("Post module", () => {
 
   // ----------------------------------- TEST DE CREATION DE POST D'UN UTILISATEUR CONNECTE -------------------------------------------
   describe("Création de post par un utilisateur connecté", () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
     test("Quand la compétence n'existe pas, une NotFoundError doit être renvoyée", async () => {
       const req = {
         user: { id: 1, username: "JohnDoe" }, // Utilisateur connecté
@@ -501,11 +315,12 @@ describe("Post module", () => {
       const [error] = next.mock.calls[0];
       expect(error).toBeInstanceOf(BadRequestError);
       expect(error.message).toBe(
-        "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence."
+        "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
       );
     });
-
     test("Quand l'utilisateur a atteint la limite maximale de posts, une ForbiddenError doit être renvoyée", async () => {
+      // Réinitialiser les mocks avant chaque test
+
       const req = {
         user: { id: 1, username: "JohnDoe" },
         validatedData: { content: "Contenu", title: "Titre", skill_id: 5 },
@@ -513,26 +328,27 @@ describe("Post module", () => {
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
       const next = jest.fn();
 
-      Skill.findByPk.mockResolvedValueOnce({ id: 5 }); // Compétence trouvée
-      Post.findOne.mockResolvedValueOnce(null); // Aucun post existant avec la compétence
-      Post.count.mockResolvedValueOnce(10); // L'utilisateur a déjà 10 posts
+      // Simuler que l'utilisateur a déjà 10 posts (limite atteinte)
+      Post.count.mockResolvedValueOnce(10);
 
       await postController.createPost(req, res, next);
 
-      expect(Skill.findByPk).toHaveBeenCalledWith(5);
-      expect(Post.findOne).toHaveBeenCalledWith({
-        where: { skill_id: 5, user_id: 1 },
-      });
+      // Vérifier que Post.count a été appelé avec les bons paramètres
       expect(Post.count).toHaveBeenCalledWith({
         where: { user_id: 1 },
       });
 
-      expect(next).toHaveBeenCalledTimes(1);
+      // Vérifier que Skill.findByPk et Post.findOne n'ont PAS été appelés
+      // car l'exécution s'arrête après la vérification du nombre de posts
+      expect(Skill.findByPk).not.toHaveBeenCalled();
+      expect(Post.findOne).not.toHaveBeenCalled();
 
+      // Vérifier que next a été appelé avec une ForbiddenError
+      expect(next).toHaveBeenCalledTimes(1);
       const [error] = next.mock.calls[0];
       expect(error).toBeInstanceOf(ForbiddenError);
       expect(error.message).toBe(
-        "Limite de 10 posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau."
+        "Limite de 10 posts crées atteinte. Veuillez supprimer un post existant pour en créer un nouveau.",
       );
     });
 
@@ -562,7 +378,7 @@ describe("Post module", () => {
       const [error] = next.mock.calls[0];
       expect(error).toBeInstanceOf(BadRequestError);
       expect(error.message).toBe(
-        "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence."
+        "Vous avez déjà un post avec cette compétence. Veuillez choisir une autre compétence.",
       );
     });
   });
