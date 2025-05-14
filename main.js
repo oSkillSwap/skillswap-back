@@ -29,7 +29,7 @@ const corsOptions = {
     "https://localhost:5173",
     "https://skillswap.vercel.app",
     "https://localhost:3000",
-    "http://localhost:300",
+    "http://localhost:3000",
   ],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   credentials: true,
