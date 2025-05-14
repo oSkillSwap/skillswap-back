@@ -367,7 +367,11 @@ export const userController = {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
-    if (userLoggedIn.id === Number(userIdOrUsername)) {
+    if (userLoggedIn.username === targetUser.username) {
+      return next(new BadRequestError("Vous ne pouvez pas vous suivre vous-même"));
+    }
+
+    if (Number(userLoggedIn.id) === Number(userIdOrUsername)) {
       return next(new BadRequestError("Vous ne pouvez pas vous suivre vous-même"));
     }
 
