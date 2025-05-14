@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjEwMDczLCJleHAiOjE3NDcyMTcyNzN9.GeALL76d1BD86JgaRAH_Y6vD5sJ6F_D1_y4_g6lEaI4
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjE0NjUxLCJleHAiOjE3NDcyMjE4NTF9.7sVS8MIdxrPRyFgTwjHqx1xcMo6QLZF4zUH9T6JfwlE
 // ID User: 11
 
 ### Register a user
@@ -213,11 +213,11 @@ GET http://localhost:3000/api/me/follows
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/api/me/follow/11
+POST http://localhost:3000/api/me/follow/Erwan
 Authorization: Bearer {{token}}
 
 ###
-DELETE http://localhost:3000/api/me/follow/12
+DELETE http://localhost:3000/api/me/follow/Gregory
 Authorization: Bearer {{token}}
 
 

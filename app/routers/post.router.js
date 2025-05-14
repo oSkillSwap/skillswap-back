@@ -40,15 +40,15 @@ postRouter.route("/posts").get(controllerwrapper(postController.getPosts));
 
 /**
  * @swagger
- * /api/posts/{id}:
+ * /api/posts/{userIdOrUsername}:
  *   get:
  *     summary: Récupérer les posts d'un utilisateur spécifique
  *     tags: [Posts]
  *     parameters:
- *       - name: id
+ *       - name: userIdOrUsername
  *         in: path
  *         required: true
- *         description: ID de l'utilisateur dont vous souhaitez récupérer les posts
+ *         description: ID ou username de l'utilisateur dont vous souhaitez récupérer les posts
  *         schema:
  *           type: integer
  *           example: 1
@@ -73,11 +73,7 @@ postRouter.route("/posts").get(controllerwrapper(postController.getPosts));
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
 // /posts/:id -> user-specific posts
-postRouter.get(
-  "/posts/:id",
-  validateParams("id"),
-  controllerwrapper(postController.getPostsFromUser)
-);
+postRouter.get("/posts/:userIdOrUsername", controllerwrapper(postController.getPostsFromUser));
 
 // /me/posts -> posts related to authenticated user's
 postRouter
@@ -200,11 +196,7 @@ postRouter
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
   // Get posts from logged-in user
-  .post(
-    authenticate,
-    validate(postSchema),
-    controllerwrapper(postController.createPost)
-  ); // Create a new post
+  .post(authenticate, validate(postSchema), controllerwrapper(postController.createPost)); // Create a new post
 
 /**
  * @swagger
@@ -264,11 +256,7 @@ postRouter
  *                   type: string
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
-postRouter.delete(
-  "/me/posts/:id",
-  authenticate,
-  controllerwrapper(postController.deletePost)
-);
+postRouter.delete("/me/posts/:id", authenticate, controllerwrapper(postController.deletePost));
 
 /**
  * @swagger
@@ -348,5 +336,5 @@ postRouter.patch(
   "/me/posts/:id",
   authenticate,
   validate(updatePostSchema),
-  controllerwrapper(postController.updatePost)
+  controllerwrapper(postController.updatePost),
 );

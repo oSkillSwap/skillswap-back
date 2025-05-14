@@ -33,16 +33,21 @@ export const reviewController = {
   },
 
   getReviewsFromUser: async (req, res, next) => {
-    const { id } = req.params;
+    const { userIdOrUsername } = req.params;
 
-    const user = await User.findByPk(id);
+    const user = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+    });
     if (!user) {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
     const reviews = await Review.findAll({
       where: {
-        user_id: id,
+        user_id: user.id,
       },
       include: [
         {
@@ -80,16 +85,12 @@ export const reviewController = {
     }
 
     if (review.user_id !== userId) {
-      return next(
-        new ForbiddenError("Vous ne pouvez modifier que vos propres reviews")
-      );
+      return next(new ForbiddenError("Vous ne pouvez modifier que vos propres reviews"));
     }
 
     await review.update({ grade, content });
 
-    return res
-      .status(200)
-      .json({ message: "Review mise à jour avec succès", review });
+    return res.status(200).json({ message: "Review mise à jour avec succès", review });
   },
 
   createReview: async (req, res, next) => {
@@ -102,9 +103,7 @@ export const reviewController = {
     }
 
     if (!post.isClosed) {
-      return next(
-        new ForbiddenError("L'annonce doit être fermée pour laisser un avis")
-      );
+      return next(new ForbiddenError("L'annonce doit être fermée pour laisser un avis"));
     }
 
     const proposition = await Proposition.findOne({
@@ -124,9 +123,7 @@ export const reviewController = {
 
     if (post.user_id !== userId) {
       return next(
-        new ForbiddenError(
-          "Vous n'avez pas le droit de laisser un avis sur cette annonce"
-        )
+        new ForbiddenError("Vous n'avez pas le droit de laisser un avis sur cette annonce"),
       );
     }
 
@@ -142,8 +139,8 @@ export const reviewController = {
     if (existingReview) {
       return next(
         new ForbiddenError(
-          "Vous avez déjà laissé un avis pour cette annonce et cette proposition."
-        )
+          "Vous avez déjà laissé un avis pour cette annonce et cette proposition.",
+        ),
       );
     }
 
@@ -161,11 +158,7 @@ export const reviewController = {
     });
 
     if (existingReviewForUser) {
-      return next(
-        new ForbiddenError(
-          "Vous avez déjà laissé un avis pour cet utilisateur."
-        )
-      );
+      return next(new ForbiddenError("Vous avez déjà laissé un avis pour cet utilisateur."));
     }
 
     const review = await Review.create({

@@ -41,13 +41,13 @@ describe("User module", () => {
     test("Quand l'utilisateur se suit lui-même, une BadRequestError doit être renvoyée", async () => {
       // Préparation des données de test
       // Configurer le mock pour ce test spécifique
-      User.findByPk
+      User.findOne
         .mockResolvedValueOnce(mockUser) // Pour targetUser
         .mockResolvedValueOnce(mockUser); // Pour userLoggedIn
 
       // Préparation des données de test
       const req = {
-        params: { userId: 1 }, // Identifiant de l'utilisateur à suivre
+        params: { userIdOrUsername: "1" }, // Identifiant de l'utilisateur à suivre
         user: { id: 1 }, // Identifiant de l'utilisateur connecté (même ID)
       };
       // Appel de la méthode à tester
@@ -81,13 +81,12 @@ describe("User module", () => {
         hasFollows: jest.fn().mockResolvedValue(true),
       };
 
-      User.findByPk
-        .mockResolvedValueOnce(mockUser)
-        .mockResolvedValueOnce(mockLoggedUser);
+      User.findOne.mockResolvedValueOnce(mockUser);
+      User.findByPk.mockResolvedValueOnce(mockLoggedUser);
 
       const req = {
-        params: { userId: 2 },
-        user: { id: 1 },
+        params: { userIdOrUsername: "johndoe" },
+        user: { username: "johndoe" },
       };
 
       await userController.followUser(req, res, next);
@@ -107,9 +106,8 @@ describe("User module", () => {
         addFollows: jest.fn().mockResolvedValue(true),
       };
 
-      User.findByPk
-        .mockResolvedValueOnce(mockUser)
-        .mockResolvedValueOnce(mockLoggedUser);
+      User.findOne.mockResolvedValueOnce(mockUser);
+      User.findByPk.mockResolvedValueOnce(mockLoggedUser);
 
       const req = {
         params: { userId: 2 },
@@ -197,9 +195,9 @@ describe("User module", () => {
       };
 
       // Configuration des mocks pour User.findByPk
-      User.findByPk
-        .mockResolvedValueOnce(mockUser) // Retourne l'utilisateur cible
-        .mockResolvedValueOnce(mockLoggedUser); // Retourne l'utilisateur connecté
+      User.findOne.mockResolvedValueOnce(mockUser);
+      // Retourne l'utilisateur cible
+      User.findByPk.mockResolvedValueOnce(mockLoggedUser); // Retourne l'utilisateur connecté
 
       const req = {
         params: { userId: 2 }, // ID de l'utilisateur à ne plus suivre
@@ -231,9 +229,8 @@ describe("User module", () => {
       };
 
       // Configuration des mocks pour User.findByPk
-      User.findByPk
-        .mockResolvedValueOnce(mockUser) // Retourne l'utilisateur cible
-        .mockResolvedValueOnce(mockLoggedUser); // Retourne l'utilisateur connecté
+      User.findOne.mockResolvedValueOnce(mockUser); // Retourne l'utilisateur cible
+      User.findByPk.mockResolvedValueOnce(mockLoggedUser); // Retourne l'utilisateur connecté
 
       // Simulation de la requête HTTP
       const req = {

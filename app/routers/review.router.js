@@ -35,21 +35,19 @@ export const reviewRouter = Router();
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  *
  */
-reviewRouter
-  .route("/reviews")
-  .get(controllerwrapper(reviewController.getReviews)); // Get all reviews
+reviewRouter.route("/reviews").get(controllerwrapper(reviewController.getReviews)); // Get all reviews
 
 /**
  * @swagger
- * /api/reviews/{id}:
+ * /api/reviews/{userIdOrUsername}:
  *   get:
  *     summary: Récupérer les évaluations d'un utilisateur spécifique
  *     tags: [Reviews]
  *     parameters:
- *       - name: id
+ *       - name: userIdOrUsername
  *         in: path
  *         required: true
- *         description: ID de l'utilisateur dont vous souhaitez récupérer les évaluations
+ *         description: ID ou username de l'utilisateur dont vous souhaitez récupérer les évaluations
  *         schema:
  *           type: integer
  *           example: 1
@@ -83,11 +81,10 @@ reviewRouter
  *                   type: string
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
-// /reviews/:id -> user-specific reviews
+// /reviews/:userIdOrUsername -> user-specific reviews
 reviewRouter.get(
-  "/reviews/:id",
-  validateParams("id"),
-  controllerwrapper(reviewController.getReviewsFromUser)
+  "/reviews/:userIdOrUsername",
+  controllerwrapper(reviewController.getReviewsFromUser),
 );
 
 /**
@@ -171,11 +168,7 @@ reviewRouter.get(
 // Create a review
 reviewRouter
   .route("/me/reviews")
-  .post(
-    authenticate,
-    validate(reviewSchema),
-    controllerwrapper(reviewController.createReview)
-  );
+  .post(authenticate, validate(reviewSchema), controllerwrapper(reviewController.createReview));
 
 /**
  * @swagger
@@ -269,5 +262,5 @@ reviewRouter.patch(
   authenticate,
   validateParams("reviewId"),
   validate(updateReviewSchema),
-  controllerwrapper(reviewController.updateReview)
+  controllerwrapper(reviewController.updateReview),
 );

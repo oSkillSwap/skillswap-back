@@ -5,7 +5,7 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken } from "../helpers/jwt.js";
-import { Category, Review, User, Availability } from "../models/associations.js";
+import { Availability, Category, Review, User } from "../models/associations.js";
 
 export const userController = {
   register: async (req, res, next) => {
@@ -148,8 +148,12 @@ export const userController = {
   },
 
   getFollowersAndFollowsFromUser: async (req, res, next) => {
-    const { id } = req.params;
-    const user = await User.findByPk(id, {
+    const { userIdOrUsername } = req.params;
+    const user = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
       attributes: [],
       include: [
         {
@@ -344,21 +348,26 @@ export const userController = {
   },
 
   followUser: async (req, res, next) => {
-    const { userId } = req.params;
+    const { userIdOrUsername } = req.params;
     const userLoggedIn = req.user;
 
     if (!userLoggedIn) {
       return next(new UnauthorizedError("Utilisateur non authentifié"));
     }
 
-    const targetUser = await User.findByPk(userId);
+    const targetUser = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+    });
     const user = await User.findByPk(userLoggedIn.id);
 
     if (!targetUser) {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
-    if (userLoggedIn.id === Number(userId)) {
+    if (userLoggedIn.id === Number(userIdOrUsername)) {
       return next(new BadRequestError("Vous ne pouvez pas vous suivre vous-même"));
     }
 
@@ -374,13 +383,18 @@ export const userController = {
 
   unfollowUser: async (req, res, next) => {
     const userLoggedIn = req.user;
-    const { userId } = req.params;
+    const { userIdOrUsername } = req.params;
 
     if (!userLoggedIn) {
       return next(new UnauthorizedError("Utilisateur non authentifié"));
     }
 
-    const targetUser = await User.findByPk(userId);
+    const targetUser = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+    });
     const user = await User.findByPk(userLoggedIn.id);
 
     if (!targetUser) {
