@@ -33,10 +33,16 @@ export const messageController = {
   },
 
   getConversation: async (req, res) => {
-    const { userId } = req.params;
+    const { userIdOrUsername } = req.params;
     const loggedInUserId = req.user.id;
 
-    const conversationPartner = await User.findByPk(userId);
+    const conversationPartner = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+      attributes: ["id", "username", "avatar"],
+    });
 
     if (!conversationPartner) {
       return next(new NotFoundError("Utilisateur non trouvé"));
@@ -45,8 +51,8 @@ export const messageController = {
     const conversation = await Message.findAll({
       where: {
         [Op.or]: [
-          { sender_id: loggedInUserId, receiver_id: userId },
-          { sender_id: userId, receiver_id: loggedInUserId },
+          { sender_id: loggedInUserId, receiver_id: conversationPartner.id },
+          { sender_id: conversationPartner.id, receiver_id: loggedInUserId },
         ],
       },
       include: [
@@ -69,17 +75,26 @@ export const messageController = {
   },
 
   createMessage: async (req, res, next) => {
-    const { userId } = req.params;
-    const senderId = req.user.id;
+    const { userIdOrUsername } = req.params;
+    const sender = req.user;
     const { message } = req.validatedData;
 
-    const conversationPartner = await User.findByPk(userId);
+    const conversationPartner = await User.findOne({
+      // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+      where: isNaN(userIdOrUsername)
+        ? { username: userIdOrUsername }
+        : { id: Number(userIdOrUsername) },
+    });
 
     if (!conversationPartner) {
       return next(new NotFoundError("Utilisateur non trouvé"));
     }
 
-    if (senderId === Number(userId)) {
+    if (sender.username === conversationPartner.username) {
+      return next(new ForbiddenError("Impossible d'envoyer un message à soi-même"));
+    }
+
+    if (sender.id === userIdOrUsername) {
       return next(new ForbiddenError("Impossible d'envoyer un message à soi-même"));
     }
 
@@ -88,8 +103,8 @@ export const messageController = {
     }
 
     const newMessage = await Message.create({
-      sender_id: senderId,
-      receiver_id: userId,
+      sender_id: sender.id,
+      receiver_id: conversationPartner.id,
       content: message,
     });
 

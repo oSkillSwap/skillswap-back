@@ -37,32 +37,32 @@ export const messageRouter = Router();
  *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
  */
 // /me/messages -> Get all messages related to authenticated user's
-messageRouter.get(
-  "/me/messages",
-  authenticate,
-  controllerwrapper(messageController.getMessages)
-);
+messageRouter.get("/me/messages", authenticate, controllerwrapper(messageController.getMessages));
 
 // /me/messages/:userId
 messageRouter
-  .route("/me/messages/:userId")
+  .route("/me/messages/:userIdOrUsername")
 
   /**
    * @swagger
-   * /api/me/messages/{userId}:
+   * /api/me/messages/{userIdOrUsername}:
    *   get:
    *     summary: Récupérer tous les messages entre l'utilisateur authentifié et un autre utilisateur
    *     tags: [Messages]
    *     security:
    *       - bearerAuth: []
    *     parameters:
-   *       - name: userId
+   *       - name: userIdOrUsername
    *         in: path
    *         required: true
-   *         description: ID de l'utilisateur avec lequel vous souhaitez récupérer les messages
+   *         description: ID ou username de l'utilisateur avec lequel vous souhaitez récupérer les messages
    *         schema:
-   *           type: integer
-   *           example: 1
+   *           oneOf:
+   *             - type: string
+   *               format: int64
+   *             - type: string
+   *           example: johndoe
+   *           description: Nom d'utilisateur ou ID de l'utilisateur
    *     responses:
    *       200:
    *         description: Liste des messages entre les deux utilisateurs
@@ -94,28 +94,28 @@ messageRouter
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
   // Get all messages between two users
-  .get(
-    authenticate,
-    validateParams("userId"),
-    controllerwrapper(messageController.getConversation)
-  )
+  .get(authenticate, controllerwrapper(messageController.getConversation))
 
   /**
    * @swagger
-   * /api/me/messages/{userId}:
+   * /api/me/messages/{userIdOrUsername}:
    *   post:
    *     summary: Envoyer un message à un utilisateur
    *     tags: [Messages]
    *     security:
    *       - bearerAuth: []
    *     parameters:
-   *       - name: userId
+   *       - name: userIdOrUsername
    *         in: path
    *         required: true
-   *         description: ID de l'utilisateur à qui vous souhaitez envoyer un message
+   *         description: ID ou username de l'utilisateur à qui vous souhaitez envoyer un message
    *         schema:
-   *           type: integer
-   *           example: 1
+   *           oneOf:
+   *             - type: string
+   *               format: int64
+   *             - type: string
+   *           example: johndoe
+   *           description: Nom d'utilisateur ou ID de l'utilisateur
    *     requestBody:
    *       required: true
    *       content:
@@ -187,9 +187,4 @@ messageRouter
    *                   example: "Une erreur inattendue est survenue. Veuillez réessayer."
    */
   // Send a message to a user
-  .post(
-    authenticate,
-    validateParams("userId"),
-    validate(messageSchema),
-    messageController.createMessage
-  );
+  .post(authenticate, validate(messageSchema), messageController.createMessage);

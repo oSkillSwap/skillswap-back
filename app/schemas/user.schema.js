@@ -9,15 +9,7 @@ const sanitizeTextarea = (val) =>
   });
 
 // SLot for availabilities
-const validDays = [
-  "Lundi",
-  "Mardi",
-  "Mercredi",
-  "Jeudi",
-  "Vendredi",
-  "Samedi",
-  "Dimanche",
-];
+const validDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 const validSlots = ["matin", "midi", "après-midi", "soir"];
 
 export const registerSchema = z
@@ -69,10 +61,10 @@ export const updateUserSchema = z.object({
   username: z
     .string()
     .min(3, "Le nom d'utilisateur est requis")
-    .max(25, "Maximum 16 caractères")
+    .max(25, "Maximum 25 caractères")
     .regex(
       /^[a-zA-Z0-9-]+$/,
-      "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets"
+      "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres ou des tirets",
     )
     .optional()
     .transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
@@ -99,7 +91,7 @@ export const updateUserSchema = z.object({
       z.object({
         day_of_the_week: z.enum(validDays),
         time_slot: z.enum(validSlots),
-      })
+      }),
     )
     .optional(),
 });

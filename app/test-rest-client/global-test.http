@@ -6,7 +6,7 @@ GET http://localhost:3000/api/users
 GET http://localhost:3000/api/reviews
 
 ###GET review by author
-GET http://localhost:3000/api/reviews/5
+GET http://localhost:3000/api/reviews/1
 
 ###GET all categories
 GET http://localhost:3000/api/categories

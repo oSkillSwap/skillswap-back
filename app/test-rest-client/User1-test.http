@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MTIwNDg3LCJleHAiOjE3NDcxMjc2ODd9.WJbzxL8hP2RdCXPYQVgdvQkNb8rKEmHTUBGiX7t9ki8
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjEwMDczLCJleHAiOjE3NDcyMTcyNzN9.GeALL76d1BD86JgaRAH_Y6vD5sJ6F_D1_y4_g6lEaI4
 // ID User: 11
 
 ### Register a user
@@ -6,10 +6,10 @@ POST http://localhost:3000/api/register
 Content-Type: application/json
 
 {
-  "username": "Erwannnnn",
+  "username": "Erwan",
   "lastName": "Mettouchi",
   "firstName": "Erwan",
-  "email": "erwannnn@gmail.com",
+  "email": "erwann@gmail.com",
   "password": "ErwanMettouchi1+",
   "avatar": "",
   "description": "Travail en boucle"
@@ -97,11 +97,11 @@ GET http://localhost:3000/api/me/messages
 Authorization: Bearer {{token}}
 
 ###GET messages with user
-GET http://localhost:3000/api/me/messages/12
+GET http://localhost:3000/api/me/messages/Erwan
 Authorization: Bearer {{token}}
 
 ###
-POST http://localhost:3000/api/me/messages/12
+POST http://localhost:3000/api/me/messages/Erwannnnn
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
