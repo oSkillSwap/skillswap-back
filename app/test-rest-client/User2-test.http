@@ -6,10 +6,10 @@ POST http://localhost:3000/api/register
 Content-Type: application/json
 
 {
-  "username": "Gregory",
+  "username": "Greg",
   "lastName": "Virmaud",
   "firstName": "Gregory",
-  "email": "gregory@gmail.com",
+  "email": "greg@gmail.com",
   "password": "GregoryVirmaud1234+",
   "avatar": "",
   "description": "Travail sur le backend"
@@ -22,7 +22,7 @@ Content-Type: application/json
 
 {
 
-  "email": "gregory@gmail.com",
+  "email": "greg@gmail.com",
   "password": "GregoryVirmaud1234+"
 }
 

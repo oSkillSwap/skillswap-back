@@ -31,6 +31,19 @@ User.belongsToMany(User, {
   otherKey: "follower_id",
 });
 
+// User Reviewed
+Review.belongsTo(User, {
+  as: "ReviewedUser",
+  foreignKey: "reviewed_id",
+  onDelete: "SET NULL",
+});
+
+User.hasMany(Review, {
+  as: "ReviewsReceived",
+  foreignKey: "reviewed_id",
+  onDelete: "SET NULL",
+});
+
 // User 0,N <-> 1,1 Post
 // User can create several posts, Post can be created by one user
 User.hasMany(Post, { as: "Posts", foreignKey: "user_id" });
@@ -138,13 +151,4 @@ Post.belongsTo(Skill, {
   allowNull: false,
 });
 
-export {
-  User,
-  Message,
-  Post,
-  Proposition,
-  Review,
-  Skill,
-  Availability,
-  Category,
-};
+export { User, Message, Post, Proposition, Review, Skill, Availability, Category };

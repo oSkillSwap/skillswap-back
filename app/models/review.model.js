@@ -15,9 +15,18 @@ Review.init(
     content: {
       type: DataTypes.TEXT,
     },
+    reviewed_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "user",
+        key: "id",
+      },
+      onDelete: "SET NULL",
+    },
   },
   {
     sequelize,
     tableName: "review",
-  }
+  },
 );

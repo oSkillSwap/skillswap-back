@@ -4,7 +4,7 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
-import { Post, Proposition, User } from "../models/associations.js";
+import { Post, Proposition, User, Review } from "../models/associations.js";
 
 export const propositionController = {
   // Get all user's proposition
@@ -69,6 +69,11 @@ export const propositionController = {
           include: {
             association: "SkillWanted",
           },
+        },
+        {
+          model: Review,
+          required: false,
+          attributes: ["grade", "content", "user_id", "reviewed_id"],
         },
       ],
       group: ["Proposition.id", "Receiver.id", "Post.id", "Post->SkillWanted.id"],
@@ -203,11 +208,25 @@ export const propositionController = {
           association: "Receiver",
           attributes: ["id", "username", "avatar"],
         },
+        {
+          model: Review,
+          required: false,
+          attributes: ["id", "grade", "content"],
+          include: {
+            association: "Reviewer",
+            attributes: ["id", "username", "avatar"],
+          },
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
 
-    return res.status(200).json({ propositions });
+    const enriched = propositions.map((p) => ({
+      ...p.toJSON(),
+      hasReviewByOwner: p.Review?.Reviewer?.id === p.Post.user_id,
+    }));
+
+    return res.status(200).json({ propositions: enriched });
   },
 
   finishProposition: async (req, res, next) => {
