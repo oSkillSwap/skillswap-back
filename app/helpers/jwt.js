@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const SECRET = process.env.JWT_SECRET;
 
 //Generate a JWT token
-export const generateToken = (payload, expiresIn = "2h") => {
+export const generateToken = (payload, expiresIn = "15m") => {
   return jwt.sign(payload, SECRET, { expiresIn });
 };
 

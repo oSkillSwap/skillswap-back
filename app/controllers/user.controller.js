@@ -69,23 +69,41 @@ export const userController = {
       return next(new UnauthorizedError("Identifiants incorrects"));
     }
 
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-    });
-
-    res.status(200).json({
-      message: "Connexion réussie",
-      token,
-      user: {
+    // Access token (15 minutes)
+    const accessToken = generateToken(
+      {
         id: user.id,
-        username: user.username,
         email: user.email,
-        avatar: user.avatar,
+        username: user.username,
+        role: user.role,
       },
-    });
+      "15m",
+    );
+
+    // Refresh token (7 jours)
+    const refreshToken = generateToken(
+      { id: user.id, email: user.email, username: user.username, role: user.role },
+      "7d",
+    );
+
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false, // true if using https
+        sameSite: "Lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      })
+      .status(200)
+      .json({
+        message: "Connexion réussie",
+        token: accessToken,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+        },
+      });
   },
 
   getUsers: async (req, res, next) => {
@@ -415,5 +433,33 @@ export const userController = {
     return res.status(200).json({
       message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
     });
+  },
+  refreshToken: async (req, res, next) => {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      return next(new JsonWebTokenError("Refresh token manquant"));
+    }
+    const payload = verifyToken(token); // On récupère l'id du user
+
+    // Tu peux retrouver l'utilisateur si nécessaire
+    const user = await User.findByPk(payload.id);
+
+    if (!user) {
+      return next(new JsonWebTokenError("Utilisateur non trouvé"));
+    }
+
+    // Regénère un nouvel access token
+    const newAccessToken = generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
+      "15m",
+    );
+
+    res.status(200).json({ token: newAccessToken });
   },
 };

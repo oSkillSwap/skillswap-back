@@ -639,3 +639,5 @@ userRouter.patch(
   validate(updatePasswordSchema),
   userController.updatePassword,
 );
+
+userRouter.post("/refresh-token", controllerwrapper(userController.refreshToken));

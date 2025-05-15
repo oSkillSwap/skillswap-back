@@ -6,6 +6,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
+import cookieParser from "cookie-parser";
 import { router } from "./app/routers/router.js";
 import messageSocketHandlers from "./app/sockets/message.socket.js";
 
@@ -29,7 +30,7 @@ const corsOptions = {
     "https://localhost:5173",
     "https://skillswap.vercel.app",
     "https://localhost:3000",
-    "http://localhost:300",
+    "http://localhost:3000",
   ],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   credentials: true,
@@ -66,6 +67,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: t
 
 // Router
 app.use("/api", router);
+
+app.use(cookieParser());
 
 // Socket.IO integration
 const httpServer = createServer(app);

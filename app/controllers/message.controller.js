@@ -94,7 +94,7 @@ export const messageController = {
       return next(new ForbiddenError("Impossible d'envoyer un message à soi-même"));
     }
 
-    if (sender.id === userIdOrUsername) {
+    if (Number(sender.id) === Number(userIdOrUsername)) {
       return next(new ForbiddenError("Impossible d'envoyer un message à soi-même"));
     }
 
