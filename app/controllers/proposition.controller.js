@@ -44,7 +44,6 @@ export const propositionController = {
   getUserSentPropositions: async (req, res, next) => {
     const user = req.user;
     if (!user) return next(new UnauthorizedError("Utilisateur non authentifié"));
-
     const propositions = await Proposition.findAll({
       where: { sender_id: user.id },
       include: [
@@ -74,9 +73,21 @@ export const propositionController = {
           model: Review,
           required: false,
           attributes: ["grade", "content", "user_id", "reviewed_id"],
+          include: {
+            association: "Reviewer", // 👈 essentiel pour GROUP BY
+            attributes: ["id", "username", "avatar"],
+          },
         },
       ],
-      group: ["Proposition.id", "Receiver.id", "Post.id", "Post->SkillWanted.id"],
+      group: [
+        "Proposition.id",
+        "Receiver.id",
+        "Post.id",
+        "Post->SkillWanted.id",
+        "Review.id",
+        "Review->Reviewer.id", // 👈 nécessaire avec include Reviewer
+      ],
+      order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({ propositions });
