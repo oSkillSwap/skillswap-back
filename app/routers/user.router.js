@@ -4,11 +4,14 @@ import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validateParams } from "../middlewares/validateParams.js";
 import { validate } from "../middlewares/validates.js";
+import multer from "multer";
 import {
   loginSchema,
   registerSchema,
   updatePasswordSchema,
   updateUserSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from "../schemas/user.schema.js";
 
 export const userRouter = Router();
@@ -641,3 +644,23 @@ userRouter.patch(
 );
 
 userRouter.post("/refresh-token", controllerwrapper(userController.refreshToken));
+
+userRouter.post(
+  "/auth/forgot-password",
+  validate(forgotPasswordSchema),
+  controllerwrapper(userController.forgotPassword),
+);
+
+userRouter.post(
+  "/auth/reset-password/:token",
+  validate(resetPasswordSchema),
+  controllerwrapper(userController.resetPassword),
+);
+
+const upload = multer({ dest: "uploads/" });
+userRouter.patch(
+  "/me/avatar",
+  authenticate,
+  upload.single("avatar"),
+  controllerwrapper(userController.uploadAvatar),
+);
