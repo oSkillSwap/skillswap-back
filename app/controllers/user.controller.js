@@ -549,29 +549,44 @@ export const userController = {
   },
 
   uploadAvatar: async (req, res, next) => {
-    const user = await User.findByPk(req.user.id);
-    if (!user) {
-      return next(new NotFoundError("Utilisateur non trouvé"));
+    try {
+      const user = await User.findByPk(req.user.id);
+      if (!user) {
+        return next(new NotFoundError("Utilisateur non trouvé"));
+      }
+
+      if (!req.file) {
+        return next(new BadRequestError("Aucun fichier envoyé"));
+      }
+
+      const inputPath = req.file.path;
+      const filename = req.file.filename;
+      const webpFilename = `${filename}.webp`;
+      const outputPath = path.join("uploads", webpFilename);
+
+      // Convert in WebP
+      await sharp(inputPath).resize(300, 300).webp({ quality: 80 }).toFile(outputPath);
+
+      // Delete temporary original file
+      await fs.unlink(inputPath);
+
+      // Delete old Image ( /uploads/)
+      if (user.avatar?.startsWith("/uploads/")) {
+        const oldAvatarPath = path.join("uploads", path.basename(user.avatar));
+        try {
+          await fs.unlink(oldAvatarPath);
+        } catch (err) {
+          console.warn(`Fichier ancien avatar introuvable : ${oldAvatarPath}`);
+        }
+      }
+
+      // Update User
+      const avatarUrl = `/uploads/${webpFilename}`;
+      await user.update({ avatar: avatarUrl });
+
+      return res.status(200).json({ avatar: avatarUrl });
+    } catch (err) {
+      return next(err);
     }
-
-    if (!req.file) {
-      return next(new BadRequestError("Aucun fichier envoyé"));
-    }
-
-    const inputPath = req.file.path; // original file
-    const filename = req.file.filename;
-    const webpFilename = `${filename}.webp`;
-    const outputPath = path.join("uploads", webpFilename);
-
-    // Webp Conversion
-    await sharp(inputPath).resize(300, 300).webp({ quality: 80 }).toFile(outputPath);
-
-    // Delete original file
-    await fs.unlink(inputPath);
-
-    const avatarUrl = `/uploads/${webpFilename}`;
-    await user.update({ avatar: avatarUrl });
-
-    return res.status(200).json({ avatar: avatarUrl });
   },
 };

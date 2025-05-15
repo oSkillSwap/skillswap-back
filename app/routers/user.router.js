@@ -2,9 +2,8 @@ import { Router } from "express";
 import { userController } from "../controllers/user.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
-import { validateParams } from "../middlewares/validateParams.js";
+import { uploadAvatar } from "../middlewares/upload.middleware.js";
 import { validate } from "../middlewares/validates.js";
-import multer from "multer";
 import {
   loginSchema,
   registerSchema,
@@ -657,10 +656,9 @@ userRouter.post(
   controllerwrapper(userController.resetPassword),
 );
 
-const upload = multer({ dest: "uploads/" });
 userRouter.patch(
   "/me/avatar",
   authenticate,
-  upload.single("avatar"),
+  uploadAvatar.single("avatar"),
   controllerwrapper(userController.uploadAvatar),
 );

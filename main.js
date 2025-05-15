@@ -87,6 +87,13 @@ const io = new Server(httpServer, {
 // Socket.IO server logic
 messageSocketHandlers(io);
 
+app.use((err, req, res, next) => {
+  if (err.message.includes("Seuls les fichiers images")) {
+    return res.status(400).json({ message: err.message });
+  }
+  next(err);
+});
+
 // Server launch
 const port = process.env.PORT || 3000;
 httpServer.listen(port, () => {
