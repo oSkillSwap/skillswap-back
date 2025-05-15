@@ -78,7 +78,7 @@ export const userController = {
         username: user.username,
         role: user.role,
       },
-      "1m",
+      "15m",
     );
 
     // Refresh token (7 jours)
@@ -460,7 +460,7 @@ export const userController = {
         username: user.username,
         role: user.role,
       },
-      "1m",
+      "15m",
     );
 
     res.status(200).json({ token: newAccessToken });
