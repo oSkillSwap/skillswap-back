@@ -196,27 +196,54 @@ export const propositionController = {
         {
           model: Post,
           attributes: ["id", "title", "content", "createdAt", "user_id"],
-          include: {
-            association: "SkillWanted",
-          },
+          include: { association: "SkillWanted" },
         },
         {
           association: "Sender",
-          attributes: ["id", "username", "avatar"],
+          attributes: [
+            "id",
+            "username",
+            "avatar",
+            [Sequelize.fn("AVG", Sequelize.col("Sender->Reviews.grade")), "averageGrade"],
+            [Sequelize.fn("COUNT", Sequelize.col("Sender->Reviews.grade")), "nbOfReviews"],
+          ],
+          include: {
+            association: "Reviews",
+            attributes: [],
+          },
         },
         {
           association: "Receiver",
-          attributes: ["id", "username", "avatar"],
+          attributes: [
+            "id",
+            "username",
+            "avatar",
+            [Sequelize.fn("AVG", Sequelize.col("Receiver->Reviews.grade")), "averageGrade"],
+            [Sequelize.fn("COUNT", Sequelize.col("Receiver->Reviews.grade")), "nbOfReviews"],
+          ],
+          include: {
+            association: "Reviews",
+            attributes: [],
+          },
         },
         {
           model: Review,
           required: false,
-          attributes: ["id", "grade", "content"],
+          attributes: ["id", "grade", "content", "user_id", "reviewed_id"],
           include: {
             association: "Reviewer",
             attributes: ["id", "username", "avatar"],
           },
         },
+      ],
+      group: [
+        "Proposition.id",
+        "Sender.id",
+        "Receiver.id",
+        "Post.id",
+        "Post->SkillWanted.id",
+        "Review.id",
+        "Review->Reviewer.id",
       ],
       order: [["createdAt", "DESC"]],
     });
