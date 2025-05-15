@@ -1,5 +1,6 @@
 import { JsonWebTokenError } from "../errors/jsonwebtoken-error.js";
 import { verifyToken } from "../helpers/jwt.js";
+import { User } from "../models/associations.js";
 
 // Middleware to protect routes using JWT
 export const authenticate = (req, res, next) => {

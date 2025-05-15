@@ -100,8 +100,9 @@ describe("User module", () => {
     });
 
     test("Quand un utilisateur est authentifié, qu'il ne suit pas la cible et qu'elle existe, l'opération doit réussir", async () => {
+      const mockUser = { id: 2, username: "targetUser" }; // cible à suivre
       const mockLoggedUser = {
-        id: 2,
+        id: 1,
         hasFollows: jest.fn().mockResolvedValue(false),
         addFollows: jest.fn().mockResolvedValue(true),
       };
@@ -110,7 +111,7 @@ describe("User module", () => {
       User.findByPk.mockResolvedValueOnce(mockLoggedUser);
 
       const req = {
-        params: { userId: 2 },
+        params: { userIdOrUsername: 2 },
         user: { id: 1 },
       };
 

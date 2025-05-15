@@ -2,9 +2,10 @@ import argon2 from "argon2";
 import { Op, Sequelize } from "sequelize";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ConflictError } from "../errors/conflict-error.js";
+import { JsonWebTokenError } from "../errors/jsonwebtoken-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
-import { generateToken } from "../helpers/jwt.js";
+import { generateToken, verifyToken } from "../helpers/jwt.js";
 import { Availability, Category, Review, User } from "../models/associations.js";
 
 export const userController = {
@@ -69,23 +70,41 @@ export const userController = {
       return next(new UnauthorizedError("Identifiants incorrects"));
     }
 
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-    });
-
-    res.status(200).json({
-      message: "Connexion réussie",
-      token,
-      user: {
+    // Access token (15 minutes)
+    const accessToken = generateToken(
+      {
         id: user.id,
-        username: user.username,
         email: user.email,
-        avatar: user.avatar,
+        username: user.username,
+        role: user.role,
       },
-    });
+      "1m",
+    );
+
+    // Refresh token (7 jours)
+    const refreshToken = generateToken(
+      { id: user.id, email: user.email, username: user.username, role: user.role },
+      "7d",
+    );
+
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true, // true if using https
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      })
+      .status(200)
+      .json({
+        message: "Connexion réussie",
+        token: accessToken,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+        },
+      });
   },
 
   getUsers: async (req, res, next) => {
@@ -415,5 +434,35 @@ export const userController = {
     return res.status(200).json({
       message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
     });
+  },
+  refreshToken: async (req, res, next) => {
+    const token = req.cookies.refreshToken;
+
+    console.log("refresh token", token);
+
+    if (!token) {
+      return next(new JsonWebTokenError("Refresh token manquant"));
+    }
+    const payload = verifyToken(token); // On récupère l'id du user
+
+    // Tu peux retrouver l'utilisateur si nécessaire
+    const user = await User.findByPk(payload.id);
+
+    if (!user) {
+      return next(new JsonWebTokenError("Utilisateur non trouvé"));
+    }
+
+    // Regénère un nouvel access token
+    const newAccessToken = generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
+      "1m",
+    );
+
+    res.status(200).json({ token: newAccessToken });
   },
 };

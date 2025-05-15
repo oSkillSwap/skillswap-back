@@ -6,6 +6,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
+import cookieParser from "cookie-parser";
 import { router } from "./app/routers/router.js";
 import messageSocketHandlers from "./app/sockets/message.socket.js";
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // CORS config
 const corsOptions = {
