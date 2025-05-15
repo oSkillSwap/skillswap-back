@@ -46,9 +46,7 @@ export const reviewController = {
     }
 
     const reviews = await Review.findAll({
-      where: {
-        user_id: user.id,
-      },
+      where: { reviewed_id: user.id },
       include: [
         {
           association: "Reviewer",
@@ -135,29 +133,12 @@ export const reviewController = {
         proposition_id: proposition.id,
       },
     });
-
-    if (existingReview) {
-      return next(
-        new ForbiddenError(
-          "Vous avez déjà laissé un avis pour cette annonce et cette proposition.",
-        ),
-      );
-    }
-
-    const existingReviewForUser = await Review.findOne({
-      where: {
-        user_id: userId,
-      },
-      include: {
-        model: Proposition,
-        required: true,
-        where: {
-          sender_id: reviewedId,
-        },
-      },
+    console.log("Recherche de review pour", {
+      user_id: userId,
+      proposition_id: proposition.id,
     });
 
-    if (existingReviewForUser) {
+    if (existingReview) {
       return next(new ForbiddenError("Vous avez déjà laissé un avis pour cet utilisateur."));
     }
 

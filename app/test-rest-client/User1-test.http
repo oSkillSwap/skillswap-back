@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZXJ3YW5ubm5AZ21haWwuY29tIiwidXNlcm5hbWUiOiJFcndhbm5ubm4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjE0NjUxLCJleHAiOjE3NDcyMjE4NTF9.7sVS8MIdxrPRyFgTwjHqx1xcMo6QLZF4zUH9T6JfwlE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjMyMzAwLCJleHAiOjE3NDcyMzk1MDB9.ykHAbfccXyDA-dh2nka_My3kPBUbghCZykBHGolxUUQ
 // ID User: 11
 
 ### Register a user
@@ -20,7 +20,7 @@ POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
-  "email": "erwannnn@gmail.com",
+  "email": "erwann@gmail.com",
   "password": "ErwanMettouchi1+"
 }
 

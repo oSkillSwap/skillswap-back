@@ -4,7 +4,7 @@ import { ConflictError } from "../errors/conflict-error.js";
 import { ForbiddenError } from "../errors/forbidden-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
-import { Post, Proposition, User } from "../models/associations.js";
+import { Post, Proposition, User, Review } from "../models/associations.js";
 
 export const propositionController = {
   // Get all user's proposition
@@ -44,7 +44,6 @@ export const propositionController = {
   getUserSentPropositions: async (req, res, next) => {
     const user = req.user;
     if (!user) return next(new UnauthorizedError("Utilisateur non authentifié"));
-
     const propositions = await Proposition.findAll({
       where: { sender_id: user.id },
       include: [
@@ -70,8 +69,25 @@ export const propositionController = {
             association: "SkillWanted",
           },
         },
+        {
+          model: Review,
+          required: false,
+          attributes: ["grade", "content", "user_id", "reviewed_id"],
+          include: {
+            association: "Reviewer", // 👈 essentiel pour GROUP BY
+            attributes: ["id", "username", "avatar"],
+          },
+        },
       ],
-      group: ["Proposition.id", "Receiver.id", "Post.id", "Post->SkillWanted.id"],
+      group: [
+        "Proposition.id",
+        "Receiver.id",
+        "Post.id",
+        "Post->SkillWanted.id",
+        "Review.id",
+        "Review->Reviewer.id", // 👈 nécessaire avec include Reviewer
+      ],
+      order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({ propositions });
@@ -191,23 +207,64 @@ export const propositionController = {
         {
           model: Post,
           attributes: ["id", "title", "content", "createdAt", "user_id"],
-          include: {
-            association: "SkillWanted",
-          },
+          include: { association: "SkillWanted" },
         },
         {
           association: "Sender",
-          attributes: ["id", "username", "avatar"],
+          attributes: [
+            "id",
+            "username",
+            "avatar",
+            [Sequelize.fn("AVG", Sequelize.col("Sender->Reviews.grade")), "averageGrade"],
+            [Sequelize.fn("COUNT", Sequelize.col("Sender->Reviews.grade")), "nbOfReviews"],
+          ],
+          include: {
+            association: "Reviews",
+            attributes: [],
+          },
         },
         {
           association: "Receiver",
-          attributes: ["id", "username", "avatar"],
+          attributes: [
+            "id",
+            "username",
+            "avatar",
+            [Sequelize.fn("AVG", Sequelize.col("Receiver->Reviews.grade")), "averageGrade"],
+            [Sequelize.fn("COUNT", Sequelize.col("Receiver->Reviews.grade")), "nbOfReviews"],
+          ],
+          include: {
+            association: "Reviews",
+            attributes: [],
+          },
         },
+        {
+          model: Review,
+          required: false,
+          attributes: ["id", "grade", "content", "user_id", "reviewed_id"],
+          include: {
+            association: "Reviewer",
+            attributes: ["id", "username", "avatar"],
+          },
+        },
+      ],
+      group: [
+        "Proposition.id",
+        "Sender.id",
+        "Receiver.id",
+        "Post.id",
+        "Post->SkillWanted.id",
+        "Review.id",
+        "Review->Reviewer.id",
       ],
       order: [["createdAt", "DESC"]],
     });
 
-    return res.status(200).json({ propositions });
+    const enriched = propositions.map((p) => ({
+      ...p.toJSON(),
+      hasReviewByOwner: p.Review?.Reviewer?.id === p.Post.user_id,
+    }));
+
+    return res.status(200).json({ propositions: enriched });
   },
 
   finishProposition: async (req, res, next) => {
