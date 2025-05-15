@@ -89,8 +89,8 @@ export const userController = {
     res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false, // true if using https
-        sameSite: "Lax",
+        secure: true, // true if using https
+        sameSite: "Strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       })
       .status(200)
