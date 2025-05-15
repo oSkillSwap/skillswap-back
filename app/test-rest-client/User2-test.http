@@ -1,4 +1,4 @@
-@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjEwMTA5LCJleHAiOjE3NDcyMTczMDl9.BVIxBojtgo8_8f3pqed6WXSf91biXw_DXyK75rIX-sA
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiZ3JlZ29yeUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6IkdyZWdvcnkiLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3Mjc1NzQ1LCJleHAiOjE3NDcyNzY2NDV9.j0RqMpH_OEPKhyCBXQkJSyhlj4lRamVQIz2C3A3KeJM
 // ID: 12
 
 ### Register a user
@@ -37,7 +37,7 @@ Authorization: Bearer {{token2}}
 
 ###GET all my messages
 GET http://localhost:3000/api/me/messages
-Authorization: Bearer  {{token2}}
+Authorization: Bearer {{token2}}
 
 ###GET messages with user
 GET http://localhost:3000/api/me/messages/Erwan
@@ -160,3 +160,7 @@ Authorization: Bearer {{token2}}
 ###
 DELETE http://localhost:3000/api/me/follow/12
 Authorization: Bearer {{token2}}
+
+
+### GET avalabilities
+POST http://localhost:3000/api/refresh-token 

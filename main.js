@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // CORS config
 const corsOptions = {
@@ -67,8 +68,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: t
 
 // Router
 app.use("/api", router);
-
-app.use(cookieParser());
 
 // Socket.IO integration
 const httpServer = createServer(app);

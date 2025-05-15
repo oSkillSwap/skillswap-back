@@ -2,9 +2,10 @@ import argon2 from "argon2";
 import { Op, Sequelize } from "sequelize";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ConflictError } from "../errors/conflict-error.js";
+import { JsonWebTokenError } from "../errors/jsonwebtoken-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
-import { generateToken } from "../helpers/jwt.js";
+import { generateToken, verifyToken } from "../helpers/jwt.js";
 import { Availability, Category, Review, User } from "../models/associations.js";
 
 export const userController = {
@@ -90,7 +91,6 @@ export const userController = {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true, // true if using https
-        sameSite: "Strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       })
       .status(200)
@@ -436,6 +436,8 @@ export const userController = {
   },
   refreshToken: async (req, res, next) => {
     const token = req.cookies.refreshToken;
+
+    console.log("refresh token", token);
 
     if (!token) {
       return next(new JsonWebTokenError("Refresh token manquant"));
