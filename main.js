@@ -39,8 +39,7 @@ const corsOptions = {
     "https://localhost:5173",
     "http://localhost:3000",
     "https://localhost:3000",
-    "http://18.185.123.233",
-    "https://18.185.123.233",
+    "https://skillswap.olivier-renard.com",
   ],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   credentials: true,
@@ -73,10 +72,10 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
 
 // Router
-app.use("/api", router);
+app.use("/", router);
 
 // Socket.IO integration
 const httpServer = createServer(app);
