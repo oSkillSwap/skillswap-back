@@ -125,3 +125,33 @@ export const updatePasswordSchema = z.object({
       message: "Un caractère spécial requis",
     }),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Email invalide").trim(),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+      .regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+      .regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+      .regex(/[0-9]/, { message: "Un chiffre requis" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Un caractère spécial requis",
+      }),
+    confirmPassword: z
+      .string()
+      .min(8, { message: "Le mot de passe doit faire au moins 8 caractères" })
+      .regex(/[a-z]/, { message: "Une lettre minuscule requise" })
+      .regex(/[A-Z]/, { message: "Une lettre majuscule requise" })
+      .regex(/[0-9]/, { message: "Un chiffre requis" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Un caractère spécial requis",
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });

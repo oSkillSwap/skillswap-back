@@ -7,8 +7,56 @@ import { NotFoundError } from "../errors/not-found-error.js";
 import { UnauthorizedError } from "../errors/unauthorized-error.js";
 import { generateToken, verifyToken } from "../helpers/jwt.js";
 import { Availability, Category, Review, User } from "../models/associations.js";
+import crypto from "crypto";
+import { transporter } from "../helpers/mail.js";
+import sharp from "sharp";
+import path from "node:path";
+import fs from "node:fs/promises";
+
+async function sendResetEmail(to, resetUrl) {
+  await transporter.sendMail({
+    from: '"SkillSwap" <virmaud.gregory@gmail.com>',
+    to,
+    subject: "Réinitialisation de votre mot de passe",
+    html: `
+      <p>Bonjour,</p>
+      <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez ci-dessous :</p>
+      <a href="${resetUrl}">${resetUrl}</a>
+      <p>Ce lien expirera dans 1 heure.</p>
+      <p>Si vous n'avez rien demandé, ignorez simplement ce message.</p>
+    `,
+  });
+}
 
 export const userController = {
+  forgotPassword: async (req, res, next) => {
+    const { email } = req.validatedData;
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(200).json({
+        message: "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé.",
+      });
+    }
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1h
+
+    await user.update({
+      reset_token: resetToken,
+      reset_token_expires: expires,
+    });
+
+    const resetUrl = `http://localhost:5173/reset-password/${rawToken}`;
+    await sendResetEmail(user.email, resetUrl);
+
+    return res.status(200).json({
+      message: "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé.",
+    });
+  },
+
   register: async (req, res, next) => {
     const users = await User.findAll();
 
@@ -435,6 +483,7 @@ export const userController = {
       message: `Vous ne suivez plus l'utilisateur ${targetUser.username}`,
     });
   },
+
   refreshToken: async (req, res, next) => {
     const token = req.cookies.refreshToken;
 
@@ -460,9 +509,84 @@ export const userController = {
         username: user.username,
         role: user.role,
       },
-      "1m",
+      "15m",
     );
 
     res.status(200).json({ token: newAccessToken });
+  },
+
+  resetPassword: async (req, res, next) => {
+    const { password, confirmPassword } = req.validatedData;
+    const { token } = req.params;
+
+    if (password !== confirmPassword) {
+      return next(new BadRequestError("Les mots de passe ne correspondent pas"));
+    }
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      where: {
+        reset_token: hashedToken,
+        reset_token_expires: {
+          [Op.gt]: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      return next(new BadRequestError("Lien invalide ou expiré"));
+    }
+
+    const hashedNewPassword = await argon2.hash(password);
+    await user.update({
+      password: hashedNewPassword,
+      reset_token: null,
+      reset_token_expires: null,
+    });
+
+    return res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
+  },
+
+  uploadAvatar: async (req, res, next) => {
+    try {
+      const user = await User.findByPk(req.user.id);
+      if (!user) {
+        return next(new NotFoundError("Utilisateur non trouvé"));
+      }
+
+      if (!req.file) {
+        return next(new BadRequestError("Aucun fichier envoyé"));
+      }
+
+      const inputPath = req.file.path;
+      const filename = req.file.filename;
+      const webpFilename = `${filename}.webp`;
+      const outputPath = path.join("uploads", webpFilename);
+
+      // Convert in WebP
+      await sharp(inputPath).resize(300, 300).webp({ quality: 80 }).toFile(outputPath);
+
+      // Delete temporary original file
+      await fs.unlink(inputPath);
+
+      // Delete old Image ( /uploads/)
+      if (user.avatar?.startsWith("/uploads/")) {
+        const oldAvatarPath = path.join("uploads", path.basename(user.avatar));
+        try {
+          await fs.unlink(oldAvatarPath);
+        } catch (err) {
+          console.warn(`Fichier ancien avatar introuvable : ${oldAvatarPath}`);
+        }
+      }
+
+      // Update User
+      const avatarUrl = `/uploads/${webpFilename}`;
+      await user.update({ avatar: avatarUrl });
+
+      return res.status(200).json({ avatar: avatarUrl });
+    } catch (err) {
+      return next(err);
+    }
   },
 };

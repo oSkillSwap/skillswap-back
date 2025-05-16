@@ -46,9 +46,17 @@ User.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    reset_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    reset_token_expires: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,
     tableName: "user",
-  }
+  },
 );

@@ -21,5 +21,4 @@ router.use(categoryRouter);
 router.use(availabilityRouter);
 router.use(propositionRouter);
 router.use(adminRouter);
-
 router.use(errorMiddleware);

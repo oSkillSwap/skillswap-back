@@ -2,13 +2,15 @@ import { Router } from "express";
 import { userController } from "../controllers/user.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
-import { validateParams } from "../middlewares/validateParams.js";
+import { uploadAvatar } from "../middlewares/upload.middleware.js";
 import { validate } from "../middlewares/validates.js";
 import {
   loginSchema,
   registerSchema,
   updatePasswordSchema,
   updateUserSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from "../schemas/user.schema.js";
 
 export const userRouter = Router();
@@ -641,3 +643,22 @@ userRouter.patch(
 );
 
 userRouter.post("/refresh-token", controllerwrapper(userController.refreshToken));
+
+userRouter.post(
+  "/auth/forgot-password",
+  validate(forgotPasswordSchema),
+  controllerwrapper(userController.forgotPassword),
+);
+
+userRouter.post(
+  "/auth/reset-password/:token",
+  validate(resetPasswordSchema),
+  controllerwrapper(userController.resetPassword),
+);
+
+userRouter.patch(
+  "/me/avatar",
+  authenticate,
+  uploadAvatar.single("avatar"),
+  controllerwrapper(userController.uploadAvatar),
+);

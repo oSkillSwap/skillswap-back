@@ -20,6 +20,14 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static("uploads"),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -78,6 +86,13 @@ const io = new Server(httpServer, {
 
 // Socket.IO server logic
 messageSocketHandlers(io);
+
+app.use((err, req, res, next) => {
+  if (err.message.includes("Seuls les fichiers images")) {
+    return res.status(400).json({ message: err.message });
+  }
+  next(err);
+});
 
 // Server launch
 const port = process.env.PORT || 3000;
