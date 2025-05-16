@@ -1,12 +1,19 @@
 import multer from "multer";
 import path from "node:path";
+import fs from "node:fs";
 
+// S'assurer que le dossier tmp/ existe
+const tmpDir = path.join("tmp");
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir);
+}
+
+// Multer utilise tmp/ comme dossier temporaire
 const storage = multer.diskStorage({
-  destination: "uploads/",
+  destination: "tmp/",
   filename: (req, file, cb) => {
-    // Format: avatar-userId-timestamp.webp
     const ext = path.extname(file.originalname);
-    const uniqueName = `avatar-${req.user?.id}-${Date.now()}${ext}`;
+    const uniqueName = `temp-${req.user?.id}-${Date.now()}${ext}`;
     cb(null, uniqueName);
   },
 });
