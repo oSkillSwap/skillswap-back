@@ -1,4 +1,5 @@
 import argon2 from "argon2";
+import { v4 as uuidv4 } from "uuid";
 import { Op, Sequelize } from "sequelize";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { ConflictError } from "../errors/conflict-error.js";
@@ -27,6 +28,17 @@ async function sendResetEmail(to, resetUrl) {
     `,
   });
 }
+
+const deleteFileSafely = async (filePath) => {
+  try {
+    await new Promise((res) => setTimeout(res, 100));
+    await fs.unlink(filePath);
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      console.error(`Erreur suppression fichier : ${filePath}`, err);
+    }
+  }
+};
 
 export const userController = {
   forgotPassword: async (req, res, next) => {
@@ -551,37 +563,26 @@ export const userController = {
   uploadAvatar: async (req, res, next) => {
     try {
       const user = await User.findByPk(req.user.id);
-      if (!user) {
-        return next(new NotFoundError("Utilisateur non trouvé"));
-      }
+      if (!user) return next(new NotFoundError("Utilisateur non trouvé"));
+      if (!req.file) return next(new BadRequestError("Aucun fichier envoyé"));
 
-      if (!req.file) {
-        return next(new BadRequestError("Aucun fichier envoyé"));
-      }
-
-      const inputPath = req.file.path;
-      const filename = req.file.filename;
-      const webpFilename = `${filename}.webp`;
+      const uniqueId = uuidv4();
+      const webpFilename = `avatar-${user.id}-${uniqueId}.webp`;
       const outputPath = path.join("uploads", webpFilename);
 
-      // Convert in WebP
-      await sharp(inputPath).resize(300, 300).webp({ quality: 80 }).toFile(outputPath);
+      // Conversion vers WebP
+      await sharp(req.file.path).resize(300, 300).webp({ quality: 80 }).toFile(outputPath);
 
-      // Delete temporary original file
-      await fs.unlink(inputPath);
+      // Supprimer le fichier temporaire (ex: temp-12-xxxx.jpg)
+      await deleteFileSafely(req.file.path);
 
-      // Delete old Image ( /uploads/)
-      if (user.avatar?.startsWith("/uploads/")) {
-        const oldAvatarPath = path.join("uploads", path.basename(user.avatar));
-        try {
-          await fs.unlink(oldAvatarPath);
-        } catch (err) {
-          console.warn(`Fichier ancien avatar introuvable : ${oldAvatarPath}`);
-        }
+      // Supprimer l'ancien avatar .webp s'il existe
+      if (user.avatar?.includes("/uploads/")) {
+        const oldFile = path.join("uploads", path.basename(user.avatar));
+        await deleteFileSafely(oldFile);
       }
 
-      // Update User
-      const avatarUrl = `/uploads/${webpFilename}`;
+      const avatarUrl = `${process.env.BASE_URL}/uploads/${webpFilename}`;
       await user.update({ avatar: avatarUrl });
 
       return res.status(200).json({ avatar: avatarUrl });
