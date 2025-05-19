@@ -265,7 +265,4 @@ export const adminController = {
 
     return res.status(200).json({ message: "Catégorie supprimée avec succès" });
   },
-  // TODO => UPDATE & CREATE & DELETE CATEGORIES
-  // 		=> UPDATE & DELETE POST
-  // 		=> UPDATE & CREATE & DELETE COMPETENCES
 };

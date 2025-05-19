@@ -31,7 +31,10 @@ export const updateUserAdminSchema = z.object({
     .optional()
     .transform((val) => (val ? sanitizeHtml(val.trim()) : undefined)),
 
-  avatar: z.string().optional(),
+  avatar: z
+    .string()
+    .optional()
+    .transform((val) => (val?.trim() === "" ? undefined : val?.trim())),
 
   description: z
     .string()
