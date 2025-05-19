@@ -1,6 +1,6 @@
 {
   "name": "skillswap-back",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Backend api SkillSwap",
   "main": "main.js",
   "scripts": {
