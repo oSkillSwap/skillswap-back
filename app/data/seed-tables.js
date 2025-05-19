@@ -16,19 +16,29 @@ await sequelize.sync({ force: true });
 console.log("\u{1F4BE} Base synchronisée, début du seed...");
 
 // ----------------------
-// 1. CRÉATION DES CATÉGORIES ET COMPÉTENCES
+// 1. CATÉGORIES & COMPÉTENCES AVEC ICÔNES LUCIDE
 // ----------------------
 const categoryData = [
-  { name: "Informatique", skills: ["Mac", "Linux", "Windows", "Android", "Iphone"] },
+  {
+    name: "Informatique",
+    icon: "MonitorSmartphone",
+    skills: ["Mac", "Linux", "Windows", "Android", "iPhone"],
+  },
   {
     name: "Programmation",
-    skills: ["JS", "Python", "PHP", "NodeJS", "NGNIX", "Appache", "Wordpress"],
+    icon: "Code2",
+    skills: ["JS", "Python", "PHP", "NodeJS", "NGINX", "Apache", "WordPress"],
   },
-  { name: "Développement personnel", skills: ["Respiration", "Yoga"] },
   {
-    name: "Langues Etrangères",
+    name: "Développement personnel",
+    icon: "HeartPulse",
+    skills: ["Respiration", "Yoga"],
+  },
+  {
+    name: "Langues Étrangères",
+    icon: "Languages",
     skills: [
-      "Francais",
+      "Français",
       "Anglais",
       "Italien",
       "Espagnol",
@@ -36,11 +46,19 @@ const categoryData = [
       "Mandarin",
       "Arabe",
       "Russe",
-      "Japonnais",
+      "Japonais",
     ],
   },
-  { name: "Bricolage", skills: ["Maconnerie", "Electricité", "Plomberie"] },
-  { name: "Scolaire", skills: ["Maths", "Géographie", "Histoire", "Physique", "Philo"] },
+  {
+    name: "Bricolage",
+    icon: "Hammer",
+    skills: ["Maçonnerie", "Électricité", "Plomberie"],
+  },
+  {
+    name: "Scolaire",
+    icon: "GraduationCap",
+    skills: ["Maths", "Géographie", "Histoire", "Physique", "Philo"],
+  },
 ];
 
 const categories = [];
@@ -49,7 +67,7 @@ const skills = [];
 for (const cat of categoryData) {
   const category = await Category.create({
     name: cat.name,
-    icon: faker.image.avatar(),
+    icon: cat.icon,
   });
   categories.push(category);
 
@@ -79,23 +97,32 @@ for (const jour of jours) {
 // 3. UTILISATEURS
 // ----------------------
 const memberPasswordHash = await argon2.hash("Password1+");
-const adminPasswordHash = await argon2.hash("AdminSkillswap1+");
+const adminPasswordHash = await argon2.hash("SwAdmin1+");
 
 const firstNames = ["Emma", "Léo", "Noah", "Mia", "Lucas", "Jade", "Hugo", "Lina", "Liam", "Chloé"];
+
+const femaleNames = ["Emma", "Mia", "Jade", "Lina", "Chloé"];
 const users = [];
 
 for (let i = 0; i < firstNames.length; i++) {
   const name = firstNames[i];
+  const isFemale = femaleNames.includes(name);
+
+  // Utilisation de randomuser.me pour des avatars réalistes
+  const avatarIndex = faker.number.int({ min: 1, max: 99 }); // 1 à 99 disponibles
+  const avatar = `https://randomuser.me/api/portraits/${isFemale ? "women" : "men"}/${avatarIndex}.jpg`;
+
   const user = await User.create({
     username: name.toLowerCase(),
-    lastName: faker.name.lastName(),
+    lastName: faker.person.lastName(),
     firstName: name,
     email: `${name.toLowerCase()}@mail.com`,
     password: memberPasswordHash,
     role: "member",
-    avatar: faker.image.avatar(),
+    avatar,
     description: faker.lorem.sentence(),
   });
+
   users.push(user);
   await user.addSkills(faker.helpers.shuffle(skills).slice(0, 2));
   await user.addWantedSkills(faker.helpers.shuffle(skills).slice(0, 2));
@@ -104,14 +131,14 @@ for (let i = 0; i < firstNames.length; i++) {
 
 // Admin
 await User.create({
-  username: "GregAdmin&8",
-  lastName: "Virmaud",
-  firstName: "Gregory",
-  email: "virmaud.gregory@gmail.com",
+  username: "AdminSkillSwap",
+  lastName: "Admin",
+  firstName: "Skillswap",
+  email: "skillswap@mail.com",
   password: adminPasswordHash,
   role: "admin",
-  avatar: faker.image.avatar(),
-  description: "Administrateur de la plateforme",
+  avatar: "https://randomuser.me/api/portraits/men/0.jpg",
+  description: "Administrateur de la plateforme SkillSwap",
 });
 
 // ----------------------
@@ -145,7 +172,7 @@ for (const user of users) {
 }
 
 // ----------------------
-// 6. PROPOSITIONS + ÉCHANGES TERMINÉS + REVIEWS
+// 6. PROPOSITIONS + REVIEWS
 // ----------------------
 const propositions = [];
 for (const post of posts) {
@@ -165,7 +192,6 @@ for (const post of posts) {
     });
     propositions.push(prop);
 
-    // Si acceptée et terminée, on crée une review de l'auteur du post vers le sender
     if (accepted) {
       await Review.create({
         title: faker.lorem.words(3),

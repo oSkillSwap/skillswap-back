@@ -1,9 +1,14 @@
-import { Category } from "../models/associations.js";
+import { Category, Skill } from "../models/associations.js";
 
 export const categoryController = {
   getCategories: async (req, res, next) => {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({
+      include: {
+        model: Skill,
+        attributes: ["id", "name"],
+      },
+    });
 
-    return res.status(200).json({ categories });
+    res.status(200).json({ categories });
   },
 };

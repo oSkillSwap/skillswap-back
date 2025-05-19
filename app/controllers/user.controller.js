@@ -61,7 +61,8 @@ export const userController = {
       reset_token_expires: expires,
     });
 
-    const resetUrl = `http://localhost:5173/reset-password/${rawToken}`;
+    const baseFrontendUrl = process.env.BASE_URL.replace(/\/api\/?$/, "");
+    const resetUrl = `${baseFrontendUrl}/reset-password/${rawToken}`;
     await sendResetEmail(user.email, resetUrl);
 
     return res.status(200).json({
@@ -163,6 +164,7 @@ export const userController = {
           username: user.username,
           email: user.email,
           avatar: user.avatar,
+          role: user.role,
         },
       });
   },
