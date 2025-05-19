@@ -139,7 +139,7 @@ export const userController = {
         username: user.username,
         role: user.role,
       },
-      "1m",
+      "15m",
     );
 
     // Refresh token (7 jours)
