@@ -29,3 +29,8 @@ export const updateUserSkillsSchema = z.object({
       message: "Chaque compétence doit être un identifiant entier",
     }),
 });
+
+export const updateSkillSchema = z.object({
+  name: z.string().min(1),
+  category_id: z.number().int(),
+});

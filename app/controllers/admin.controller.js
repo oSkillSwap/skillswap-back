@@ -1,13 +1,7 @@
 import { Sequelize } from "sequelize";
 import { BadRequestError } from "../errors/badrequest-error.js";
 import { NotFoundError } from "../errors/not-found-error.js";
-import {
-  Category,
-  Message,
-  Post,
-  Review,
-  User,
-} from "../models/associations.js";
+import { Category, Message, Post, Review, User, Skill } from "../models/associations.js";
 
 export const adminController = {
   getDashboard: async (req, res, next) => {
@@ -16,6 +10,7 @@ export const adminController = {
     const totalCategories = await Category.count();
 
     const latestUsers = await User.findAll({
+      where: { isBanned: false },
       limit: 5,
       order: [["createdAt", "DESC"]],
       attributes: ["id", "username", "email", "createdAt"],
@@ -44,6 +39,7 @@ export const adminController = {
 
   getUsers: async (req, res, next) => {
     const users = await User.findAll({
+      where: { isBanned: false },
       attributes: {
         exclude: ["password"],
       },
@@ -65,10 +61,7 @@ export const adminController = {
         exclude: ["password"],
         include: [
           [Sequelize.fn("AVG", Sequelize.col("Reviews.grade")), "averageGrade"],
-          [
-            Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")),
-            "nbOfReviews",
-          ],
+          [Sequelize.fn("COUNT", Sequelize.col("Reviews.grade")), "nbOfReviews"],
         ],
       },
       include: [
@@ -180,7 +173,7 @@ export const adminController = {
         } else if (msg.action === "update") {
           await Message.update(
             { content: msg.content },
-            { where: { id: msg.id, sender_id: user.id } }
+            { where: { id: msg.id, sender_id: user.id } },
           );
         }
       }
@@ -195,7 +188,7 @@ export const adminController = {
         } else if (review.action === "update") {
           await Review.update(
             { content: review.content, grade: review.grade },
-            { where: { id: review.id, user_id: user.id } }
+            { where: { id: review.id, user_id: user.id } },
           );
         }
       }
@@ -212,11 +205,30 @@ export const adminController = {
     });
   },
 
+  createCategory: async (req, res, next) => {
+    const { name, icon } = req.validatedData;
+
+    const existing = await Category.findOne({ where: { name } });
+    if (existing) {
+      return next(new ConflictError("Cette catégorie existe déjà"));
+    }
+
+    const category = await Category.create({ name, icon });
+
+    res.status(201).json({ message: "Catégorie créée", category });
+  },
+
   getCategories: async (req, res, next) => {
-    const Categories = await Category.findAll({
+    const categories = await Category.findAll({
+      include: {
+        model: Skill,
+        attributes: ["id", "name"],
+      },
       order: [["createdAt", "DESC"]],
     });
-    res.status(200).json({ Categories });
+
+    console.log("👉 Catégories avec skills :", JSON.stringify(categories, null, 2));
+    res.status(200).json({ categories });
   },
 
   updateCategories: async (req, res, next) => {

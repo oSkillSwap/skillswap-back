@@ -3,10 +3,7 @@ import { skillController } from "../controllers/skill.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { controllerwrapper } from "../middlewares/controllerwrapper.js";
 import { validate } from "../middlewares/validates.js";
-import {
-  updateUserSkillsSchema,
-  updateWantedSkillsSchema,
-} from "../schemas/skill.schema.js";
+import { updateUserSkillsSchema, updateWantedSkillsSchema } from "../schemas/skill.schema.js";
 
 export const skillRouter = Router();
 
@@ -108,7 +105,7 @@ skillRouter.put(
   "/me/wanted-skills",
   authenticate,
   validate(updateWantedSkillsSchema),
-  controllerwrapper(skillController.updateUserWantedSkills)
+  controllerwrapper(skillController.updateUserWantedSkills),
 );
 
 /**
@@ -181,5 +178,5 @@ skillRouter.patch(
   "/me/skills",
   authenticate,
   validate(updateUserSkillsSchema),
-  controllerwrapper(skillController.updateUserSkills)
+  controllerwrapper(skillController.updateUserSkills),
 );
