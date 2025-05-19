@@ -97,13 +97,21 @@ for (const jour of jours) {
 // 3. UTILISATEURS
 // ----------------------
 const memberPasswordHash = await argon2.hash("Password1+");
-const adminPasswordHash = await argon2.hash("AdminSkillswap1+");
+const adminPasswordHash = await argon2.hash("SwAdmin1+");
 
 const firstNames = ["Emma", "Léo", "Noah", "Mia", "Lucas", "Jade", "Hugo", "Lina", "Liam", "Chloé"];
+
+const femaleNames = ["Emma", "Mia", "Jade", "Lina", "Chloé"];
 const users = [];
 
 for (let i = 0; i < firstNames.length; i++) {
   const name = firstNames[i];
+  const isFemale = femaleNames.includes(name);
+
+  // Utilisation de randomuser.me pour des avatars réalistes
+  const avatarIndex = faker.number.int({ min: 1, max: 99 }); // 1 à 99 disponibles
+  const avatar = `https://randomuser.me/api/portraits/${isFemale ? "women" : "men"}/${avatarIndex}.jpg`;
+
   const user = await User.create({
     username: name.toLowerCase(),
     lastName: faker.person.lastName(),
@@ -111,9 +119,10 @@ for (let i = 0; i < firstNames.length; i++) {
     email: `${name.toLowerCase()}@mail.com`,
     password: memberPasswordHash,
     role: "member",
-    avatar: faker.image.avatar(),
+    avatar,
     description: faker.lorem.sentence(),
   });
+
   users.push(user);
   await user.addSkills(faker.helpers.shuffle(skills).slice(0, 2));
   await user.addWantedSkills(faker.helpers.shuffle(skills).slice(0, 2));
@@ -122,14 +131,14 @@ for (let i = 0; i < firstNames.length; i++) {
 
 // Admin
 await User.create({
-  username: "GregAdmin&8",
-  lastName: "Virmaud",
-  firstName: "Gregory",
-  email: "virmaud.gregory@gmail.com",
+  username: "AdminSkillSwap",
+  lastName: "Admin",
+  firstName: "Skillswap",
+  email: "skillswap@mail.com",
   password: adminPasswordHash,
   role: "admin",
-  avatar: faker.image.avatar(),
-  description: "Administrateur de la plateforme",
+  avatar: "https://randomuser.me/api/portraits/men/0.jpg",
+  description: "Administrateur de la plateforme SkillSwap",
 });
 
 // ----------------------
