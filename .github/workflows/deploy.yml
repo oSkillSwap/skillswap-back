@@ -3,7 +3,7 @@ name: 🚀 Deploy to EC2
 on:
   push:
     branches:
-      - dev # ou develop selon ta stratégie
+      - main
 
 jobs:
   deploy:
@@ -29,7 +29,8 @@ jobs:
 
             cd ${{ secrets.DEPLOY_PATH }}
             git stash
-            git pull origin dev
+            git switch main
+            git pull origin main
             npm install
             pm2 restart all
           EOF
