@@ -61,7 +61,8 @@ export const userController = {
       reset_token_expires: expires,
     });
 
-    const resetUrl = `${process.env.BASE_URL}/reset-password/${rawToken}`;
+    const baseFrontendUrl = process.env.BASE_URL.replace(/\/api\/?$/, "");
+    const resetUrl = `${baseFrontendUrl}/reset-password/${rawToken}`;
     await sendResetEmail(user.email, resetUrl);
 
     return res.status(200).json({
