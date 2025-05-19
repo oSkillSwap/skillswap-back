@@ -1,0 +1,42 @@
+
+### GET all users
+GET http://localhost:3000/api/users
+
+### GET all reviews
+GET http://localhost:3000/api/reviews
+
+###GET review by author
+GET http://localhost:3000/api/reviews/5
+
+###GET all categories
+GET http://localhost:3000/api/categories
+
+
+### GET all posts written by 1 user
+GET http://localhost:3000/api/posts/5
+
+### GET all posts
+GET http://localhost:3000/api/posts
+
+### GET follow user
+GET http://localhost:3000/api/users/follows/Erwan
+
+### GET all skills
+GET http://localhost:3000/api/skills
+
+### GET proposition
+GET http://localhost:3000/api/propositions/5
+
+### GET Unfound user
+GET http://localhost:3000/api/users/5
+
+### GET Unfound user
+GET http://localhost:3000/api/users/user3
+
+
+### GET avalabilities
+GET http://localhost:3000/api/availabilities
+
+
+### GET avalabilities
+POST http://localhost:3000/api/refresh-token 

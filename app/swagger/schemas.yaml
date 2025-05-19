@@ -1,0 +1,669 @@
+openapi: 3.0.0
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+        lastName:
+          type: string
+          example: Doe
+        firstName:
+          type: string
+          example: John
+        role:
+          type: string
+          enum: [ admin, member ]
+          example: member
+        isBanned:
+          type: boolean
+          example: false
+        isAvailable:
+          type: boolean
+          example: true
+        description:
+          type: string
+          example: Développeur passionné
+        avatar:
+          type: string
+          format: uri
+          example: http://example.com/avatar.jpg
+        averageGrade:
+          type: number
+          format: float
+          example: 4.5
+        nbOfReviews:
+          type: integer
+          format: int32
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        Skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Skill'
+        WantedSkills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Skill'
+
+    DetailedUser:
+      allOf:
+      - $ref: '#/components/schemas/User'
+      - type: object
+        properties:
+          Availabilities:
+            type: array
+            items:
+              $ref: '#/components/schemas/Availability'
+
+    NonDetailedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+
+    Skill:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: JavaScript
+      category_id:
+        type: integer
+        format: int64
+        example: 1
+
+    Availability:
+      type: object
+      required:
+      - id
+      - day_of_the_week
+      - time_slot
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        day_of_the_week:
+          type: string
+          enum: [ Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche ]
+        time_slot:
+          type: string
+          enum: [ matin, midi, apres-midi, soir ]
+
+    FollowsAndFollowers:
+      type: object
+      properties:
+        Followers:
+          type: array
+          items:
+            $ref: '#/components/schemas/NonDetailedUser'
+        Follows:
+          type: array
+          items:
+            $ref: '#/components/schemas/NonDetailedUser'
+
+    RegisterUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: Password1234+
+        email:
+          type: string
+          format: email
+          example: johndoe@gmail.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+      required:
+      - username
+      - password
+      - email
+
+    LoginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: johndoe@gmail.com
+        password:
+          type: string
+          example: Password1234+
+      required:
+      - email
+      - password
+
+    UpdateUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: Password1234+
+        email:
+          type: string
+          format: email
+          example: johndoe@gmail.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        description:
+          type: string
+          example: Développeur passionné
+        avatar:
+          type: string
+          format: uri
+          example: http://example.com/avatar.jpg
+
+    UpdateWantedSkills:
+      type: object
+      properties:
+        wantedSkills:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [ 1, 2, 3, 4, 5 ]
+
+    UpdateSkills:
+      type: object
+      properties:
+        skills:
+          type: array
+          items:
+            type: integer
+            format: int64
+          example: [ 1, 2, 3, 4, 5 ]
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Très bon développeur !
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        Reviewer:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            username:
+              type: string
+              example: johndoe
+            lastName:
+              type: string
+              example: Doe
+            firstName:
+              type: string
+              example: John
+            email:
+              type: string
+              format: email
+              example: johndoe@gmail.com
+            role:
+              type: string
+              enum: [ admin, member ]
+              example: member
+            isBanned:
+              type: boolean
+              example: false
+            isAvailable:
+              type: boolean
+              example: true
+            description:
+              type: string
+              example: Développeur passionné
+            avatar:
+              type: string
+              format: uri
+              example: http://example.com/avatar.jpg
+            createdAt:
+              type: string
+              format: date-time
+              example: 2023-01-01T00:00:00Z
+            updatedAt:
+              type: string
+              format: date-time
+              example: 2023-01-01T00:00:00Z
+
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+        avatar:
+          type: string
+          format: uri
+          example: http://example.com/avatar.jpg
+        description:
+          type: string
+          example: Développeur passionné
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Mon premier post !
+        Author:
+          $ref: '#/components/schemas/Author'
+
+    Proposition:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: Proposition de projet
+        state:
+          type: string
+          enum: [ en attente, acceptée, refusée ]
+          example: en attente
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        sender_id:
+          type: integer
+          format: int64
+          example: 1
+        receiver_id:
+          type: integer
+          format: int64
+          example: 2
+        post_id:
+          type: integer
+          format: int64
+          example: 1
+        Post:
+          $ref: '#/components/schemas/Post'
+
+    Reviewer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: johndoe
+
+    ReviewFromUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Très bon développeur !
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+        proposition_id:
+          type: integer
+          format: int64
+          example: 1
+        Reviewer:
+          $ref: '#/components/schemas/Reviewer'
+        Proposition:
+          $ref: '#/components/schemas/Proposition'
+
+    UpdateReview:
+      type: object
+      properties:
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+
+    CreateReview:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Très bon développeur !
+        grade:
+          type: number
+          format: float
+          example: 4.5
+        content:
+          type: string
+          example: Très bon développeur, je le recommande !
+        proposition_id:
+          type: integer
+          format: int64
+          example: 1
+        reviewed_id:
+          type: integer
+          format: int64
+          example: 1
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Informatique
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: Bonjour, comment ça va ?
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        sender_id:
+          type: integer
+          format: int64
+          example: 1
+        receiver_id:
+          type: integer
+          format: int64
+          example: 2
+
+    CreateMessage:
+      type: object
+      properties:
+        content:
+          type: string
+          example: Bonjour, comment ça va ?
+
+    Annonce:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: Je cherche un développeur pour un projet.
+        title:
+          type: string
+          example: Annonce de projet
+        isClosed:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+        skill_id:
+          type: integer
+          format: int64
+          example: 1
+        SkillWanted:
+          $ref: '#/components/schemas/Skill'
+        Author:
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            username:
+              type: string
+              example: johndoe
+            nbOfReviews:
+              type: integer
+              format: int32
+              example: 10
+            averageGrade:
+              type: number
+              format: float
+              example: 4.5
+
+    PostFromUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Mon premier post !
+        content:
+          type: string
+          example: Contenu du post
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+        skill_id:
+          type: integer
+          format: int64
+          example: 1
+        SkillWanted:
+          $ref: '#/components/schemas/Skill'
+
+    CreatePost:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Mon premier post !
+        content:
+          type: string
+          example: Contenu du post
+        skill_id:
+          type: integer
+          format: int64
+          example: 1
+
+    PropositionFromUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: Proposition de projet
+        state:
+          type: string
+          enum: [ en attente, acceptée, refusée ]
+          example: en attente
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        sender_id:
+          type: integer
+          format: int64
+          example: 1
+        receiver_id:
+          type: integer
+          format: int64
+          example: 2
+        post_id:
+          type: integer
+          format: int64
+          example: 1
+        Post:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            title:
+              type: string
+              example: Mon premier post !
+            SkillWanted:
+              $ref: '#/components/schemas/Skill'
+        Sender:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            username:
+              type: string
+              example: johndoe
+            avatar:
+              type: string
+              format: uri
+              example: http://example.com/avatar.jpg
+        Receiver:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 2
+            username:
+              type: string
+              example: janedoe
+            avatar:
+              type: string
+              format: uri
+              example: http://example.com/avatar.jpg
+
+    CreateProposition:
+      type: object
+      properties:
+        content:
+          type: string
+          example: Proposition de projet
+
+    UpdatePost:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Mon premier post modifié!
+        content:
+          type: string
+          example: Contenu du post modifié

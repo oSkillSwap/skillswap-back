@@ -1,0 +1,239 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiZXJ3YW5uQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiRXJ3YW4iLCJyb2xlIjoibWVtYmVyIiwiaWF0IjoxNzQ3MjMyMzAwLCJleHAiOjE3NDcyMzk1MDB9.ykHAbfccXyDA-dh2nka_My3kPBUbghCZykBHGolxUUQ
+// ID User: 11
+
+### Register a user
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "username": "Erwan",
+  "lastName": "Mettouchi",
+  "firstName": "Erwan",
+  "email": "erwann@gmail.com",
+  "password": "ErwanMettouchi1+",
+  "avatar": "",
+  "description": "Travail en boucle"
+}
+
+###login a user
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+  "email": "erwann@gmail.com",
+  "password": "ErwanMettouchi1+"
+}
+
+
+###Test the JWT connexion
+GET http://localhost:3000/api/me/users
+Authorization: Bearer {{token}}
+
+### Password Update
+PATCH http://localhost:3000/api/me/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "ErwanMettouchi1+",
+  "newPassword": "ErwanMettouchi1+",
+  "confirmPassword": "ErwanMettouchi1+"
+}
+
+### DELETE myself
+DELETE http://localhost:3000/api/me
+Authorization: Bearer {{token}}
+
+### Normal Update
+PATCH http://localhost:3000/api/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanMisAJour",
+  "description": "Nouvelle description après mise à jour",
+  "availabilities": [
+    { "day_of_the_week": "Mardi", "time_slot": "midi" },
+    { "day_of_the_week": "Jeudi", "time_slot": "matin" }
+  ]
+}
+
+
+###
+### Fail to change already Used email
+PATCH http://localhost:3000/api/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "gregory@gmail.com"
+}
+
+###
+### Empty request should fail
+PATCH http://localhost:3000/api/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+### Update All fields at once
+PATCH http://localhost:3000/api/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "ErwanSecondUpdate",
+  "firstName": "ErwanSecUpdate",
+  "lastName": "Metouchi2",
+  "email": "erwan2@gmail.com",
+  "avatar": "/avatars/avatar2.png",
+  "description": "Je suis toujours en train de bosser meme la nuit"
+}
+
+###GET all my messages
+GET http://localhost:3000/api/me/messages
+Authorization: Bearer {{token}}
+
+###GET messages with user
+GET http://localhost:3000/api/me/messages/Erwan
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/api/me/messages/Erwannnnn
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "message" : "Un message de test  a destination de Gregory"
+}
+
+### GET all My posts
+GET http://localhost:3000/api/me/posts
+Authorization: Bearer {{token}}
+
+
+###
+GET http://localhost:3000/api/me/users
+Authorization: Bearer {{token}}
+
+### GET all propositions from a user
+GET http://localhost:3000/api/me/propositions
+Authorization: Bearer {{token}}
+
+### POST a proposition 
+POST http://localhost:3000/api/me/propositions/31
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content" : "une proposition"
+}
+
+
+### Create a review -> Don't Have access
+POST http://localhost:3000/api/me/reviews
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Super collaboration",
+  "postId": 8,
+  "propositionId": 21,
+  "grade": 5,
+  "comment": "Super collaboration, très professionnel !"
+}
+
+
+### PATCH a review (update) -> Don't have access
+PATCH http://localhost:3000/api/me/reviews/21
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grade": 5,
+  "content": "Mise à jour de ma review, super expérience !"
+}
+
+###
+GET http://localhost:3000/api/me/users
+Authorization: Bearer {{token}}
+
+### Update my wanted skills
+PUT http://localhost:3000/api/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": [1, 2, 3, 4, 5]
+}
+
+### Try to send invalid wantedSkills
+PUT http://localhost:3000/api/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": ["javascript", "node"]
+}
+
+
+### Try to send an empty wantedSkills array
+PUT http://localhost:3000/api/me/wanted-skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "wantedSkills": []
+}
+
+
+
+### PATCH user skills (update user_has_skill table)
+PATCH http://localhost:3000/api/me/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skills": [1, 3, 5] 
+}
+
+### PATCH user skills - remove all skills
+PATCH http://localhost:3000/api/me/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skills": []
+}
+
+###
+GET http://localhost:3000/api/me/follows
+Authorization: Bearer {{token}}
+
+###
+POST http://localhost:3000/api/me/follow/Erwan
+Authorization: Bearer {{token}}
+
+###
+DELETE http://localhost:3000/api/me/follow/Gregory
+Authorization: Bearer {{token}}
+
+
+
+### Dashboard Admin -> Access Denied
+GET http://localhost:3000/api/admin/dashboard
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Dashboard User Admin
+GET http://localhost:3000/api/admin/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+
+### Dashboard User Admin
+GET http://localhost:3000/api/admin/users/4
+Authorization: Bearer {{token}}
+Content-Type: application/json
